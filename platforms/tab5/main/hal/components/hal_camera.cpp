@@ -225,8 +225,8 @@ void app_camera_display(void* arg)
                 .i2c_handle = NULL,
                 .freq       = 400000,  // TAB5_MIPI_CSI_SCCB_I2C_FREQ,
             },
-        .reset_pin = -1,  // TAB5_MIPI_CSI_CAM_SENSOR_RESET_PIN,
-        .pwdn_pin  = -1,  // TAB5_MIPI_CSI_CAM_SENSOR_PWDN_PIN,
+        .reset_pin = GPIO_NUM_NC,  // TAB5_MIPI_CSI_CAM_SENSOR_RESET_PIN,
+        .pwdn_pin  = GPIO_NUM_NC,  // TAB5_MIPI_CSI_CAM_SENSOR_PWDN_PIN,
     };
     csi_config.sccb_config.i2c_handle = bsp_i2c_get_handle();
 

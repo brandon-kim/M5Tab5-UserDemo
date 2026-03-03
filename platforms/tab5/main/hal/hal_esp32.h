@@ -5,7 +5,7 @@
  */
 #pragma once
 #include <hal/hal.h>
-#include <ina226.hpp>
+#include <ina226.h>
 #include <lvgl.h>
 #include "utils/rx8130/rx8130.h"
 
@@ -22,7 +22,8 @@ public:
     uint32_t millis() override;
     int getCpuTemp() override;
 
-    INA226 ina226;
+    /* INA226 converted to C API. Use ina226_init(), ina226_readBusVoltage(), etc.
+       (call-sites must be updated separately) */
     RX8130_Class rx8130;
     lv_disp_t* lvDisp      = nullptr;
     lv_indev_t* lvKeyboard = nullptr;
@@ -74,6 +75,11 @@ public:
     void setExtAntennaEnable(bool enable) override;
     bool getExtAntennaEnable() override;
     void startWifiAp() override;
+
+#if USE_WIFI_AP == 0
+    std::string getWifiSSID() override; // get SSID
+    std::string getWifiIPv4() override; // get My IP Address (v4)
+#endif
 
     bool isSdCardMounted() override;
     std::vector<FileEntry_t> scanSdCard(const std::string& dirPath) override;

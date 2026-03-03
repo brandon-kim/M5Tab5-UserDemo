@@ -18,10 +18,10 @@ static const std::string _tag = "power";
 void HalEsp32::updatePowerMonitorData()
 {
     // mclog::tagInfo(_tag, "update power monitor");
-    powerMonitorData.busVoltage   = ina226.readBusVoltage();
-    powerMonitorData.shuntVoltage = ina226.readShuntVoltage();
-    powerMonitorData.busPower     = ina226.readBusPower();
-    powerMonitorData.shuntCurrent = ina226.readShuntCurrent();
+    powerMonitorData.busVoltage   = ina226_readBusVoltage();
+    powerMonitorData.shuntVoltage = ina226_readShuntVoltage();
+    powerMonitorData.busPower     = ina226_readBusPower();
+    powerMonitorData.shuntCurrent = ina226_readShuntCurrent();
 }
 
 void HalEsp32::setChargeQcEnable(bool enable)
@@ -90,8 +90,6 @@ void HalEsp32::powerOff()
     bsp_generate_poweroff_signal();
 }
 
-extern esp_lcd_touch_handle_t _lcd_touch_handle;
-
 void HalEsp32::sleepAndTouchWakeup()
 {
     mclog::tagInfo(_tag, "sleep and touch wakeup");
@@ -105,10 +103,12 @@ void HalEsp32::sleepAndTouchWakeup()
     uint16_t touch_strength[1];
     uint8_t touch_cnt = 0;
 
+    esp_lcd_touch_handle_t touch_handle = bsp_display_get_touch_handle();
+
     while (1) {
-        esp_lcd_touch_read_data(_lcd_touch_handle);
+        esp_lcd_touch_read_data(touch_handle);
         bool touchpad_pressed =
-            esp_lcd_touch_get_coordinates(_lcd_touch_handle, touch_x, touch_y, touch_strength, &touch_cnt, 1);
+            esp_lcd_touch_get_coordinates(touch_handle, touch_x, touch_y, touch_strength, &touch_cnt, 1);
         // mclog::tagInfo(_tag, "touchpad pressed: {}", touchpad_pressed);
         if (!touchpad_pressed) {
             break;
@@ -117,9 +117,9 @@ void HalEsp32::sleepAndTouchWakeup()
     }
 
     while (1) {
-        esp_lcd_touch_read_data(_lcd_touch_handle);
+        esp_lcd_touch_read_data(touch_handle);
         bool touchpad_pressed =
-            esp_lcd_touch_get_coordinates(_lcd_touch_handle, touch_x, touch_y, touch_strength, &touch_cnt, 1);
+            esp_lcd_touch_get_coordinates(touch_handle, touch_x, touch_y, touch_strength, &touch_cnt, 1);
         // mclog::tagInfo(_tag, "touchpad pressed: {}", touchpad_pressed);
         if (touchpad_pressed) {
             break;

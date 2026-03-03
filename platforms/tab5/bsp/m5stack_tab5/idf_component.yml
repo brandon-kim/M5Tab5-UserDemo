@@ -1,0 +1,62 @@
+targets:
+- esp32p4
+
+tags:
+- bsp
+
+dependencies:
+  idf: '>=5.4'
+
+#  espressif/button:
+#    version: ^4
+#    override_path: ${BSP_COMPONENT_PATH}/button   # use component in a local directory, not from registry
+#    public: true
+
+# usb host support  
+#  usb:
+#    version: ^1
+#    public:  true
+
+  espressif/usb_host_hid: ^1.0.3
+
+#  espressif/esp_tinyusb: 
+#    version: ^2.1.0
+#    override_path: ${BSP_COMPONENT_PATH}/esp_tinyusb
+#    public: true
+
+  # not used currently after v5.4 IDF upgrade
+  #i2c_bus:
+  #  #version: ^1.5.0
+  #  override_path: ${BSP_COMPONENT_PATH}/i2c_bus
+  #  public: true
+
+  #spi_bus:
+  #  override_path: ${BSP_COMPONENT_PATH}/spi_bus
+  #  public: true
+
+  espressif/esp_codec_dev:
+    version: ^1.5.4
+#    override_path: ../../components/esp_codec_dev
+    public: true
+
+
+  lvgl/lvgl: '>=8,<10'
+
+  espressif/esp_lvgl_port:
+    version: ^2.7.0
+#    override_path: "../../components/esp_lvgl_port"
+    public: true
+
+  # need v5.5.0+ idf 
+  #espressif/esp_lvgl_adapeter:
+  #  override_path:: 
+  #  public: true
+
+  #espressif/esp_lcd_st7123: ^1.0.1
+
+  espressif/esp_lcd_touch_st7123:
+    version: ^1.0.0
+    override_path: ../../components/lcd_touch/esp_lcd_touch_st7123
+    public: true
+
+

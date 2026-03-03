@@ -1,0 +1,66 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../.."
+        }
+    ],
+    "settings": {
+        "search.exclude": {
+            "**/*.map": true,
+            "**/build/": true,
+            "**/.git": true,
+            "**/*.bin": true,
+            "**/*.elf": true
+        },
+        "files.exclude": {
+            "**/.git": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*.pyc": true,
+            "**/__pycache__": true
+        },
+        "github.copilot.enable": {
+            "*": true,
+            "yaml": true,
+            "plaintext": false,
+            "markdown": true
+        },
+        "github.copilot.chat.localeOverride": "ko",
+        "editor.inlineSuggest.enabled": true,
+        "editor.suggestSelection": "first",
+        "editor.tabCompletion": "on",
+        "editor.wordBasedSuggestions": "matchingDocuments",
+        "editor.suggest.showKeywords": true,
+        "editor.suggest.showSnippets": true,
+        "editor.acceptSuggestionOnEnter": "on",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.formatOnSave": false,
+        "editor.formatOnPaste": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.trimAutoWhitespace": true,
+        "editor.renderWhitespace": "boundary",
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": true,
+        "editor.guides.bracketPairsHorizontal": true,
+        "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+        "terminal.integrated.defaultProfile.windows": "Command Prompt",
+        "terminal.integrated.tabs.defaultColor": "terminal.ansiBlack",
+        "terminal.integrated.fontFamily": "Bitstream Vera Sans Mono",
+        "C_Cpp.autocomplete": "default",
+        "C_Cpp.enhancedColorization": "enabled",
+        "C_Cpp.default.cStandard": "c17",
+        "C_Cpp.default.cppStandard": "c++17",
+        "C_Cpp.default.intelliSenseMode": "gcc-x64",
+        "C_Cpp.errorSquiggles": "enabled",
+        "C_Cpp.autoAddFileAssociations": false,
+    }
+}

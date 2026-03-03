@@ -14,9 +14,9 @@ extern "C" {
 #include <bsp/m5stack_tab5.h>
 #include <lv_demos.h>
 
-extern esp_lcd_touch_handle_t _lcd_touch_handle;
-
 static const std::string _tag = "hal";
+#if 0
+extern esp_lcd_touch_handle_t _lcd_touch_handle;
 
 static void lvgl_read_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
@@ -43,7 +43,7 @@ static void lvgl_read_cb(lv_indev_t* indev, lv_indev_data_t* data)
         data->point.y = touch_y[0];
     }
 }
-
+#endif
 void HalEsp32::init()
 {
     mclog::tagInfo(_tag, "init");
@@ -64,7 +64,7 @@ void HalEsp32::init()
     // setChargeEnable(false);
 
     mclog::tagInfo(_tag, "i2c scan");
-    bsp_i2c_scan();
+    bsp_i2c_scan(bsp_i2c_get_handle());
 
     mclog::tagInfo(_tag, "codec init");
     delay(200);
@@ -74,11 +74,11 @@ void HalEsp32::init()
     imu_init();
 
     mclog::tagInfo(_tag, "ina226 init");
-    ina226.begin(i2c_bus_handle, 0x41);
-    ina226.configure(INA226_AVERAGES_16, INA226_BUS_CONV_TIME_1100US, INA226_SHUNT_CONV_TIME_1100US,
+    ina226_init(i2c_bus_handle, 0x41);
+    ina226_configure(INA226_AVERAGES_16, INA226_BUS_CONV_TIME_1100US, INA226_SHUNT_CONV_TIME_1100US,
                      INA226_MODE_SHUNT_BUS_CONT);
-    ina226.calibrate(0.005, 8.192);
-    mclog::tagInfo(_tag, "bus voltage: {}", ina226.readBusVoltage());
+    ina226_calibrate(0.005, 8.192);
+    mclog::tagInfo(_tag, "bus voltage: {}", ina226_readBusVoltage());
 
     mclog::tagInfo(_tag, "rx8130 init");
     rx8130.begin(i2c_bus_handle, 0x32);
@@ -87,30 +87,10 @@ void HalEsp32::init()
     update_system_time();
 
     mclog::tagInfo(_tag, "display init");
-    bsp_reset_tp();
-    bsp_display_cfg_t cfg = {.lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
-                             .buffer_size   = BSP_LCD_H_RES * BSP_LCD_V_RES,
-                             .double_buffer = true,
-                             .flags         = {
-#if CONFIG_BSP_LCD_COLOR_FORMAT_RGB888
-                                 .buff_dma = false,
-#else
-                                 .buff_dma = true,
-#endif
-                                 .buff_spiram = true,
-                                 .sw_rotate   = true,
-                             }};
-    lvDisp = bsp_display_start_with_config(&cfg);
+    lvDisp = bsp_display_start();
     lv_display_set_rotation(lvDisp, LV_DISPLAY_ROTATION_90);
     bsp_display_backlight_on();
-
-    // // Touchpad lvgl indev
-    // mclog::tagInfo(_tag, "create lvgl touchpad indev");
-    // lvTouchpad = lv_indev_create();
-    // lv_indev_set_type(lvTouchpad, LV_INDEV_TYPE_POINTER);
-    // lv_indev_set_read_cb(lvTouchpad, lvgl_read_cb);
-    // lv_indev_set_display(lvTouchpad, lvDisp);
-
+    
     mclog::tagInfo(_tag, "usb host init");
     bsp_usb_host_start(BSP_USB_HOST_POWER_MODE_USB_DEV, true);
 
@@ -192,10 +172,7 @@ uint32_t HalEsp32::millis()
 int HalEsp32::getCpuTemp()
 {
     if (_temp_sensor == nullptr) {
-        temperature_sensor_config_t temp_sensor_config = {
-            .range_min = 20,
-            .range_max = 100,
-        };
+        temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(20, 100);
         temperature_sensor_install(&temp_sensor_config, &_temp_sensor);
         temperature_sensor_enable(_temp_sensor);
     }
