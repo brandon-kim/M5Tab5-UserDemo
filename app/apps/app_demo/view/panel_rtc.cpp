@@ -7,14 +7,14 @@
 #include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
-#include <smooth_ui_toolkit.h>
-#include <smooth_lvgl.h>
+#include <smooth_ui_toolkit.hpp>
+#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 #include <apps/utils/ui/window.h>
 #include <apps/utils/ui/toast.h>
 #include <ctime>
 
-using namespace launcher_view;
+using namespace demo_view;
 using namespace smooth_ui_toolkit;
 using namespace smooth_ui_toolkit::lvgl_cpp;
 

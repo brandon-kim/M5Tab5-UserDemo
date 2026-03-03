@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-#include "app_launcher.h"
+#include "app_demo.h"
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
@@ -12,32 +12,34 @@
 
 using namespace mooncake;
 
-AppLauncher::AppLauncher()
+AppDemo::AppDemo()
 {
-    setAppInfo().name = "AppLauncher";
+    setAppInfo().name = "AppDemo";
+    setAppInfo().icon = (void*)LV_SYMBOL_IMAGE;  // LVGL 내장 심볼 (예시)
 }
 
-void AppLauncher::onCreate()
+void AppDemo::onCreate()
 {
     mclog::tagInfo(getAppInfo().name, "on create");
 
-    open();
+    // App is ready, but won't auto-open
+    // Will be opened by AppLauncher when user clicks the card
 }
 
-void AppLauncher::onOpen()
+void AppDemo::onOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
-    _view = std::make_unique<launcher_view::LauncherView>();
+    _view = std::make_unique<demo_view::LauncherView>();
     _view->init();
 }
 
-void AppLauncher::onRunning()
+void AppDemo::onRunning()
 {
     _view->update();
 }
 
-void AppLauncher::onClose()
+void AppDemo::onClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
 

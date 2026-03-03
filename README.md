@@ -1,8 +1,31 @@
-# M5Tab5 User Demo
+# M5Tab5 User Demo ( Modified for Windows 11 Emulation ) 
 
 User demo source code of [M5Tab5](https://docs.m5stack.com/en/products/sku/k145).
 
+## Updates
+
+- Updated LVGL component to v9.4.0
+- Updated dependency components and modified related code:
+  - **LVGL:** v9.4.0
+  - **Mooncake:** v2.3.3
+  - **Mooncake Log:** v1.4.0
+  - **Smooth UI Toolkit:** v2.11.0
+
+
+
 ## Build
+
+
+### Install SDL and the build tools [https://github.com/lvgl/lv_port_pc_vscode](https://github.com/lvgl/lv_port_pc_vscode)
+
+- **Windows (vcpkg):** `vcpkg install sdl2`  (`vcpkg` can be installed from [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)) Also install either MinGW or another compiler and `cmake`.
+- **macOS (Homebrew):** `brew install sdl2 cmake make`  
+- **Linux:**  
+  - **Debian/Ubuntu:** `sudo apt install build-essential cmake libsdl2-dev`  
+  - **Arch:** `sudo pacman -S base-devel cmake sdl2`  
+  - **Fedora:** `sudo dnf install @development-tools cmake SDL2-devel`  
+- **Manual Installation of SDL:** Download from [SDL’s website](https://github.com/libsdl-org/SDL/releases) and place headers/libraries in your project.
+- **Verify Installation:** `sdl2-config --version`, `cmake --version`, `gcc --version`, `g++ --version` (should return the installed version).  
 
 ### Fetch Dependencies
 

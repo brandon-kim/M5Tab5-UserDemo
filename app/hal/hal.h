@@ -12,6 +12,8 @@
 #include <mutex>
 #include <vector>
 
+// 변경 사항 : https://qiita.com/nak435/items/ccceb21f307d671e9a55
+#define  USE_WIFI_AP   0  // 1 station
 /**
  * @brief Hardware abstraction layer
  *
@@ -257,7 +259,10 @@ public:
     virtual void startWifiAp()
     {
     }
-
+#if USE_WIFI_AP == 0
+    virtual std::string getWifiSSID(){ return ""; }
+    virtual std::string getWifiIPv4(){ return ""; }
+#endif
     /* --------------------------------- SD Card -------------------------------- */
     struct FileEntry_t {
         std::string name;

@@ -8,12 +8,12 @@
 #include <hal/hal.h>
 #include <assets/assets.h>
 #include <mooncake_log.h>
-#include <smooth_ui_toolkit.h>
-#include <smooth_lvgl.h>
+#include <smooth_ui_toolkit.hpp>
+#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 #include <apps/utils/ui/toast.h>
 
-using namespace launcher_view;
+using namespace demo_view;
 using namespace smooth_ui_toolkit;
 using namespace smooth_ui_toolkit::lvgl_cpp;
 
@@ -72,12 +72,13 @@ public:
         _panel_ssid->setBorderWidth(0);
         _panel_ssid->setBgColor(lv_color_hex(0x725151));
 
+#if USE_WIFI_AP > 0        
         _label_ssid = std::make_unique<Label>(_panel_ssid->get());
         _label_ssid->align(LV_ALIGN_CENTER, 0, 0);
         _label_ssid->setTextFont(&lv_font_montserrat_24);
         _label_ssid->setTextColor(lv_color_hex(0xFFFFFF));
         _label_ssid->setText("M5Tab5-UserDemo-WiFi");
-
+#endif
         _panel_url = std::make_unique<Container>(_window->get());
         _panel_url->align(LV_ALIGN_CENTER, 105, 0);
         _panel_url->setSize(336, 51);
@@ -85,12 +86,13 @@ public:
         _panel_url->setBorderWidth(0);
         _panel_url->setBgColor(lv_color_hex(0x725151));
 
+#if USE_WIFI_AP > 0   
         _label_url = std::make_unique<Label>(_panel_url->get());
         _label_url->align(LV_ALIGN_CENTER, 0, 0);
         _label_url->setTextFont(&lv_font_montserrat_24);
         _label_url->setTextColor(lv_color_hex(0xFFFFFF));
         _label_url->setText("http://192.168.4.1");
-
+#endif
         _panel_msg = std::make_unique<Container>(_window->get());
         _panel_msg->align(LV_ALIGN_CENTER, 0, 96);
         _panel_msg->setSize(547, 77);
@@ -166,6 +168,23 @@ private:
 
             _label_msg_b.reset();
         }
+
+#if USE_WIFI_AP == 0   
+
+       _label_ssid = std::make_unique<Label>(_panel_ssid->get());
+       _label_ssid->align(LV_ALIGN_CENTER, 0, 0);
+       _label_ssid->setTextFont(&lv_font_montserrat_24);
+       _label_ssid->setTextColor(lv_color_hex(0xFFFFFF));
+       _label_ssid->setText(GetHAL()->getWifiSSID());
+
+       _label_url = std::make_unique<Label>(_panel_url->get());
+       _label_url->align(LV_ALIGN_CENTER, 0, 0);
+       _label_url->setTextFont(&lv_font_montserrat_24);
+       _label_url->setTextColor(lv_color_hex(0xFFFFFF));
+       _label_url->setText("http://" + GetHAL()->getWifiIPv4());
+
+#endif
+
     }
 };
 

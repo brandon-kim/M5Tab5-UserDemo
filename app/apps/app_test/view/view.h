@@ -13,13 +13,12 @@
 #include <smooth_lvgl.hpp>
 #include <vector>
 
-namespace launcher_view {
+namespace test_view {
 
 /**
- * @brief Card-based App Launcher View
- * Displays installed apps as scrollable cards
+ * @brief  App Test View
  */
-class LauncherView {
+class TestView {
 public:
     void init();
     void update();
@@ -27,11 +26,10 @@ public:
 private:
     bool _is_stacked = false;
     lv_obj_t* _card_container = nullptr;
-    std::vector<mooncake::AppProps_t> _app_list;
-    
+
     void _create_app_cards();
     void _load_installed_apps();
     static void _card_event_handler(lv_event_t* e);
 };
 
-}  // namespace launcher_view
+}  // namespace test_view

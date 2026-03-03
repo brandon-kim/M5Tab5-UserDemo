@@ -11,22 +11,12 @@ set(MOONCAKE_BUILD_EXAMPLE OFF)
 add_subdirectory(dependencies/mooncake)
 
 # Mooncake log
-set(MOONCAKE_EVENT_BUILD_EXAMPLE OFF)
+set(MOONCAKE_LOG_BUILD_EXAMPLE OFF)
 add_subdirectory(dependencies/mooncake_log)
 
 # Smooth ui shit
 set(SMOOTH_UI_TOOLKIT_BUILD_EXAMPLE OFF)
 add_subdirectory(dependencies/smooth_ui_toolkit)
-
-# App layer
-file(GLOB_RECURSE APP_LAYER_SRCS
-    app/*.c
-    app/*.cc
-    app/*.cpp
-)
-set(APP_LAYER_INCS
-    app/
-)
 
 # Lvgl
 set(LV_CONF_INCLUDE_SIMPLE OFF)
@@ -34,9 +24,13 @@ set(LV_CONF_PATH ../../lv_conf.h)
 add_subdirectory(dependencies/lvgl)
 
 # SDL
-find_package(SDL2 REQUIRED SDL2)
+find_package(SDL2 REQUIRED)
 include_directories(PUBLIC ${SDL2_INCLUDE_DIRS})
 target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS})
+#message(STATUS "SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+list(REMOVE_ITEM SDL2_LIBRARIES SDL2::SDL2main)
+
+
 
 # App layer
 file(GLOB_RECURSE APP_LAYER_SRCS

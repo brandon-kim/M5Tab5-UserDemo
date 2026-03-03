@@ -28,13 +28,24 @@ void app::Init(InitCallback_t callback)
 
     on_startup_anim();
     on_install_apps();
+    
+    // Open AppLauncher as default launcher
+    auto& mc = GetMooncake();
+    auto app_props = mc.getAllAppProps();
+    for (const auto& prop : app_props) {
+        if (prop.info.name == "AppLauncher") {
+            mclog::tagInfo(_tag, "Opening AppLauncher as default");
+            mc.openApp(prop.appID);
+            break;
+        }
+    }
 }
 
 void app::Update()
 {
     GetMooncake().update();
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined ( __WIN32__ ) || ( defined(__APPLE__) && defined(__MACH__) )
     // 'nextEventMatchingMask should only be called from the Main Thread!'
     auto time_till_next = lv_timer_handler();
     std::this_thread::sleep_for(std::chrono::milliseconds(time_till_next));
