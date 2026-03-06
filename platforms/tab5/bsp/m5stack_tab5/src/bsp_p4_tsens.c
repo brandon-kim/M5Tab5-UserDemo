@@ -4,7 +4,7 @@
 #include "esp_check.h"
 #include "esp_log.h"
 
-static const char *TAG = "esp32_p4_tsens";
+static const char *TAG = "p4_tsens";
 
 static temperature_sensor_handle_t tsens = NULL;
 

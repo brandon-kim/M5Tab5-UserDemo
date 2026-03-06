@@ -338,7 +338,7 @@ void bsp_generate_poweroff_signal()
     }
 }
 
-bool bsp_headphone_detect()
+bool bsp_headphone_detect( void )
 {
     uint8_t hp_detect = bsp_io_expander1_read_bit( IO_EXPANDER1_HP_DETECT );
     
@@ -350,8 +350,8 @@ bool bsp_headphone_detect()
 
     return false;
 }
-
-bool bsp_usb_c_detect()
+    
+bool bsp_usb_c_detect( void )
 {
     uint8_t usb_c_det = bsp_io_expander2_read_bit( IO_EXPANDER2_CHG_EN );
 

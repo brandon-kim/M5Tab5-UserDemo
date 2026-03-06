@@ -1,6 +1,6 @@
 dependencies:
   chmorgan/esp-audio-player:
-    component_hash: c8ac1998e9af863bc41b57e592f88d1a5791a0f891485122336ddabbf7a65033
+    component_hash: a19dba40c076e59baaf6383041b6feeb25135dbc5a5b8bcc6b497d8d947095c6
     dependencies:
     - name: chmorgan/esp-libhelix-mp3
       registry_url: https://components.espressif.com
@@ -12,7 +12,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.0.7
+    version: 1.1.0
   chmorgan/esp-file-iterator:
     component_hash: 327091394b9ef5c2cd395a960ab70ae64479e0a8831cbd9925e38895fad93719
     dependencies:
@@ -38,7 +38,7 @@ dependencies:
     - name: idf
       version: '>=4.4.2'
     source:
-      path: E:\workspace\esp32_proj\M5Tab5-UserDemo\platforms\tab5\components\lcd_touch\esp_lcd_touch
+      path: D:\GitHub\M5Tab5-UserDemo\platforms\tab5\components\lcd_touch\esp_lcd_touch
       type: local
     version: 1.2.1
   espressif/cmake_utilities:
@@ -157,7 +157,7 @@ dependencies:
     - name: idf
       version: '>=4.4.2'
     source:
-      path: E:\workspace\esp32_proj\M5Tab5-UserDemo\platforms\tab5\components\lcd_touch\esp_lcd_touch_st7123
+      path: D:\GitHub\M5Tab5-UserDemo\platforms\tab5\components\lcd_touch\esp_lcd_touch_st7123
       type: local
     version: 1.0.1
   espressif/esp_lvgl_port:
@@ -306,11 +306,11 @@ dependencies:
   idf:
     source:
       type: idf
-    version: 5.5.1
+    version: 5.5.3
   lvgl/lvgl:
     dependencies: []
     source:
-      path: E:\workspace\esp32_proj\M5Tab5-UserDemo\dependencies\lvgl
+      path: D:\GitHub\M5Tab5-UserDemo\dependencies\lvgl
       type: local
     version: '*'
   m5stack_tab5:
@@ -332,7 +332,7 @@ dependencies:
       public: true
       version: ^1.0.0
     source:
-      path: E:\workspace\esp32_proj\M5Tab5-UserDemo\platforms\tab5\bsp\m5stack_tab5
+      path: D:\GitHub\M5Tab5-UserDemo\platforms\tab5\bsp\m5stack_tab5
       type: local
     targets:
     - esp32p4
