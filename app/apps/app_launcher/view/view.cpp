@@ -128,7 +128,7 @@ void LauncherView::_card_event_handler(lv_event_t* e)
     if (code == LV_EVENT_CLICKED) {
         // Get app ID from card user data
         int app_id = (int)(intptr_t)lv_obj_get_user_data(target);
-        mclog::tagInfo(_tag, "Card clicked: app ID = %d", app_id);
+        mclog::tagInfo(_tag, "Card clicked: app ID = {}", app_id);
         self->_selected_app_id = app_id;
     }
 }
