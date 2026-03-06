@@ -12,6 +12,7 @@ extern "C" {
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <bsp/m5stack_tab5.h>
+#include <bsp/esp32_p4_tsense.h>
 #include <lv_demos.h>
 
 static const std::string _tag = "hal";
@@ -79,6 +80,8 @@ void HalEsp32::init()
                      INA226_MODE_SHUNT_BUS_CONT);
     ina226_calibrate(0.005, 8.192);
     mclog::tagInfo(_tag, "bus voltage: {}", ina226_readBusVoltage());
+
+    bsp_tsense_init();
 
     mclog::tagInfo(_tag, "rx8130 init");
     rx8130.begin(i2c_bus_handle, 0x32);
@@ -156,8 +159,7 @@ void HalEsp32::set_gpio_output_capability()
 /* -------------------------------------------------------------------------- */
 /*                                   System                                   */
 /* -------------------------------------------------------------------------- */
-#include <driver/temperature_sensor.h>
-static temperature_sensor_handle_t _temp_sensor = nullptr;
+
 
 void HalEsp32::delay(uint32_t ms)
 {
@@ -171,16 +173,9 @@ uint32_t HalEsp32::millis()
 
 int HalEsp32::getCpuTemp()
 {
-    if (_temp_sensor == nullptr) {
-        temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(20, 100);
-        temperature_sensor_install(&temp_sensor_config, &_temp_sensor);
-        temperature_sensor_enable(_temp_sensor);
-    }
-
-    float temp = 0;
-    temperature_sensor_get_celsius(_temp_sensor, &temp);
-
-    return temp;
+    uint32_t temp_x100 = bsp_tsense_read_x100();
+    
+    return (temp_x100 + 50) / 100;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -21,10 +21,13 @@ namespace launcher_view {
  */
 class LauncherView {
 public:
+    ~LauncherView();
     void init();
     void update();
+     int consumeSelectedAppId();
 
 private:
+    int _selected_app_id = -1;
     bool _is_stacked = false;
     lv_obj_t* _card_container = nullptr;
     std::vector<mooncake::AppProps_t> _app_list;

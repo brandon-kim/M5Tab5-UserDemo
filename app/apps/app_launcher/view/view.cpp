@@ -22,7 +22,6 @@ static const std::string _tag = "launcher-view";
 void LauncherView::init()
 {
     mclog::tagInfo(_tag, "init launcher view with card layout");
-
     ui::signal_window_opened().clear();
     ui::signal_window_opened().connect([&](bool opened) { _is_stacked = opened; });
 
@@ -45,6 +44,13 @@ void LauncherView::init()
     // Load and create app cards
     _load_installed_apps();
     _create_app_cards();
+}
+
+int LauncherView::consumeSelectedAppId()
+{
+    int id = _selected_app_id;
+    _selected_app_id = -1;
+    return id;
 }
 
 void LauncherView::_load_installed_apps()
@@ -87,7 +93,7 @@ void LauncherView::_create_app_cards()
         lv_obj_set_user_data(card, (void*)(intptr_t)app_prop.appID);
         
         // Add event listener
-        lv_obj_add_event_cb(card, _card_event_handler, LV_EVENT_CLICKED, nullptr);
+        lv_obj_add_event_cb(card, _card_event_handler, LV_EVENT_CLICKED, this);
         
         // Create flexbox for card content
         lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
@@ -117,19 +123,13 @@ void LauncherView::_card_event_handler(lv_event_t* e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t* target = (lv_obj_t*)lv_event_get_target(e);
-    
+    auto* self = (LauncherView*)lv_event_get_user_data(e);
+
     if (code == LV_EVENT_CLICKED) {
         // Get app ID from card user data
         int app_id = (int)(intptr_t)lv_obj_get_user_data(target);
         mclog::tagInfo(_tag, "Card clicked: app ID = %d", app_id);
-        
-        // Open the app
-        auto& mc = mooncake::GetMooncake();
-        if (mc.isAppExist(app_id)) {
-            auto app_info = mc.getAppInfo(app_id);
-            mclog::tagInfo(_tag, "Opening app: %s (ID: %d)", app_info.name.c_str(), app_id);
-            mc.openApp(app_id);
-        }
+        self->_selected_app_id = app_id;
     }
 }
 
@@ -137,5 +137,14 @@ void LauncherView::update()
 {
     LvglLockGuard lock;
     // Update logic if needed
+}
+
+LauncherView::~LauncherView()
+{
+    LvglLockGuard lock;
+    if (_card_container) {
+        lv_obj_delete(_card_container);  // child objects will be deleted automatically
+        _card_container = nullptr;
+    }
 }
 

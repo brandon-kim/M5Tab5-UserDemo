@@ -25,6 +25,9 @@
 #define PI4IO_REG_INT_MASK   0x11
 #define PI4IO_REG_IRQ_STA    0x13
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern i2c_master_dev_handle_t i2c_dev_handle_pi4ioe1;
 extern i2c_master_dev_handle_t i2c_dev_handle_pi4ioe2;
@@ -43,6 +46,8 @@ extern uint8_t  bsp_io_expander2_read_bit( uint8_t bit_mask );
 extern esp_err_t  bsp_io_expander1_read_output( uint8_t *output );
 extern esp_err_t  bsp_io_expander2_read_output( uint8_t *output );
 
-
+#ifdef __cplusplus
+}   
+#endif
 
 #endif // __BSP_BSP_PI4IOE_H__

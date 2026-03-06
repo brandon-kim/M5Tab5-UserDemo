@@ -35,6 +35,19 @@ void AppLauncher::onOpen()
 void AppLauncher::onRunning()
 {
     _view->update();
+
+     int selected = _view->consumeSelectedAppId();
+    if (selected >= 0) {
+        auto& mc = mooncake::GetMooncake();
+        if (mc.isAppExist(selected)) {
+            mclog::tagInfo(getAppInfo().name, "Opening app ID: %d", selected);
+            mc.openApp(selected);
+            // no app switching isn't implemented yet, so close app launcher after click
+            mclog::tagInfo(getAppInfo().name, "Closing AppLauncher");
+            close();  
+        }
+    }
+
 }
 
 void AppLauncher::onClose()
