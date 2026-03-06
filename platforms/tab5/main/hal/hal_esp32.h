@@ -7,7 +7,7 @@
 #include <hal/hal.h>
 #include <ina226.h>
 #include <lvgl.h>
-#include "utils/rx8130/rx8130.h"
+#include "rx8130.h"
 
 class HalEsp32 : public hal::HalBase {
 public:
@@ -24,7 +24,8 @@ public:
 
     /* INA226 converted to C API. Use ina226_init(), ina226_readBusVoltage(), etc.
        (call-sites must be updated separately) */
-    RX8130_Class rx8130;
+    /* RX8130 converted to C API. Use rx8130_init(), rx8130_get_time(), etc.
+       (call-sites must be updated separately) */
     lv_disp_t* lvDisp      = nullptr;
     lv_indev_t* lvKeyboard = nullptr;
 

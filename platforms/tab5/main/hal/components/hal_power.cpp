@@ -145,15 +145,15 @@ void HalEsp32::sleepAndRtcWakeup()
 
     mclog::tagInfo(_tag, "set rtc alarm");
     struct tm time;
-    rx8130.getTime(&time);
+    rx8130_getTime(&time);
     time.tm_hour = 0;
     time.tm_min  = 1;
     time.tm_sec  = 49;
-    rx8130.setTime(&time);
+    rx8130_setTime(&time);
     time.tm_hour = 0;
     time.tm_min  = 2;
     time.tm_sec  = 0;
-    rx8130.setAlarmIrq(&time);
+    rx8130_setAlarmIrq(&time);
 
     // delay(800);
     powerOff();

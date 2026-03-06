@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include "hal/hal_esp32.h"
-extern "C" {
-#include "utils/rx8130/rx8130.h"
-}
+#include "rx8130.h"
 #include <mooncake_log.h>
 #include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
@@ -84,8 +82,8 @@ void HalEsp32::init()
     bsp_tsense_init();
 
     mclog::tagInfo(_tag, "rx8130 init");
-    rx8130.begin(i2c_bus_handle, 0x32);
-    rx8130.initBat();
+    rx8130_init(i2c_bus_handle, 0x32);
+    rx8130_initBat();
     clearRtcIrq();
     update_system_time();
 
@@ -209,15 +207,15 @@ void HalEsp32::lvglUnlock()
 void HalEsp32::clearRtcIrq()
 {
     mclog::tagInfo(_tag, "clear rtc irq");
-    rx8130.clearIrqFlags();
-    rx8130.disableIrq();
+    rx8130_clearIrqFlags();
+    rx8130_disableIrq();
 }
 
 void HalEsp32::setRtcTime(tm time)
 {
     mclog::tagInfo(_tag, "set rtc time to {}/{}/{} {:02d}:{:02d}:{:02d}", time.tm_year + 1900, time.tm_mon + 1,
                    time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
-    rx8130.setTime(&time);
+    rx8130_setTime(&time);
     delay(50);
 
     update_system_time();
@@ -225,15 +223,15 @@ void HalEsp32::setRtcTime(tm time)
 
 void HalEsp32::update_system_time()
 {
-    mclog::tagInfo(_tag, "update system time");
-    struct tm time;
-    rx8130.getTime(&time);
-    mclog::tagInfo(_tag, "sync to rtc time: {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}", time.tm_year + 1900,
-                   time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+    struct tm rtc_time;
+    time_t    rtc_time_sec;
+    rx8130_getTime(&rtc_time);
+    rtc_time_sec = mktime(&rtc_time);
     struct timeval now;
-    now.tv_sec  = mktime(&time);
+    now.tv_sec  = rtc_time_sec;
     now.tv_usec = 0;
     settimeofday(&now, NULL);
+    mclog::tagInfo(_tag, "update system time %s", asctime(&rtc_time));
 }
 
 /* -------------------------------------------------------------------------- */
