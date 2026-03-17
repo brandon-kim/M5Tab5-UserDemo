@@ -217,30 +217,12 @@ static cam_t* camera       = NULL;
 
 void app_camera_display(void* arg)
 {
-    /* camera config */
-    static esp_video_init_csi_config_t csi_config = {
-        .sccb_config =
-            {
-                .init_sccb  = false,
-                .i2c_handle = NULL,
-                .freq       = 400000,  // TAB5_MIPI_CSI_SCCB_I2C_FREQ,
-            },
-        .reset_pin = GPIO_NUM_NC,  // TAB5_MIPI_CSI_CAM_SENSOR_RESET_PIN,
-        .pwdn_pin  = GPIO_NUM_NC,  // TAB5_MIPI_CSI_CAM_SENSOR_PWDN_PIN,
-    };
-    csi_config.sccb_config.i2c_handle = bsp_i2c_get_handle();
-
-    esp_video_init_config_t cam_config = {
-        .csi  = &csi_config,  // Point to CSI config
-        .dvp  = NULL,         // No DVP configuration
-        .jpeg = NULL,         // No JPEG configuration
-    };
 
     if (!cam_is_initial) {
         camera = (cam_t*)malloc(sizeof(cam_t));
         printf("\n============= video init ==============\n");
         cam_is_initial = true;
-        ESP_ERROR_CHECK(esp_video_init(&cam_config));
+        ESP_ERROR_CHECK(bsp_camera_start(NULL));
         printf("\n============= video open ==============\n");
         int video_cam_fd = app_video_open(CAM_DEV_PATH, EXAMPLE_VIDEO_FMT_RGB565);
         if (video_cam_fd < 0) {

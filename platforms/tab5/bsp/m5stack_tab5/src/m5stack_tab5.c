@@ -25,6 +25,7 @@
 #include "esp_lcd_touch_st7123.h"
 #include "bsp_err_check.h"
 #include "esp_codec_dev_defaults.h"
+#include "esp_video_init.h"
 #include "esp_log.h"
 
 static const char *TAG = "bsp";
@@ -392,6 +393,12 @@ void bsp_reset_tp()
     bsp_io_expander1_set_bit( IO_EXPANDER1_TP_RST, 1 );
     vTaskDelay( pdMS_TO_TICKS( 100 ) );
 }
+
+void bsp_set_camera_enable( bool en )
+{
+    bsp_io_expander1_set_bit( IO_EXPANDER1_CAM_RST, en );
+}
+
 #include "esp_spiffs.h"
 //==================================================================================
 // spiffs
@@ -598,7 +605,6 @@ static int                    volume;
  * I2S Audio Function
  *
  **************************************************************************************************/
-#define BSP_I2S_SAMPLE_RATE ( 48000 )
 esp_err_t bsp_codec_i2sdata_init( const i2s_std_config_t *i2s_config )
 {
     esp_err_t ret = ESP_FAIL;
@@ -1512,14 +1518,13 @@ esp_err_t bsp_cam_osc_init( void )
     return ESP_OK;
 }
 
-#if 0
+
 esp_err_t bsp_camera_start(const bsp_camera_cfg_t *cfg)
 {
 
-    /* Initilize I2C */
-    BSP_ERROR_CHECK_RETURN_ERR(bsp_i2c_init());
+   i2c_master_bus_handle_t   i2c_handle   = bsp_i2c_get_handle();
     /* Enable Feature */
-    BSP_ERROR_CHECK_RETURN_ERR(bsp_feature_enable(BSP_FEATURE_CAMERA, true));
+    bsp_set_camera_enable(true);//BSP_ERROR_CHECK_RETURN_ERR(bsp_feature_enable(BSP_FEATURE_CAMERA, true));
     vTaskDelay(pdMS_TO_TICKS(100));
 
     const esp_video_init_csi_config_t base_csi_config = {
@@ -1538,7 +1543,7 @@ esp_err_t bsp_camera_start(const bsp_camera_cfg_t *cfg)
 
     return esp_video_init(&cam_config);
 }
-#endif
+
 
 #if 0
 /* Feature enable */

@@ -131,6 +131,8 @@
 #define BSP_I2S_DSIN     ( GPIO_NUM_28 )
 #define BSP_POWER_AMP_IO ( GPIO_NUM_NC )
 #define BSP_SPEAKER_EN   ( IO_EXPANDER1_SPK_EN )
+#define BSP_I2S_SAMPLE_RATE    ( 48000 )
+
 /** @} */ // end of audio
 
 /** @defgroup g04_display Display and Touch
@@ -138,8 +140,8 @@
  *  @{
  */
 #define BSP_LCD_BACKLIGHT  ( GPIO_NUM_22 )
-#define BSP_LCD_RST        ( GPIO_NUM_NC ) // //(IO_EXPANDER_PIN_NUM_4)
-#define BSP_LCD_RST_EXT_IO ( IO_EXPANDER_PIN_NUM_4 )
+#define BSP_LCD_RST        ( GPIO_NUM_NC )        // (IO_EXPANDER_PIN_NUM_4)
+#define BSP_LCD_RST_EXT_IO IO_EXPANDER1_LCD_RST   // (IO_EXPANDER_PIN_NUM_4 )
 #define BSP_LCD_TOUCH_RST  ( GPIO_NUM_NC ) // IO Exanpder
 #define BSP_LCD_TOUCH_INT  ( GPIO_NUM_23 ) // 23
 #define BSP_TOUCH_EN       ( GPIO_NUM_NC ) //(IO_EXPANDER_PIN_NUM_5)
@@ -149,7 +151,7 @@
  *  @brief USB BSP API
  *  @{
  */
-#define BSP_USB_EN  ( IO_EXPANDER_PIN_NUM_3 )
+#define BSP_USB_EN            IO_EXPANDER2_USB5V_EN   // ( IO_EXPANDER_PIN_NUM_3 )
 #define BSP_USB_POS ( GPIO_NUM_20 )
 #define BSP_USB_NEG ( GPIO_NUM_19 )
 /** @} */ // end of usb
@@ -161,7 +163,7 @@
 #define BSP_CAM_MCLK_GPIO    ( GPIO_NUM_36 )
 #define BSP_CAMERA_GPIO_XCLK ( GPIO_NUM_NC )
 #define BSP_CAMERA_RST       ( GPIO_NUM_NC )
-#define BSP_CAMERA_EN        ( IO_EXPANDER_PIN_NUM_6 )
+#define BSP_CAMERA_EN        IO_EXPANDER1_CAM_RST  //( IO_EXPANDER_PIN_NUM_6 )
 /** @} */ // end of camera
 
 /** @defgroup g02_storage SD Card 
@@ -178,7 +180,7 @@
 #define BSP_SD_DET       ( GPIO_NUM_NC )
 
 /** @} */ // end of storage
-#define BSP_WIFI_EN ( IO_EXPANDER_PIN_NUM_0 )
+#define BSP_WIFI_EN      IO_EXPANDER2_WLAN_PWR_EN  //  (IO_EXPANDER_PIN_NUM_0 )
 
 #ifdef __cplusplus
 extern "C" {
@@ -616,7 +618,7 @@ void bsp_display_rotate( lv_display_t *disp, lv_disp_rotation_t rotation );
 
 esp_err_t bsp_cam_osc_init( void );
 
-#if 0 // copied from esp-bsp
+
 #define BSP_CAMERA_DEVICE   ( ESP_VIDEO_MIPI_CSI_DEVICE_NAME )
 #define BSP_CAMERA_ROTATION ( 270 )
 
@@ -634,7 +636,7 @@ typedef struct {
  * Camera sensor initialization.
  */
 esp_err_t bsp_camera_start(const bsp_camera_cfg_t *cfg);
-#endif
+
 /** @} */ // end of camera
 
 /** @defgroup g99_others Others
@@ -671,7 +673,7 @@ void bsp_reset_tp( void );
 
 bool bsp_usb_c_detect( void );
 
-bool bsp_usb_a_detect( void );
+void bsp_set_camera_enable( bool en );
 
 /** \addtogroup g07_usb
  *  @{

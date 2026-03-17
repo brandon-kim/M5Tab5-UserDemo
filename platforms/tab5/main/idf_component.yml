@@ -11,6 +11,7 @@ dependencies:
   espressif/esp-dsp: 
     version: ^1.7.0
     public: true
+    
   lvgl/lvgl:
   #  version: ^9.4.0
     override_path: ../../../dependencies/lvgl
@@ -29,12 +30,8 @@ dependencies:
   chmorgan/esp-file-iterator: ^1.0.0
   #espressif/esp-modbus: ^2.1.1
   #chmorgan/esp-libhelix-mp3: ^1.0.3
-  #chmorgan/esp-file-iterator: ^1.0.0
   #espressif2022/image_player: ^1.1.1
   #espressif/esp_image_effects: ^1.0.1
-  #espressif/esp_audio_codec: ^2.4.0
-  esp_video:
-    version: "^1.4.1"
-    public:  true
-    #override_path: "../../components/esp_video"
+  #espressif/esp_audio_codec: ^2.4.1
+
   

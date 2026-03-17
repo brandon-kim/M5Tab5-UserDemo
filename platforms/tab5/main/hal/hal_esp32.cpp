@@ -71,7 +71,7 @@ void HalEsp32::init()
 
     mclog::tagInfo(_tag, "imu init");
     imu_init();
-
+    
     mclog::tagInfo(_tag, "ina226 init");
     ina226_init(i2c_bus_handle, 0x41);
     ina226_configure(INA226_AVERAGES_16, INA226_BUS_CONV_TIME_1100US, INA226_SHUNT_CONV_TIME_1100US,
@@ -79,7 +79,11 @@ void HalEsp32::init()
     ina226_calibrate(0.005, 8.192);
     mclog::tagInfo(_tag, "bus voltage: {}", ina226_readBusVoltage());
 
+    mclog::tagInfo(_tag, "tsense init");
     bsp_tsense_init();
+
+    //mclog::tagInfo(_tag, "camera init");
+    //bsp_camera_start(NULL);
 
     mclog::tagInfo(_tag, "rx8130 init");
     rx8130_init(i2c_bus_handle, 0x32);

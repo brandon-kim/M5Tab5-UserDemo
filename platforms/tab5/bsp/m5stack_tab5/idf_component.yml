@@ -59,4 +59,8 @@ dependencies:
     override_path: ../../components/lcd_touch/esp_lcd_touch_st7123
     public: true
 
+  esp_video:
+    version: "^1.4.1"
+    public:  true
+    #override_path: "../../components/esp_video"
 
