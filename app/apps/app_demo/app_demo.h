@@ -9,14 +9,14 @@
 #include <memory>
 
 /**
- * @brief 派生 App
+ * @brief derived App
  *
  */
 class AppDemo : public mooncake::AppAbility {
 public:
     AppDemo();
 
-    // 重写生命周期回调
+    // Override lifecycle callbacks
     void onCreate() override;
     void onOpen() override;
     void onRunning() override;

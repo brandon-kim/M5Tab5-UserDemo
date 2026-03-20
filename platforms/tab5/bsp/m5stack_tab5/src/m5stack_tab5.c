@@ -890,14 +890,14 @@ void bsp_codec_init( void )
     bsp_codec_es7210_set( 48000, 16, 4 );
     bsp_codec_es8388_set( 48000, 16, 2 );
 
-    /* 初始化 codec handle */
-    bsp_codec_config_t *codec_cfg  = &g_codec_handle; // 获取 codec handle
-    codec_cfg->i2s_read            = bsp_i2s_read; // I2S 读数据
-    codec_cfg->i2s_write           = bsp_i2s_write; // I2S 写数据
-    codec_cfg->set_mute            = bsp_codec_set_mute; // 静音设置
-    codec_cfg->set_volume          = bsp_codec_set_volume; // 音量设置
+	/* codec handle */
+    bsp_codec_config_t *codec_cfg  = &g_codec_handle; 
+    codec_cfg->i2s_read            = bsp_i2s_read; 
+    codec_cfg->i2s_write           = bsp_i2s_write; 
+    codec_cfg->set_mute            = bsp_codec_set_mute; 
+    codec_cfg->set_volume          = bsp_codec_set_volume; 
     codec_cfg->get_volume          = bsp_codec_get_volume;
-    codec_cfg->set_in_gain         = bsp_codec_set_in_gain; // 麦克风输入增益设置
+    codec_cfg->set_in_gain         = bsp_codec_set_in_gain; 
     codec_cfg->codec_reconfig_fn   = bsp_codec_es7210_set;
     codec_cfg->i2s_reconfig_clk_fn = bsp_codec_es8388_set;
 
@@ -1441,7 +1441,7 @@ lv_indev_t *bsp_display_get_input_dev( void )
 
 void bsp_display_rotate( lv_display_t *disp, lv_disp_rotation_t rotation )
 {
-    lv_disp_set_rotation( disp, rotation );
+    lv_display_set_rotation( disp, rotation );
 }
 
 bool bsp_display_lock( uint32_t timeout_ms )

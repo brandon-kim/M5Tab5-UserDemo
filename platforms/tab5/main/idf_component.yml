@@ -17,8 +17,8 @@ dependencies:
     override_path: ../../../dependencies/lvgl
     public: true
 
+  espressif/esp_lv_decoder: '*'
   #espressif/esp_mmap_assets: '*'
-  #espressif/esp_lv_decoder: '*'
   #espressif/esp_lv_fs: '*'
 
   #esp_hosted(and esp_wifi_remote) version should be matched with C6 firmware version

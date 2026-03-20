@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 /**
- * @brief 派生 App
+ * @brief derived App
  *
  */
 class AppTest : public mooncake::AppAbility {
@@ -22,7 +22,7 @@ public:
     AppTest();
 	~AppTest();
 
-    // 重写生命周期回调
+    //  Override lifecycle callbacks
     void onCreate() override;
     void onOpen() override;
     void onRunning() override;

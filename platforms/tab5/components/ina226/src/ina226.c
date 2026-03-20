@@ -31,7 +31,7 @@ SOFTWARE.
 #include <stdbool.h>
 
 
-#define I2C_MASTER_TIMEOUT_MS 50     // 
+#define I2C_MASTER_TIMEOUT_MS           50     // 
 
 /* internal helpers (file-local) */
 static int16_t readRegister16_internal(uint8_t reg);
@@ -58,10 +58,16 @@ static ina226_handle_t s_ina226_handle = NULL;
 bool ina226_init(i2c_master_bus_handle_t bus_handle, uint8_t address)
 {
     ina226_handle_t dev_handle; 
-    dev_handle = (ina226_handle_t)malloc(sizeof(ina226_dev_t));
-    if (dev_handle == NULL) {
-        return false;
+
+    if( s_ina226_handle == NULL ) {
+        dev_handle = (ina226_handle_t)malloc(sizeof(ina226_dev_t));
+        if (dev_handle == NULL) {
+            return false;
+        }
+    } else {
+        dev_handle = s_ina226_handle;
     }
+
     dev_handle->inaAddress = address;
 
     i2c_device_config_t dev_cfg = {

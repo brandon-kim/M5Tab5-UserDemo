@@ -17,7 +17,7 @@ using namespace smooth_ui_toolkit::lvgl_cpp;
 
 AppStartupAnim::AppStartupAnim()
 {
-    // 配置 App 信息
+    // Configure App Info
     setAppInfo().name = "AppStartupAnim";
 }
 

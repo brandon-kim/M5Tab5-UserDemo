@@ -18,7 +18,7 @@
 i2c_master_dev_handle_t i2c_dev_handle_pi4ioe1;
 i2c_master_dev_handle_t i2c_dev_handle_pi4ioe2;
 
-#define  TAG "BSP_PI4IOE"
+#define TAG "BSP_PI4IOE"
 
 static esp_err_t reg_write1( uint8_t reg_addr, uint8_t data )
 {
@@ -42,7 +42,6 @@ static esp_err_t reg_write2( uint8_t reg_addr, uint8_t data )
 
 void bsp_io_expander_pi4ioe_init( i2c_master_bus_handle_t bus_handle )
 {
-
     // Initialize PI4IOE1 (address 0x43)
     i2c_device_config_t dev_cfg1 = {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
@@ -88,7 +87,7 @@ esp_err_t bsp_io_expander1_set_bit( uint8_t bit_mask, uint8_t level )
 
     write_buf[ 0 ] = PI4IO_REG_OUT_SET;
 
-    if( ESP_OK != i2c_master_transmit_receive( i2c_dev_handle_pi4ioe1, write_buf, 1, read_buf, 1, I2C_MASTER_TIMEOUT_MS ) ) {
+    if ( ESP_OK != i2c_master_transmit_receive( i2c_dev_handle_pi4ioe1, write_buf, 1, read_buf, 1, I2C_MASTER_TIMEOUT_MS ) ) {
         return ESP_FAIL;
     }
 
@@ -109,7 +108,7 @@ esp_err_t bsp_io_expander2_set_bit( uint8_t bit_mask, uint8_t level )
     uint8_t read_buf[ 1 ]  = { 0 };
 
     write_buf[ 0 ] = PI4IO_REG_OUT_SET;
-    if( ESP_OK != i2c_master_transmit_receive( i2c_dev_handle_pi4ioe2, write_buf, 1, read_buf, 1, I2C_MASTER_TIMEOUT_MS ) ) {
+    if ( ESP_OK != i2c_master_transmit_receive( i2c_dev_handle_pi4ioe2, write_buf, 1, read_buf, 1, I2C_MASTER_TIMEOUT_MS ) ) {
         return ESP_FAIL;
     }
 
@@ -126,8 +125,8 @@ esp_err_t bsp_io_expander2_set_bit( uint8_t bit_mask, uint8_t level )
 
 uint8_t bsp_io_expander1_read_bit( uint8_t bit_mask )
 {
-    uint8_t   write_buf[ 2 ] = { 0 };
-    uint8_t   read_buf[ 1 ]  = { 0 };
+    uint8_t write_buf[ 2 ] = { 0 };
+    uint8_t read_buf[ 1 ]  = { 0 };
 
     write_buf[ 0 ] = PI4IO_REG_IN_STA;
     if ( ESP_OK != i2c_master_transmit_receive( i2c_dev_handle_pi4ioe1, write_buf, 1, read_buf, 1, I2C_MASTER_TIMEOUT_MS ) ) {

@@ -12,7 +12,7 @@
  */
 
 /* clang-format off */
-#if 1 /*Set it to "1" to enable content*/
+#if 1 /* Set this to "1" to enable content */
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -40,7 +40,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -49,7 +49,7 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_STRING    LV_STDLIB_CLIB
 
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
@@ -58,7 +58,8 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
-#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_CLIB
+
 
 #define LV_STDINT_INCLUDE       <stdint.h>
 #define LV_STDDEF_INCLUDE       <stddef.h>
@@ -135,7 +136,7 @@
  * Requirements:
  * - `LV_USE_MATRIX = 1`.
  * - Rendering engine needs to support 3x3 matrix transformations. */
-#define LV_DRAW_TRANSFORM_USE_MATRIX            0
+#define LV_DRAW_TRANSFORM_USE_MATRIX            1
 
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
@@ -154,7 +155,11 @@
 /** Stack size of drawing thread.
  * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
  */
-#define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)         /**< [bytes]*/
+#if !defined(_WIN32) && !defined(_WIN64)
+#define LV_DRAW_THREAD_STACK_SIZE        (32 * 1024)     /**< [bytes]*/
+#else
+#define LV_DRAW_THREAD_STACK_SIZE        (128 * 1024)   /**[bytes]*/
+#endif
 
 /** Thread priority of the drawing task.
  *  Higher values mean higher priority.
@@ -224,8 +229,9 @@
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
     #endif
 
-    /* Enable drawing complex gradients in software: linear at an angle, radial or conical */
+    /** Enable drawing complex gradients in software: linear at an angle, radial or conical */
     #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
+
 #endif
 
 /*Use TSi's aka (Think Silicon) NemaGFX */
@@ -327,6 +333,9 @@
     /** Disable linear gradient extension for some older versions of drivers. */
     #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 
+    /** Maximum path dump print length (in points) */
+    #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
+
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #define LV_USE_VG_LITE_DRIVER  0
     #if LV_USE_VG_LITE_DRIVER
@@ -409,7 +418,8 @@
  *-----------*/
 
 /** Enable log module */
-#define LV_USE_LOG 0
+#define LV_USE_LOG 1
+
 #if LV_USE_LOG
     /** Set value to one of the following levels of logging detail:
      *  - LV_LOG_LEVEL_TRACE    Log detailed information.
@@ -422,7 +432,11 @@
 
     /** - 1: Print log with 'printf';
      *  - 0: User needs to register a callback with `lv_log_register_print_cb()`. */
-    #define LV_LOG_PRINTF 0
+#if !defined(_WIN32) && !defined(_WIN64)
+     #define LV_LOG_PRINTF 0
+#else
+     #define LV_LOG_PRINTF 1
+#endif    
 
     /** Set callback to print logs.
      *  E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`.
@@ -431,7 +445,7 @@
 
     /** - 1: Enable printing timestamp;
      *  - 0: Disable printing timestamp. */
-    #define LV_LOG_USE_TIMESTAMP 1
+    #define LV_LOG_USE_TIMESTAMP 0
 
     /** - 1: Print file and line number of the log;
      *  - 0: Do not print file and line number of the log. */
@@ -457,8 +471,13 @@
  * If LV_USE_LOG is enabled, an error message will be printed on failure. */
 #define LV_USE_ASSERT_NULL          1   /**< Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
+#if !defined(_WIN32) && !defined(_WIN64)
 #define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
+#else
+#define LV_USE_ASSERT_STYLE         1   /**< Check if the styles are properly initialized. (Very fast, recommended) */
+#define LV_USE_ASSERT_MEM_INTEGRITY 1   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
+#endif
 #define LV_USE_ASSERT_OBJ           0   /**< Check the object's type and existence (e.g. not deleted). (Slow) */
 
 /** Add a custom handler when assert happens e.g. to restart MCU. */
@@ -496,7 +515,7 @@
  *  If size is not set to 0, the decoder will fail to decode when the cache is full.
  *  If size is 0, the cache function is not enabled and the decoded memory will be
  *  released immediately after use. */
-#define LV_CACHE_DEF_SIZE       0
+#define LV_CACHE_DEF_SIZE       (8388608)
 
 /** Default number of image header cache entries. The cache is used to store the headers of images
  *  The main logic is like `LV_CACHE_DEF_SIZE` but for image headers. */
@@ -515,7 +534,7 @@
 #define LV_COLOR_MIX_ROUND_OFS  0
 
 /** Add 2 x 32-bit variables to each `lv_obj_t` to speed up getting style properties */
-#define LV_OBJ_STYLE_CACHE      0
+#define LV_OBJ_STYLE_CACHE      1
 
 /** Add `id` field to `lv_obj_t` */
 #define LV_USE_OBJ_ID           0
@@ -585,15 +604,15 @@
 #define LV_ATTRIBUTE_EXTERN_DATA
 
 /** Use `float` as `lv_value_precise_t` */
-#define LV_USE_FLOAT            0
+#define LV_USE_FLOAT            1
 
 /** Enable matrix support
  *  - Requires `LV_USE_FLOAT = 1` */
-#define LV_USE_MATRIX           0
+#define LV_USE_MATRIX           1
 
 /** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
 #ifndef LV_USE_PRIVATE_API
-    #define LV_USE_PRIVATE_API  0
+#define LV_USE_PRIVATE_API		1
 #endif
 
 /*==================
@@ -734,7 +753,7 @@
 
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
-    #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
+    #define LV_CALENDAR_WEEK_STARTS_MONDAY 1
     #if LV_CALENDAR_WEEK_STARTS_MONDAY
         #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
     #else
@@ -819,7 +838,7 @@
 /* Documentation for themes can be found here: https://docs.lvgl.io/master/details/common-widget-features/styles/styles.html#themes . */
 
 /** A simple, impressive and very complete theme */
-#define LV_USE_THEME_DEFAULT 1
+#define LV_USE_THEME_DEFAULT    1
 #if LV_USE_THEME_DEFAULT
     /** 0: Light mode; 1: Dark mode */
     #define LV_THEME_DEFAULT_DARK 0
@@ -832,10 +851,10 @@
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /** A very simple theme that is a good starting point for a custom theme */
-#define LV_USE_THEME_SIMPLE 1
+#define LV_USE_THEME_SIMPLE     0
 
 /** A theme designed for monochrome displays */
-#define LV_USE_THEME_MONO 1
+#define LV_USE_THEME_MONO 0
 
 /*==================
  * LAYOUTS
@@ -858,12 +877,12 @@
 /** Setting a default driver letter allows skipping the driver prefix in filepaths.
  *  Documentation about how to use the below driver-identifier letters can be found at
  *  https://docs.lvgl.io/master/details/main-modules/fs.html#lv-fs-identifier-letters . */
-#define LV_FS_DEFAULT_DRIVER_LETTER '\0'
+#define LV_FS_DEFAULT_DRIVER_LETTER   'S' //'\0'
 
-/** API for fopen, fread, etc. */
-#define LV_USE_FS_STDIO 0
+/*API for fopen, fread, etc*/
+#define LV_USE_FS_STDIO 1
 #if LV_USE_FS_STDIO
-    #define LV_FS_STDIO_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_STDIO_LETTER 'S'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_STDIO_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_STDIO_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
@@ -875,7 +894,7 @@
     #define LV_FS_POSIX_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_POSIX_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
-
+#if !defined(_WIN32) && !defined(_WIN64)
 /** API for CreateFile, ReadFile, etc. */
 #define LV_USE_FS_WIN32 0
 #if LV_USE_FS_WIN32
@@ -883,7 +902,15 @@
     #define LV_FS_WIN32_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_WIN32_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
-
+#else
+/*API for CreateFile, ReadFile, etc*/
+#define LV_USE_FS_WIN32 1
+#if LV_USE_FS_WIN32
+    #define LV_FS_WIN32_LETTER 'E'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_WIN32_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+    #define LV_FS_WIN32_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
+#endif
+#endif//#if !defined(_WIN32) && !defined(_WIN64)
 /** API for FATFS (needs to be added separately). Uses f_open, f_read, etc. */
 #define LV_USE_FS_FATFS 0
 #if LV_USE_FS_FATFS
@@ -929,7 +956,6 @@
 #if LV_USE_FS_FROGFS
     #define LV_FS_FROGFS_LETTER '\0'
 #endif
-
 /** LODEPNG decoder library */
 #define LV_USE_LODEPNG 0
 
@@ -958,13 +984,13 @@
 #define LV_USE_GSTREAMER 0
 
 /** Decode bin images to RAM */
-#define LV_BIN_DECODER_RAM_LOAD 0
+#define LV_BIN_DECODER_RAM_LOAD 1
 
 /** RLE decompress library */
-#define LV_USE_RLE 0
+#define LV_USE_RLE 1
 
 /** QR code library */
-#define LV_USE_QRCODE 0
+#define LV_USE_QRCODE 1
 
 /** Barcode code library */
 #define LV_USE_BARCODE 0
@@ -981,11 +1007,11 @@
 #endif
 
 /** Built-in TTF decoder */
-#define LV_USE_TINY_TTF 0
+#define LV_USE_TINY_TTF 1
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
-    #define LV_TINY_TTF_FILE_SUPPORT 0
-    #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+    #define LV_TINY_TTF_FILE_SUPPORT      1
+    #define LV_TINY_TTF_CACHE_GLYPH_CNT   256
     #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 #endif
 
@@ -1008,7 +1034,7 @@
 #define LV_USE_THORVG_EXTERNAL 0
 
 /** Use lvgl built-in LZ4 lib */
-#define LV_USE_LZ4_INTERNAL  0
+#define LV_USE_LZ4_INTERNAL  1
 
 /** Use external LZ4 library */
 #define LV_USE_LZ4_EXTERNAL  0
@@ -1038,7 +1064,7 @@
 
 /** 1: Enable API to take snapshot for object */
 #define LV_USE_SNAPSHOT 0
-
+#if !defined(_WIN32) && !defined(_WIN64)
 /** 1: Enable system monitor component */
 #define LV_USE_SYSMON   0
 #if LV_USE_SYSMON
@@ -1070,7 +1096,40 @@
         #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
     #endif
 #endif /*LV_USE_SYSMON*/
+#else
+/** 1: Enable system monitor component */
+#define LV_USE_SYSMON   0
+#if LV_USE_SYSMON
+    /** Get the idle percentage. E.g. uint32_t my_get_idle(void); */
+    #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
+    /** 1: Enable usage of lv_os_get_proc_idle_percent.*/
+    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
+    #if LV_SYSMON_PROC_IDLE_AVAILABLE
+        /** Get the applications idle percentage.
+         * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
+    #endif
 
+    /** 1: Show CPU usage and FPS count.
+     *  - Requires `LV_USE_SYSMON = 1` */
+    #define LV_USE_PERF_MONITOR 1
+    #if LV_USE_PERF_MONITOR
+        #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+
+        /** 0: Displays performance data on the screen; 1: Prints performance data using log. */
+        #define LV_USE_PERF_MONITOR_LOG_MODE 0
+    #endif
+
+    /** 1: Show used memory and memory fragmentation.
+     *     - Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
+     *     - Requires `LV_USE_SYSMON = 1`*/
+    #define LV_USE_MEM_MONITOR 1
+    #if LV_USE_MEM_MONITOR
+        #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+    #endif
+#endif /*LV_USE_SYSMON*/
+
+#endif
 /** 1: Enable runtime performance profiler */
 #define LV_USE_PROFILER 0
 #if LV_USE_PROFILER
@@ -1173,7 +1232,7 @@
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
     /** Quick access bar, 1:use, 0:do not use.
      *  - Requires: lv_list */
-    #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+    #define LV_FILE_EXPLORER_QUICK_ACCESS        0
 #endif
 
 /** 1: Enable Font manager */
@@ -1202,13 +1261,16 @@
 
 /*1: Enable color filter style*/
 #define LV_USE_COLOR_FILTER     0
-
 /*==================
  * DEVICES
  *==================*/
 
 /** Use SDL to open window on PC and handle mouse and keyboard. */
+#if !defined(_WIN32) && !defined(_WIN64)
+#define LV_USE_SDL              0
+#else
 #define LV_USE_SDL              1
+#endif
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
     #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /**< LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance */
@@ -1391,10 +1453,10 @@
 *======================*/
 
 /** Enable examples to be built with the library. */
-#define LV_BUILD_EXAMPLES 0
+#define LV_BUILD_EXAMPLES  0
 
 /** Build the demos */
-#define LV_BUILD_DEMOS 0
+#define LV_BUILD_DEMOS     0
 
 /*===================
  * DEMO USAGE

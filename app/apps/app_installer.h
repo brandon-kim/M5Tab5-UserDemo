@@ -30,7 +30,7 @@ inline void on_startup_anim()
 }
 
 /**
- * @brief App 安装回调 (App Installation Callback)
+ * @brief App install callback (App Installation Callback)
  * Plan to add a new AppLauncher when time permits
  *
  * @param mooncake

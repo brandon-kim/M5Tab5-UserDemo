@@ -15,6 +15,15 @@ set(PROJECT_VER_MINOR 1)
 set(PROJECT_VER_PATCH 0)
 set(PROJECT_VER "${PROJECT_VER_MAJOR}.${PROJECT_VER_MINOR}.${PROJECT_VER_PATCH}")
 
+
+#idf_build_set_property(COMPILE_OPTIONS "-DDEBUG" APPEND) 
+
+# For LVGL code : custom config file setup
+#idf_build_set_property(COMPILE_OPTIONS "-Wno-attributes" APPEND) 
+idf_build_set_property(COMPILE_OPTIONS "-Wno-format" APPEND) 
+idf_build_set_property(COMPILE_OPTIONS "-DLV_LVGL_H_INCLUDE_SIMPLE=1" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-DLV_CONF_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/../../lv_conf.h\"" APPEND)
+
 set(EXTRA_COMPONENT_DIRS 
     "../../dependencies"
 )
@@ -27,15 +36,5 @@ set(EXTRA_COMPONENT_DIRS
 
 project(m5stack_tab5)
 
-# Display Compile Time Information
-message(STATUS "--------------Compile Info------------")
-message(STATUS "IDF_PATH = ${IDF_PATH}")
-message(STATUS "IDF_TARGET = ${IDF_TARGET}")
-message(STATUS "PROJECT_NAME = ${PROJECT_NAME}")
-#message(STATUS "PROJECTS_PATH = ${PROJECTS_PATH}")
-#message(STATUS "PROJECT_DIR = ${PROJECT_DIR}")
-message(STATUS "BUILD_DIR = ${BUILD_DIR}")
-message(STATUS "SDKCONFIG = ${SDKCONFIG}")
-message(STATUS "SDKCONFIG_DEFAULTS = ${SDKCONFIG_DEFAULTS}")
-message(STATUS "COMPILE_OPTIONS = ${COMPILE_OPTIONS}")
+
 

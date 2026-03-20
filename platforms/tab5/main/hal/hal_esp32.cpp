@@ -9,8 +9,7 @@
 #include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <bsp/m5stack_tab5.h>
-#include <bsp/esp32_p4_tsense.h>
+#include <bsp/esp-bsp.h>
 #include <lv_demos.h>
 
 static const std::string _tag = "hal";
@@ -175,9 +174,13 @@ uint32_t HalEsp32::millis()
 
 int HalEsp32::getCpuTemp()
 {
-    uint32_t temp_x100 = bsp_tsense_read_x100();
+
+    uint32_t temp_x100;
+    if( ESP_OK == bsp_tsense_read_x100(&temp_x100) ) {
+        return (temp_x100 + 50) / 100;
+    }
     
-    return (temp_x100 + 50) / 100;
+    return 0;
 }
 
 /* -------------------------------------------------------------------------- */
