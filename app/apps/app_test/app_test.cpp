@@ -9,9 +9,12 @@
  *
  */
 #include "app_test.h"
+
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
+#include <assets/assets.h>
+#include <smooth_lvgl.hpp>
 
 using namespace mooncake;
 
@@ -34,17 +37,29 @@ void AppTest::onCreate()
     // Will be opened by AppLauncher when user clicks the card
 }
 
+
 void AppTest::onOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
-    _view = std::make_unique<test_view::TestView>();
+    _view = std::make_unique<view::TestView>();
     _view->init();
+    _view->setOnQuit([this]() {
+        close();
+    });
+
 }
 
+static uint32_t _time_count;
 void AppTest::onRunning()
 {
     _view->update();
+
+    // Print "hi" every 1 second
+    if (GetHAL()->millis() - _time_count > 1000) {
+        mclog::tagInfo(getAppInfo().name, "hi");
+        _time_count = GetHAL()->millis();
+    }    
 }
 
 void AppTest::onClose()

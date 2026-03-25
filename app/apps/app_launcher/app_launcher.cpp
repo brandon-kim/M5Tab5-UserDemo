@@ -24,8 +24,7 @@ void AppLauncher::onLauncherOpen()
 
     //LvglLockGuard lock;
     _view = std::make_unique<view::LauncherView>();
-    _view->init(getAppProps());
-	
+    _view->init(getAppProps());	
 }
 
 void AppLauncher::onLauncherRunning()
@@ -36,12 +35,13 @@ void AppLauncher::onLauncherRunning()
     if (selected >= 0) {
         auto& mc = mooncake::GetMooncake();
         if (mc.isAppExist(selected)) {
-            mclog::tagInfo(getAppInfo().name, "Opening app ID: {}", selected);
-            mc.openApp(selected);
-            // no app switching isn't implemented yet, so close app launcher after click
-            mclog::tagInfo(getAppInfo().name, "Closing AppLauncher");
-            close();  
-        }
+                // Request the base launcher template to open the app
+                if (openApp(selected)) {
+                    mclog::tagInfo(getAppInfo().name, "Requesting open app ID: {}", selected);
+                } else {
+                    mclog::tagWarn(getAppInfo().name, "Failed to request open app ID: {}", selected);
+                }
+            }
     }
 
 }

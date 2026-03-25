@@ -14,7 +14,7 @@
 #include <apps/common/window/window.h>
 #include <apps/common/toast/toast.h>
 
-using namespace demo_view;
+using namespace view;
 using namespace smooth_ui_toolkit;
 using namespace smooth_ui_toolkit::lvgl_cpp;
 

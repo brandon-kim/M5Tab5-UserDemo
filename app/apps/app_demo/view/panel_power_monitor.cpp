@@ -13,7 +13,7 @@
 #include <apps/utils/audio/audio.h>
 #include <assets/assets.h>
 
-using namespace demo_view;
+using namespace view;
 using namespace smooth_ui_toolkit;
 using namespace smooth_ui_toolkit::lvgl_cpp;
 

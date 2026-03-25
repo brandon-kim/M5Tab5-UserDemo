@@ -30,7 +30,7 @@ void AppDemo::onOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
-    _view = std::make_unique<demo_view::LauncherView>();
+    _view = std::make_unique<view::AppDemoView>();
     _view->init();
 }
 

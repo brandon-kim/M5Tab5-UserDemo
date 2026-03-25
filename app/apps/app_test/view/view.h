@@ -5,14 +5,14 @@
  */
 #pragma once
 #include <cstdint>
-#include <memory>
-#include <lvgl.h>
-#include <mooncake.h>
-#include <smooth_ui_toolkit.hpp>
 #include <smooth_lvgl.hpp>
+#include <uitk/short_namespace.hpp>
+#include <string_view>
+#include <memory>
 #include <vector>
+#include <functional>
 
-namespace test_view {
+namespace view {
 
 /**
  * @brief  App Test View
@@ -21,14 +21,13 @@ class TestView {
 public:
     void init();
     void update();
+    void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
 
 private:
-    bool _is_stacked = false;
-    lv_obj_t* _card_container = nullptr;
-
-    void _create_app_cards();
-    void _load_installed_apps();
-    static void _card_event_handler(lv_event_t* e);
+    std::unique_ptr<uitk::lvgl_cpp::Container> _container;
+    std::function<void()>      _on_quit;
+    std::unique_ptr<uitk::lvgl_cpp::Label>     _label;
+    std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
 };
 
-}  // namespace test_view
+}  // namespace view

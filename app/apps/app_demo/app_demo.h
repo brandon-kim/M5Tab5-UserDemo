@@ -23,5 +23,5 @@ public:
     void onClose() override;
 
 private:
-    std::unique_ptr<demo_view::LauncherView> _view;
+    std::unique_ptr<view::AppDemoView> _view;
 };

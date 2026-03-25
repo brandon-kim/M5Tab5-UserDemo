@@ -12,13 +12,13 @@
 #include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 
-using namespace demo_view;
+using namespace view;
 using namespace smooth_ui_toolkit;
 using namespace smooth_ui_toolkit::lvgl_cpp;
 
 static const std::string _tag = "demo-view";
 
-void LauncherView::init()
+void AppDemoView::init()
 {
     mclog::tagInfo(_tag, "init");
 
@@ -52,12 +52,14 @@ void LauncherView::init()
     _panels.push_back(std::make_unique<PanelMusic>());
     _panels.push_back(std::make_unique<PanelComMonitor>());
 
+
+
     for (auto& panel : _panels) {
         panel->init();
     }
 }
 
-void LauncherView::update()
+void AppDemoView::update()
 {
     LvglLockGuard lock;
 

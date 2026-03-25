@@ -4,18 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 #include "view.h"
-#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <assets/assets.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
-#include <cstdint>
 
-using namespace test_view;
-using namespace smooth_ui_toolkit;
-using namespace smooth_ui_toolkit::lvgl_cpp;
+using namespace view;
+using namespace uitk::lvgl_cpp;
 
 static const std::string _tag = "test-view";
 
@@ -29,31 +24,30 @@ void TestView::init()
     lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_SCROLLABLE);
     
     // Create card container (horizontal scrollable)
-    _card_container = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(_card_container, lv_pct(100), lv_pct(100));
-    lv_obj_set_pos(_card_container, 0, 0);
-    lv_obj_set_flex_flow(_card_container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(_card_container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(_card_container, 10, 0);
-    lv_obj_set_style_pad_gap(_card_container, 15, 0);
-    lv_obj_set_style_bg_color(_card_container, lv_color_hex(0x1a1a1a), 0);  // 배경색 설정
-    lv_obj_set_style_bg_opa(_card_container, LV_OPA_COVER, 0);  // 불투명으로 변경
-    lv_obj_set_style_border_opa(_card_container, 0, 0);
+    _container = std::make_unique<uitk::lvgl_cpp::Container>(lv_screen_active());
+    _container->setSize(lv_pct(100), lv_pct(100));
+    _container->setPos(0, 0);
+    _container->setPadding(10, 0, 15, 0);
+    _container->setBgColor(lv_color_hex(0x1a1a1a)); 
+    _container->setBgOpa(LV_OPA_COVER, 0);  
 
     // test code
-    lv_obj_t * label = lv_label_create(_card_container);
-    lv_label_set_text(label, "Hello, AppTest!");
-#if 0        
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-    // exit button
-    _exit_btn = lv_button_create(_card_container);
-    lv_obj_t * exit_label = lv_label_create(_exit_btn);
-    lv_label_set_text(exit_label, "Exit");
-    lv_obj_set_width(_exit_btn, 100);
-    lv_obj_set_height(_exit_btn, 50);
-    
-    lv_obj_align(_exit_btn, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-#endif
+    _label = std::make_unique<uitk::lvgl_cpp::Label>(_container->get());
+    _label->setText("Hello, AppTest!");
+    _label->setPos(10, 10);
+    _label->setTextColor(lv_color_hex(0xFFFFFF));
+    _label->setTextFont(&lv_font_montserrat_14, 0);
+
+    // Create a quit button
+    _button_quit = std::make_unique<uitk::lvgl_cpp::Button>(_container->get());
+    //_button_quit->setAlign(LV_ALIGN_CENTER);
+    _button_quit->align(LV_ALIGN_TOP_RIGHT, 0, 0);
+    _button_quit->label().setText("QUIT");
+    _button_quit->onClick().connect([this]() {
+        if (_on_quit) _on_quit();
+    });
+
+
 }
 
 

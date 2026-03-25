@@ -29,5 +29,5 @@ public:
     void onClose() override;
 
 private:
-    std::unique_ptr<test_view::TestView> _view;
+    std::unique_ptr<view::TestView> _view;
 };

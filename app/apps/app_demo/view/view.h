@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
+#include <lvgl.h>
+#include <smooth_lvgl.hpp>
+#include <uitk/short_namespace.hpp>
+#include <apps/common/window/window.h>
 #include <cstdint>
 #include <memory>
-#include <lvgl.h>
-#include <apps/common/window/window.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <vector>
 
-namespace demo_view {
+namespace view {
 
 /**
  * @brief
@@ -287,7 +287,7 @@ private:
  * @brief
  *
  */
-class LauncherView {
+class AppDemoView {
 public:
     void init();
     void update();
@@ -296,8 +296,7 @@ private:
     bool _is_stacked = false;
     std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Image> _img_bg;
     std::vector<std::unique_ptr<PanelBase>> _panels;
-
     void update_anim();
 };
 
-}  // namespace demo_view
+}  // namespace view
