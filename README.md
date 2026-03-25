@@ -1,3 +1,6 @@
+
+**Warning: This code is intended for testing purchased hardware and may not function correctly in all environments. Use at your own risk.**
+
 # M5Tab5 User Demo ( Modified for Windows 11 Emulation ) 
 
 User demo source code of [M5Tab5](https://docs.m5stack.com/en/products/sku/k145).
