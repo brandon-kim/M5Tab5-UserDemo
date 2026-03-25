@@ -31,7 +31,6 @@ target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS})
 list(REMOVE_ITEM SDL2_LIBRARIES SDL2::SDL2main)
 
 
-
 # App layer
 file(GLOB_RECURSE APP_LAYER_SRCS
     app/*.c

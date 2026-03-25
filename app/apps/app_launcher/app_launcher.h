@@ -6,22 +6,22 @@
 #pragma once
 #include "view/view.h"
 #include <mooncake.h>
+#include <mooncake_templates.h>
+#include <cstdint>
 #include <memory>
 
 /**
  * @brief Derived App
  *
  */
-class AppLauncher : public mooncake::AppAbility {
+class AppLauncher : public mooncake::templates::AppLauncherBase {
 public:
-    AppLauncher();
-
-    // Override lifecycle callbacks
-    void onCreate() override;
-    void onOpen() override;
-    void onRunning() override;
-    void onClose() override;
+    void onLauncherCreate() override;
+    void onLauncherOpen() override;
+    void onLauncherRunning() override;
+    void onLauncherClose() override;
+    void onLauncherDestroy() override;
 
 private:
-    std::unique_ptr<launcher_view::LauncherView> _view;
+    std::unique_ptr<view::LauncherView> _view;
 };

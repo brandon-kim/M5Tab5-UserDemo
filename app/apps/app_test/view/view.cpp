@@ -23,9 +23,6 @@ void TestView::init()
 {
     mclog::tagInfo(_tag, "init test view with card layout");
 
-    ui::signal_window_opened().clear();
-    ui::signal_window_opened().connect([&](bool opened) { _is_stacked = opened; });
-
     LvglLockGuard lock;
 
     // Base screen
@@ -46,8 +43,17 @@ void TestView::init()
     // test code
     lv_obj_t * label = lv_label_create(_card_container);
     lv_label_set_text(label, "Hello, AppTest!");
+#if 0        
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    // exit button
+    _exit_btn = lv_button_create(_card_container);
+    lv_obj_t * exit_label = lv_label_create(_exit_btn);
+    lv_label_set_text(exit_label, "Exit");
+    lv_obj_set_width(_exit_btn, 100);
+    lv_obj_set_height(_exit_btn, 50);
     
-
+    lv_obj_align(_exit_btn, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+#endif
 }
 
 

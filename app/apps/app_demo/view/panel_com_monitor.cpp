@@ -13,8 +13,8 @@
 #include <smooth_ui_toolkit.hpp>
 #include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
-#include <apps/utils/ui/window.h>
-#include <apps/utils/ui/toast.h>
+#include <apps/common/window/window.h>
+#include <apps/common/toast/toast.h>
 
 using namespace demo_view;
 using namespace smooth_ui_toolkit;

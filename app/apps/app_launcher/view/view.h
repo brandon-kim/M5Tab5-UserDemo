@@ -8,12 +8,12 @@
 #include <memory>
 #include <lvgl.h>
 #include <mooncake.h>
-#include <apps/utils/ui/window.h>
 #include <smooth_ui_toolkit.hpp>
+#include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
 #include <vector>
 
-namespace launcher_view {
+namespace view {
 
 /**
  * @brief Card-based App Launcher View
@@ -22,7 +22,8 @@ namespace launcher_view {
 class LauncherView {
 public:
     ~LauncherView();
-    void init();
+
+    void init(std::vector<mooncake::AppProps_t> appProps);
     void update();
      int consumeSelectedAppId();
 
@@ -37,4 +38,4 @@ private:
     static void _card_event_handler(lv_event_t* e);
 };
 
-}  // namespace launcher_view
+}  // namespace view

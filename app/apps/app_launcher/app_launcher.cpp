@@ -8,31 +8,27 @@
 #include <mooncake.h>
 #include <mooncake_log.h>
 #include <smooth_lvgl.hpp>
-#include <assets/assets.h>
 
 using namespace mooncake;
 
-AppLauncher::AppLauncher()
-{
-    setAppInfo().name = "AppLauncher";
-}
-
-void AppLauncher::onCreate()
+void AppLauncher::onLauncherCreate()
 {
     mclog::tagInfo(getAppInfo().name, "on create");
 
     open();
 }
 
-void AppLauncher::onOpen()
+void AppLauncher::onLauncherOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
-    _view = std::make_unique<launcher_view::LauncherView>();
-    _view->init();
+    //LvglLockGuard lock;
+    _view = std::make_unique<view::LauncherView>();
+    _view->init(getAppProps());
+	
 }
 
-void AppLauncher::onRunning()
+void AppLauncher::onLauncherRunning()
 {
     _view->update();
 
@@ -50,9 +46,16 @@ void AppLauncher::onRunning()
 
 }
 
-void AppLauncher::onClose()
+void AppLauncher::onLauncherClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
 
+    //LvglLockGuard lock;
+
     _view.reset();
+}
+
+void AppLauncher::onLauncherDestroy()
+{
+    mclog::tagInfo(getAppInfo().name, "on destroy");
 }

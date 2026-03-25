@@ -13,17 +13,25 @@
 #include <apps/utils/audio/audio.h>
 #include <cstdint>
 
-using namespace launcher_view;
-using namespace smooth_ui_toolkit;
-using namespace smooth_ui_toolkit::lvgl_cpp;
+using namespace view;
+using namespace uitk;
+using namespace uitk::lvgl_cpp;
 
 static const std::string _tag = "launcher-view";
 
-void LauncherView::init()
+LauncherView::~LauncherView()
 {
-    mclog::tagInfo(_tag, "init launcher view with card layout");
-    ui::signal_window_opened().clear();
-    ui::signal_window_opened().connect([&](bool opened) { _is_stacked = opened; });
+    LvglLockGuard lock;
+    if (_card_container) {
+        lv_obj_delete(_card_container);  // child objects will be deleted automatically
+        _card_container = nullptr;
+    }
+}
+
+
+void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
+{
+    mclog::tagInfo(_tag, "init");
 
     LvglLockGuard lock;
 
@@ -42,44 +50,9 @@ void LauncherView::init()
     lv_obj_set_style_border_opa(_card_container, 0, 0);
     
     // Load and create app cards
-    _load_installed_apps();
-    _create_app_cards();
-}
-
-int LauncherView::consumeSelectedAppId()
-{
-    int id = _selected_app_id;
-    _selected_app_id = -1;
-    return id;
-}
-
-void LauncherView::_load_installed_apps()
-{
-    mclog::tagInfo(_tag, "loading installed apps");
-    
-    _app_list.clear();
-    
-    // Get all installed apps from Mooncake
-    auto& mc = mooncake::GetMooncake();
-    _app_list = mc.getAllAppProps();
-    
-    mclog::tagInfo(_tag, "Loaded %d apps", (int)_app_list.size());
-    
-    for (auto& app_prop : _app_list) {
-        mclog::tagInfo(_tag, "Added app: %s (ID: %d)", app_prop.info.name.c_str(), app_prop.appID);
-    }
-}
-
-void LauncherView::_create_app_cards()
-{
     mclog::tagInfo(_tag, "creating app cards");
     
-    for (auto& app_prop : _app_list) {
-        // Skip AppLauncher itself to avoid recursion
-        if (app_prop.info.name == "AppLauncher") {
-            continue;
-        }
-        
+    for (auto& app_prop : appProps) {        
         // Create card
         lv_obj_t* card = lv_obj_create(_card_container);
         lv_obj_set_size(card, 120, 140);
@@ -115,9 +88,17 @@ void LauncherView::_create_app_cards()
         lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), 0);
         lv_obj_set_style_text_font(label, &lv_font_montserrat_12, 0);
         
-        mclog::tagInfo(_tag, "Created card for app: %s (ID: %d)", app_prop.info.name.c_str(), app_prop.appID);
+        mclog::tagInfo(_tag, "Created card for app: {} (ID: {})", app_prop.info.name, app_prop.appID);
     }
 }
+
+int LauncherView::consumeSelectedAppId()
+{
+    int id = _selected_app_id;
+    _selected_app_id = -1;
+    return id;
+}
+
 
 void LauncherView::_card_event_handler(lv_event_t* e)
 {
@@ -139,12 +120,4 @@ void LauncherView::update()
     // Update logic if needed
 }
 
-LauncherView::~LauncherView()
-{
-    LvglLockGuard lock;
-    if (_card_container) {
-        lv_obj_delete(_card_container);  // child objects will be deleted automatically
-        _card_container = nullptr;
-    }
-}
 

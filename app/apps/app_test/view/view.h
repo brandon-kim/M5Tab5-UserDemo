@@ -8,7 +8,6 @@
 #include <memory>
 #include <lvgl.h>
 #include <mooncake.h>
-#include <apps/utils/ui/window.h>
 #include <smooth_ui_toolkit.hpp>
 #include <smooth_lvgl.hpp>
 #include <vector>

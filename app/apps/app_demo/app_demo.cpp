@@ -15,7 +15,7 @@ using namespace mooncake;
 AppDemo::AppDemo()
 {
     setAppInfo().name = "AppDemo";
-    setAppInfo().icon = (void*)LV_SYMBOL_IMAGE;  // LVGL 내장 심볼 (예시)
+    setAppInfo().icon = (void*)LV_SYMBOL_IMAGE;  // LVGL internal symbol, just for demo, not a real image
 }
 
 void AppDemo::onCreate()
