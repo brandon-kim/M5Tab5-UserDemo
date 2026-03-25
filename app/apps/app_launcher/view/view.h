@@ -4,14 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
-#include <cstdint>
-#include <memory>
-#include <lvgl.h>
 #include <mooncake.h>
-#include <smooth_ui_toolkit.hpp>
-#include <uitk/short_namespace.hpp>
-#include <smooth_lvgl.hpp>
+#include <lvgl.h>
+#include <cstdint>
+#include <functional>
 #include <vector>
+#include <memory>
 
 namespace view {
 
@@ -23,6 +21,7 @@ class LauncherView {
 public:
     ~LauncherView();
 
+    std::function<void(int appID)> onAppClicked;
     void init(std::vector<mooncake::AppProps_t> appProps);
     void update();
      int consumeSelectedAppId();
@@ -30,8 +29,7 @@ public:
 private:
     int _selected_app_id = -1;
     bool _is_stacked = false;
-    lv_obj_t* _card_container = nullptr;
-    std::vector<mooncake::AppProps_t> _app_list;
+    lv_obj_t* _container = nullptr;
     
     void _create_app_cards();
     void _load_installed_apps();

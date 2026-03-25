@@ -57,6 +57,15 @@ void AppDemoView::init()
     for (auto& panel : _panels) {
         panel->init();
     }
+
+    // Create a quit button
+    _button_quit = std::make_unique<uitk::lvgl_cpp::Button>(lv_screen_active());
+    //_button_quit->setAlign(LV_ALIGN_CENTER);
+    _button_quit->align(LV_ALIGN_TOP_MID, 0, 0);
+    _button_quit->label().setText("QUIT");
+    _button_quit->onClick().connect([this]() {
+        if (_on_quit) {  _on_quit();}
+    });
 }
 
 void AppDemoView::update()

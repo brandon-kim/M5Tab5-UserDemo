@@ -7,7 +7,6 @@
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
-#include <smooth_lvgl.hpp>
 
 using namespace mooncake;
 
@@ -24,25 +23,16 @@ void AppLauncher::onLauncherOpen()
 
     //LvglLockGuard lock;
     _view = std::make_unique<view::LauncherView>();
-    _view->init(getAppProps());	
+    _view->init(getAppProps());
+    _view->onAppClicked = [&](int appID) {
+        mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
+        openApp(appID);
+    };	
 }
 
 void AppLauncher::onLauncherRunning()
 {
     _view->update();
-
-     int selected = _view->consumeSelectedAppId();
-    if (selected >= 0) {
-        auto& mc = mooncake::GetMooncake();
-        if (mc.isAppExist(selected)) {
-                // Request the base launcher template to open the app
-                if (openApp(selected)) {
-                    mclog::tagInfo(getAppInfo().name, "Requesting open app ID: {}", selected);
-                } else {
-                    mclog::tagWarn(getAppInfo().name, "Failed to request open app ID: {}", selected);
-                }
-            }
-    }
 
 }
 

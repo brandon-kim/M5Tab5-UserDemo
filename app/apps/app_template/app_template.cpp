@@ -1,12 +1,7 @@
-/**
- * @file app_template.cpp
- * @author Forairaaaaa
- * @brief
- * @version 0.1
- * @date <date></date>
+/*
+ * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
  *
- * @copyright Copyright (c) 2024
- *
+ * SPDX-License-Identifier: MIT
  */
 #include "app_template.h"
 #include <hal/hal.h>
@@ -17,8 +12,10 @@ using namespace mooncake;
 
 AppTemplate::AppTemplate()
 {
-    // Configure App Info
+    // Configure App name
     setAppInfo().name = "AppTemplate";
+    // Configure App icon
+    // setAppInfo().icon = (void*)&icon_app_dummy;
 }
 
 void AppTemplate::onCreate()

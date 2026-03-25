@@ -32,6 +32,10 @@ void AppDemo::onOpen()
 
     _view = std::make_unique<view::AppDemoView>();
     _view->init();
+    _view->setOnQuit([this]() {
+        close();
+    });
+
 }
 
 void AppDemo::onRunning()

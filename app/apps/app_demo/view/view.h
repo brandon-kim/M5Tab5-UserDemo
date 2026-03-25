@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <functional>
 
 namespace view {
 
@@ -291,12 +292,15 @@ class AppDemoView {
 public:
     void init();
     void update();
+    void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
 
 private:
     bool _is_stacked = false;
     std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Image> _img_bg;
     std::vector<std::unique_ptr<PanelBase>> _panels;
     void update_anim();
+    std::function<void()>      _on_quit;
+    std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
 };
 
 }  // namespace view

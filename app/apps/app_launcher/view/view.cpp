@@ -4,27 +4,22 @@
  * SPDX-License-Identifier: MIT
  */
 #include "view.h"
-#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <assets/assets.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 #include <cstdint>
 
 using namespace view;
-using namespace uitk;
-using namespace uitk::lvgl_cpp;
 
 static const std::string _tag = "launcher-view";
 
 LauncherView::~LauncherView()
 {
     LvglLockGuard lock;
-    if (_card_container) {
-        lv_obj_delete(_card_container);  // child objects will be deleted automatically
-        _card_container = nullptr;
+    if (_container) {
+        lv_obj_delete(_container);  // child objects will be deleted automatically
+        _container = nullptr;
     }
 }
 
@@ -39,22 +34,22 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_SCROLLABLE);
     
     // Create card container (horizontal scrollable)
-    _card_container = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(_card_container, lv_pct(100), lv_pct(100));
-    lv_obj_set_pos(_card_container, 0, 0);
-    lv_obj_set_flex_flow(_card_container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(_card_container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(_card_container, 10, 0);
-    lv_obj_set_style_pad_gap(_card_container, 15, 0);
-    lv_obj_set_style_bg_opa(_card_container, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_opa(_card_container, 0, 0);
+    _container = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(_container, lv_pct(100), lv_pct(100));
+    lv_obj_set_pos(_container, 0, 0);
+    lv_obj_set_flex_flow(_container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(_container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_all(_container, 10, 0);
+    lv_obj_set_style_pad_gap(_container, 15, 0);
+    lv_obj_set_style_bg_opa(_container, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_opa(_container, 0, 0);
     
     // Load and create app cards
     mclog::tagInfo(_tag, "creating app cards");
     
     for (auto& app_prop : appProps) {        
         // Create card
-        lv_obj_t* card = lv_obj_create(_card_container);
+        lv_obj_t* card = lv_obj_create(_container);
         lv_obj_set_size(card, 120, 140);
         lv_obj_set_style_bg_color(card, lv_color_hex(0x2C3E50), 0);
         lv_obj_set_style_border_width(card, 2, 0);
@@ -117,6 +112,12 @@ void LauncherView::_card_event_handler(lv_event_t* e)
 void LauncherView::update()
 {
     LvglLockGuard lock;
+    if (_selected_app_id != -1) {
+        if (onAppClicked) {
+            onAppClicked(_selected_app_id);
+        }
+        _selected_app_id = -1;
+    }
     // Update logic if needed
 }
 
