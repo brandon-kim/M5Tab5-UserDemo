@@ -16,11 +16,9 @@ set(PROJECT_VER_PATCH 0)
 set(PROJECT_VER "${PROJECT_VER_MAJOR}.${PROJECT_VER_MINOR}.${PROJECT_VER_PATCH}")
 
 
-#idf_build_set_property(COMPILE_OPTIONS "-DDEBUG" APPEND) 
 
 # For LVGL code : custom config file setup
-#idf_build_set_property(COMPILE_OPTIONS "-Wno-attributes" APPEND) 
-idf_build_set_property(COMPILE_OPTIONS "-Wno-format" APPEND) 
+idf_build_set_property(COMPILE_OPTIONS "-Wno-attributes" APPEND) 
 idf_build_set_property(COMPILE_OPTIONS "-DLV_LVGL_H_INCLUDE_SIMPLE=1" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-DLV_CONF_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/../../lv_conf.h\"" APPEND)
 
