@@ -1002,15 +1002,15 @@ esp_err_t bsp_display_brightness_set( int brightness_percent )
     if ( brightness_percent > 100 ) {
         brightness_percent = 100;
     }
-    if ( brightness_percent < 0 ) {
+    else if ( brightness_percent < 0 ) {
         brightness_percent = 0;
     }
 
     ESP_LOGI( TAG, "Setting LCD backlight: %d%%", brightness_percent );
     // uint32_t duty_cycle = (1023 * brightness_percent) / 100; // LEDC resolution set to 10bits, thus: 100% = 1023
     uint32_t duty_cycle = ( 4095 * brightness_percent ) / 100; // LEDC resolution set to 12bits, thus: 100% = 4095
-    BSP_ERROR_CHECK_RETURN_ERR( ledc_set_duty( LEDC_LOW_SPEED_MODE, LCD_LEDC_CH, duty_cycle ) );
-    BSP_ERROR_CHECK_RETURN_ERR( ledc_update_duty( LEDC_LOW_SPEED_MODE, LCD_LEDC_CH ) );
+    BSP_ERROR_CHECK_RETURN_ERR( ledc_set_duty( LEDC_LOW_SPEED_MODE, BSP_DISPLAY_BRIGHTNESS_LEDC_CH, duty_cycle ) );
+    BSP_ERROR_CHECK_RETURN_ERR( ledc_update_duty( LEDC_LOW_SPEED_MODE, BSP_DISPLAY_BRIGHTNESS_LEDC_CH ) );
 
     return ESP_OK;
 }
