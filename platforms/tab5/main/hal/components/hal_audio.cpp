@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 #include <string.h>
-#include <bsp/m5stack_tab5.h>
+#include <bsp/esp-bsp.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <thread>
@@ -32,13 +32,13 @@ uint8_t HalEsp32::getSpeakerVolume()
 
 void HalEsp32::audioRecord(std::vector<int16_t>& data, uint16_t durationMs, float gain)
 {
-    data.resize(48000 * 4 * durationMs / 1000);
+    data.resize(BSP_I2S_SAMPLE_RATE * 4 * durationMs / 1000);
 
     // ESP_LOGI(TAG, "start record");
     bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
     codec_handle->set_in_gain(gain);
     size_t bytes_read = 0;
-    codec_handle->i2s_read((char*)data.data(), (48000 * 4 * durationMs / 1000) * sizeof(uint16_t), &bytes_read,
+    codec_handle->i2s_read((char*)data.data(), (BSP_I2S_SAMPLE_RATE * 4 * durationMs / 1000) * sizeof(uint16_t), &bytes_read,
                            portMAX_DELAY);
     // ESP_LOGI(TAG, "record done, %d bytes", bytes_read);
 }
@@ -65,7 +65,7 @@ void _audio_play_task(void* param)
 
             bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
             codec_handle->set_volume(_current_speaker_volume);
-            codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+            codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
             codec_handle->i2s_write(_audio_task_data.audio_data.data(),
                                     _audio_task_data.audio_data.size() * sizeof(uint16_t), &bytes_written,
                                     portMAX_DELAY);
@@ -104,7 +104,7 @@ void HalEsp32::audioPlay(std::vector<int16_t>& data, bool async)
         bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
         codec_handle->set_volume(_current_speaker_volume);
         size_t bytes_written = 0;
-        codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+        codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
         codec_handle->i2s_write(data.data(), data.size() * sizeof(uint16_t), &bytes_written, portMAX_DELAY);
     }
 }
@@ -125,8 +125,8 @@ static void _rec_test_task(void* param)
 {
     mclog::tagInfo(TAG, "start record test");
 
-    const size_t read_buffer_size  = 48000 * 4 * 3;
-    const size_t audio_buffer_size = 48000 * 2 * 3;
+    const size_t read_buffer_size  = BSP_I2S_SAMPLE_RATE * 4 * 3;
+    const size_t audio_buffer_size = BSP_I2S_SAMPLE_RATE * 2 * 3;
 
     // Create buffers
     if (_rec_test_data.audio_buffer == nullptr) {
@@ -136,7 +136,7 @@ static void _rec_test_task(void* param)
         _rec_test_data.read_buffer = new int16_t[read_buffer_size](0);
     }
 
-    const size_t sample_rate   = 48000;
+    const size_t sample_rate   = BSP_I2S_SAMPLE_RATE;
     const size_t total_samples = sample_rate * 4 * 3;  // 4通道，3秒
     const size_t chunk_samples = 4096 * 4;             // 4通道一帧
     const size_t chunk_bytes   = chunk_samples * sizeof(int16_t);
@@ -190,10 +190,10 @@ static void _rec_test_task(void* param)
 
     size_t bytes_written = 0;
     codec_handle->set_volume(_current_speaker_volume);
-    codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+    codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
 
     mclog::tagInfo(TAG, "start playback");
-    codec_handle->i2s_write(_rec_test_data.audio_buffer, (48000 * 2 * 3) * sizeof(uint16_t), &bytes_written,
+    codec_handle->i2s_write(_rec_test_data.audio_buffer, (BSP_I2S_SAMPLE_RATE * 2 * 3) * sizeof(uint16_t), &bytes_written,
                             portMAX_DELAY);
     mclog::tagInfo(TAG, "playback done");
 
@@ -294,7 +294,7 @@ static void _music_play_task(void* param)
 {
     bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
     codec_handle->set_volume(_current_speaker_volume);
-    codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+    codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
 
     audio_player_config_t config = {
         .mute_fn    = audio_mute_function,

@@ -628,12 +628,12 @@ esp_err_t bsp_codec_i2sdata_init( const i2s_std_config_t *i2s_config )
         ESP_GOTO_ON_ERROR( i2s_channel_init_std_mode( i2s_tx_chan, p_i2s_cfg ), err, TAG, "I2S channel initialization failed" );
         ESP_GOTO_ON_ERROR( i2s_channel_enable( i2s_tx_chan ), err, TAG, "I2S enabling failed" );
     }
-
-    // if (i2s_rx_chan != NULL) {
-    //     ESP_ERROR_CHECK(i2s_channel_init_std_mode(i2s_rx_chan, p_i2s_cfg));
-    //     ESP_ERROR_CHECK(i2s_channel_enable(i2s_rx_chan));
-    // }
-
+#if 1
+    if (i2s_rx_chan != NULL) {
+       ESP_GOTO_ON_ERROR(i2s_channel_init_std_mode(i2s_rx_chan, p_i2s_cfg), err, TAG, "I2S channel initialization failed");
+       ESP_GOTO_ON_ERROR(i2s_channel_enable(i2s_rx_chan), err, TAG, "I2S enabling failed");
+    }
+#else
     i2s_tdm_config_t tdm_cfg = {
         .clk_cfg = {
                     .sample_rate_hz  = (uint32_t)BSP_I2S_SAMPLE_RATE,
@@ -661,6 +661,7 @@ esp_err_t bsp_codec_i2sdata_init( const i2s_std_config_t *i2s_config )
         ESP_GOTO_ON_ERROR( i2s_channel_init_tdm_mode( i2s_rx_chan, &tdm_cfg ), err, TAG, "I2S channel initialization failed" );
         ESP_GOTO_ON_ERROR( i2s_channel_enable( i2s_rx_chan ), err, TAG, "I2S enabling failed" );
     }
+#endif
 
     audio_codec_i2s_cfg_t i2s_cfg = {
         .port      = BSP_I2S_NUM,
@@ -837,9 +838,22 @@ bsp_codec_config_t *bsp_get_codec_handle( void )
     return &g_codec_handle;
 }
 
-static esp_err_t bsp_codec_es8388_set( uint32_t rate, uint32_t bits_cfg, i2s_slot_mode_t ch )
+static esp_err_t bsp_codec_es8388_set( uint32_t rate, uint32_t bits_cfg, i2s_slot_mode_t mode )
 {
     esp_err_t ret = ESP_OK;
+
+    uint8_t ch = 0;
+    switch ( mode ) {
+        case I2S_SLOT_MODE_MONO:
+            ch = 1;
+            break;
+        case I2S_SLOT_MODE_STEREO:
+            ch = 2;
+            break;
+        default:
+            ch = 2;
+            break;
+    }
 
     esp_codec_dev_sample_info_t fs = {
         .sample_rate     = rate,
@@ -855,13 +869,31 @@ static esp_err_t bsp_codec_es8388_set( uint32_t rate, uint32_t bits_cfg, i2s_slo
     return ret;
 }
 
-static esp_err_t bsp_codec_es7210_set( uint32_t rate, uint32_t bps, i2s_slot_mode_t ch )
+static esp_err_t bsp_codec_es7210_set( uint32_t rate, uint32_t bps, i2s_slot_mode_t mode )
 {
     esp_err_t ret = ESP_OK;
+    uint8_t ch = 0;
+    uint8_t ch_mask = 0;
+    // 1,2 on device, 3,4 headphone jack 
+    switch ( mode ) {
+        case I2S_SLOT_MODE_MONO:
+            ch = 2;
+            ch_mask = 0x03;
+            break;
+        case I2S_SLOT_MODE_STEREO:
+            ch = 4;
+            ch_mask = 0x0F;
+            break;
+        default:
+            ch = 4;
+            ch_mask = 0x0F;
+            break;
+    }
 
     esp_codec_dev_sample_info_t fs = {
         .sample_rate     = rate,
         .channel         = ch,
+        .channel_mask    = ch_mask,
         .bits_per_sample = bps,
     };
 
@@ -886,8 +918,8 @@ void bsp_codec_init( void )
     // bsp_codec_es7210_set(16000, 16, 2);
     // bsp_codec_es8388_set(16000, 16, 2);
     // bsp_codec_es7210_set(48000, 16, 2);
-    bsp_codec_es7210_set( BSP_I2S_SAMPLE_RATE, 16, 4 );
-    bsp_codec_es8388_set( BSP_I2S_SAMPLE_RATE, 16, 2 );
+    bsp_codec_es7210_set( BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO );
+    bsp_codec_es8388_set( BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO );
 
 	/* codec handle */
     bsp_codec_config_t *codec_cfg  = &g_codec_handle; 
@@ -1407,8 +1439,9 @@ lv_display_t *bsp_display_start( void )
                           .sw_rotate   = true,
                           }
     };
-
-    cfg.lvgl_port_cfg.task_stack = ( 1024 * 16 ); // Increase stack size for LVGL task to avoid "Stack canary watchpoint triggered" issue
+    cfg.lvgl_port_cfg.task_affinity = BSP_LCD_LVGL_TASK_AFFINITY;
+    cfg.lvgl_port_cfg.task_priority = BSP_LCD_LVGL_TASK_PRIORITY;
+    cfg.lvgl_port_cfg.task_stack =    BSP_LCD_LVGL_TASK_STACK;  // Increase stack size for LVGL task to avoid "Stack canary watchpoint triggered" issue
 #endif
     return bsp_display_start_with_config( &cfg );
 }

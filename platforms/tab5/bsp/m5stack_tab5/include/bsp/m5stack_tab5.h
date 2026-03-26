@@ -131,7 +131,7 @@
 #define BSP_I2S_DSIN     ( GPIO_NUM_28 )
 #define BSP_POWER_AMP_IO ( GPIO_NUM_NC )
 #define BSP_SPEAKER_EN   ( IO_EXPANDER1_SPK_EN )
-#define BSP_I2S_SAMPLE_RATE    (44100)  //( 48000 )
+#define BSP_I2S_SAMPLE_RATE   ( 48000 )
 
 /** @} */ // end of audio
 
@@ -487,7 +487,10 @@ sdmmc_card_t *bsp_sdcard_get_handle( void );
 #endif
 #define BSP_LCD_DRAW_BUFF_DOUBLE ( CONFIG_BSP_LCD_DRAW_BUF_DOUBLE )
 
-#define  BSP_LCD_LVGL_TASK_PRIORITY     8    /* LVGL port default : 4 */
+// other task priroity and stack size -> app_config.h
+#define  BSP_LCD_LVGL_TASK_AFFINITY     (-1)    /* LVGL port default : -1 */
+#define  BSP_LCD_LVGL_TASK_PRIORITY     4       /* LVGL port default : 4 */
+#define  BSP_LCD_LVGL_TASK_STACK       (1024*16)  /* LVGL port default : 7168 */
 
 /**
  * @brief BSP display configuration structure
