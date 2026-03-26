@@ -477,15 +477,16 @@ sdmmc_card_t *bsp_sdcard_get_handle( void );
 #define BSP_LCD_PIXEL_CLOCK_MHZ ( 80 )
 
 #if ( BSP_CONFIG_NO_GRAPHIC_LIB == 0 )
-#ifndef CONFIG_BSP_LCD_DRAW_BUF_HEIGHT
-#define CONFIG_BSP_LCD_DRAW_BUF_HEIGHT 50
-#endif
 
-#define BSP_LCD_DRAW_BUFF_SIZE ( BSP_LCD_H_RES * CONFIG_BSP_LCD_DRAW_BUF_HEIGHT )
-#ifndef CONFIG_BSP_LCD_DRAW_BUF_DOUBLE
-#define CONFIG_BSP_LCD_DRAW_BUF_DOUBLE 1
-#endif
-#define BSP_LCD_DRAW_BUFF_DOUBLE ( CONFIG_BSP_LCD_DRAW_BUF_DOUBLE )
+#define BSP_DISPLAY_BRIGHTNESS_LEDC_CH  LEDC_CHANNEL_1
+
+#define BSP_LCD_DRAW_BUF_HEIGHT     50
+#define BSP_LCD_DRAW_BUFF_SIZE      ( BSP_LCD_H_RES * BSP_LCD_DRAW_BUF_HEIGHT )
+#define BSP_LCD_DRAW_BUFF_DOUBLE    1
+
+//"Select LVGL buffer mode"  depends on CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR
+//#define BSP_DISPLAY_LVGL_FULL_REFRESH   0
+//#define BSP_DISPLAY_LVGL_DIRECT_MODE    1
 
 // other task priroity and stack size -> app_config.h
 #define  BSP_LCD_LVGL_TASK_AFFINITY     (-1)    /* LVGL port default : -1 */

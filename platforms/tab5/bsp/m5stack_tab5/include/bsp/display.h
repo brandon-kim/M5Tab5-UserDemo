@@ -53,8 +53,6 @@
 #define BSP_MIPI_DSI_PHY_PWR_LDO_CHAN       (3)  // LDO_VO3 is connected to VDD_MIPI_DPHY
 #define BSP_MIPI_DSI_PHY_PWR_LDO_VOLTAGE_MV (2500)
 
-//#define CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR    1
-//#define CONFIG_BSP_DISPLAY_LVGL_FULL_REFRESH  1
 
 
 #ifdef __cplusplus

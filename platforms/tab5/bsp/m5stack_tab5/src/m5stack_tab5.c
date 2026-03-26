@@ -947,11 +947,6 @@ uint8_t bsp_codec_feed_channel( void )
 //==================================================================================
 #if ( BSP_CONFIG_NO_GRAPHIC_LIB == 0 )
 
-#ifndef CONFIG_BSP_DISPLAY_BRIGHTNESS_LEDC_CH
-#define CONFIG_BSP_DISPLAY_BRIGHTNESS_LEDC_CH LEDC_CHANNEL_1
-#endif
-#define LCD_LEDC_CH CONFIG_BSP_DISPLAY_BRIGHTNESS_LEDC_CH
-
 esp_err_t bsp_display_brightness_init( void )
 {
     // gpio_config_t io_conf = {};
@@ -970,7 +965,7 @@ esp_err_t bsp_display_brightness_init( void )
     const ledc_channel_config_t lcd_backlight_channel = {
         .gpio_num   = BSP_LCD_BACKLIGHT,
         .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel    = LCD_LEDC_CH,
+        .channel    = BSP_DISPLAY_BRIGHTNESS_LEDC_CH,
         .intr_type  = LEDC_INTR_DISABLE,
         .timer_sel  = LEDC_TIMER_0,
         .duty       = 0,
@@ -1319,9 +1314,9 @@ static lv_display_t *bsp_display_lcd_init( const bsp_display_cfg_t *cfg )
 #else
         .sw_rotate = cfg->flags.sw_rotate, /* Only SW rotation is supported for 90° and 270° */
 #endif
-#if CONFIG_BSP_DISPLAY_LVGL_FULL_REFRESH
+#if BSP_DISPLAY_LVGL_FULL_REFRESH
         .full_refresh = true,
-#elif CONFIG_BSP_DISPLAY_LVGL_DIRECT_MODE
+#elif BSP_DISPLAY_LVGL_DIRECT_MODE
         .direct_mode = true,
 #endif
                      }

@@ -12,7 +12,7 @@ menu "Board Support Package(m5stack_tab5)"
             default 1
             range 0 1
             help
-                ESP32P4 has two I2C peripherals, pick the one you want to use.
+                Pick the I2C you want to use.
 
         config BSP_I2C_FAST_MODE
             bool "Enable I2C fast mode"
@@ -34,19 +34,18 @@ menu "Board Support Package(m5stack_tab5)"
             help
                 ESP32P4 has three I2S peripherals, pick the one you want to use.
     endmenu
-
-    menu "uSD card - Virtual File System"
+    menu "SD card - Virtual File System"
         config BSP_SD_FORMAT_ON_MOUNT_FAIL
-            bool "Format uSD card if mounting fails"
+            bool "Format SD card if mounting fails"
             default n
             help
-                The SDMMC host will format (FAT) the uSD card if it fails to mount the filesystem.
+                The SDMMC host will format (FAT) the SD card if it fails to mount the filesystem.
 
         config BSP_SD_MOUNT_POINT
-            string "uSD card mount point"
+            string "SD card mount point"
             default "/sdcard"
             help
-                Mount point of the uSD card in the Virtual File System
+                Mount point of the SD card in the Virtual File System
 
     endmenu
 
@@ -64,44 +63,13 @@ menu "Board Support Package(m5stack_tab5)"
             default "n"
             help
                 Avoid tearing effect through LVGL buffer mode and double frame buffers of RGB LCD. This feature is only available for RGB LCD.
-
-        choice BSP_DISPLAY_LVGL_MODE
-            depends on BSP_DISPLAY_LVGL_AVOID_TEAR
-            prompt "Select LVGL buffer mode"
-            default BSP_DISPLAY_LVGL_FULL_REFRESH
-            config BSP_DISPLAY_LVGL_FULL_REFRESH
-                bool "Full refresh"
-            config BSP_DISPLAY_LVGL_DIRECT_MODE
-                bool "Direct mode"
-        endchoice
-            
-        config BSP_DISPLAY_BRIGHTNESS_LEDC_CH
-        int "LEDC channel index"
-        default 1
-        range 0 7
-        help
-            LEDC channel is used to generate PWM signal that controls display brightness.
-            Set LEDC index that should be used.
-                
-        config BSP_LCD_DRAW_BUF_HEIGHT
-        int "LCD framebuf height"
-        default 50
-        range 10 240
-        help
-            Framebuf is used for lvgl rendering output.
-
-        config BSP_LCD_DRAW_BUF_DOUBLE
-        bool "LCD double framebuf"
-        default y
-        help
-            Whether to enable double framebuf.
-	    
+ 
         config BSP_LCD_USE_DMA2D
             bool "Select whether to use DMA2D"
             default "y"
             help
                 Select whether to use DMA2D to draw the bitmap.
-	    
+
     endmenu
 
 endmenu
