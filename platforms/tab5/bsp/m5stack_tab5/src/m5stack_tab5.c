@@ -7,25 +7,24 @@
 #include <string.h>
 #include "driver/gpio.h"
 #include "driver/ledc.h"
-#include "esp_check.h"
+
 #include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
-#include "esp_lcd_mipi_dsi.h"
 #include "esp_ldo_regulator.h"
 #include "esp_vfs_fat.h"
+#include "sdmmc_cmd.h"
 #include "sd_pwr_ctrl_by_on_chip_ldo.h"
 
+#include "bsp_err_check.h"
 #include "bsp/m5stack_tab5.h"
 #include "bsp/bsp_pi4ioe.h"
-#include "sdmmc_cmd.h"
+#include "bsp/touch.h"
 #include "bsp/display.h"
 #include "esp_lcd_st7123.h"
-#include "bsp/touch.h"
 #include "esp_lcd_touch_st7123.h"
-#include "bsp_err_check.h"
 #include "esp_codec_dev_defaults.h"
 #include "esp_video_init.h"
+
 #include "esp_log.h"
 
 static const char *TAG = "bsp";
@@ -887,8 +886,8 @@ void bsp_codec_init( void )
     // bsp_codec_es7210_set(16000, 16, 2);
     // bsp_codec_es8388_set(16000, 16, 2);
     // bsp_codec_es7210_set(48000, 16, 2);
-    bsp_codec_es7210_set( 48000, 16, 4 );
-    bsp_codec_es8388_set( 48000, 16, 2 );
+    bsp_codec_es7210_set( BSP_I2S_SAMPLE_RATE, 16, 4 );
+    bsp_codec_es8388_set( BSP_I2S_SAMPLE_RATE, 16, 2 );
 
 	/* codec handle */
     bsp_codec_config_t *codec_cfg  = &g_codec_handle; 
@@ -1131,6 +1130,7 @@ esp_err_t bsp_display_new_with_handles( const bsp_display_config_t *config, bsp_
         .phy_clk_src        = MIPI_DSI_PHY_CLK_SRC_DEFAULT,
         .lane_bit_rate_mbps = BSP_LCD_MIPI_DSI_LANE_BITRATE_MBPS,
     };
+
     esp_lcd_dsi_bus_handle_t mipi_dsi_bus;
     ESP_RETURN_ON_ERROR( esp_lcd_new_dsi_bus( &bus_config, &mipi_dsi_bus ), TAG, "New DSI bus init failed" );
 
@@ -1147,6 +1147,7 @@ esp_err_t bsp_display_new_with_handles( const bsp_display_config_t *config, bsp_
         .virtual_channel    = 0,
         .dpi_clk_src        = MIPI_DSI_DPI_CLK_SRC_DEFAULT,
         .dpi_clock_freq_mhz = 70, // ST7123 DPI clock frequency
+        .pixel_format       = LCD_COLOR_PIXEL_FORMAT_RGB565,
         .in_color_format    = LCD_COLOR_FMT_RGB565,
         .num_fbs            = 1,
         .video_timing       = {
@@ -1228,13 +1229,8 @@ static lv_display_t *bsp_display_lcd_init( const bsp_display_cfg_t *cfg )
 {
     assert( cfg != NULL );
     esp_lcd_panel_io_handle_t  io_handle    = NULL;
-    const bsp_display_config_t bsp_disp_cfg = {
-        .dsi_bus = {
-                    .phy_clk_src        = MIPI_DSI_PHY_CLK_SRC_DEFAULT,
-                    .lane_bit_rate_mbps = BSP_LCD_MIPI_DSI_LANE_BITRATE_MBPS,
-                    }
-    };
-    BSP_ERROR_CHECK_RETURN_NULL( bsp_display_new( &bsp_disp_cfg, &disp_handles.panel, &io_handle ) );
+    const bsp_display_config_t not_usedcfg = { 0 };
+    BSP_ERROR_CHECK_RETURN_NULL( bsp_display_new( &not_usedcfg, &disp_handles.panel, &io_handle ) );
 
     //esp_lcd_panel_disp_on_off(disp_handles.panel, true);
 
@@ -1426,10 +1422,23 @@ lv_display_t *bsp_display_start_with_config( const bsp_display_cfg_t *cfg )
 #else
     BSP_ERROR_CHECK_RETURN_NULL( lvgl_port_init( &cfg->lvgl_port_cfg ) );
 #endif
-    BSP_ERROR_CHECK_RETURN_NULL( bsp_display_brightness_init() );
 
-    BSP_NULL_CHECK( disp = bsp_display_lcd_init( cfg ), NULL );
-    BSP_NULL_CHECK( disp_indev = bsp_display_indev_touch_init( disp ), NULL );
+    ESP_ERROR_CHECK_WITHOUT_ABORT( bsp_display_brightness_init() );
+
+    disp = bsp_display_lcd_init( cfg );
+	if ( disp == NULL ) {
+        ESP_LOGE( TAG, "Hardware display init failed -> registering headless dummy display" );
+        return NULL; // or headless boot implementaion
+    } else {
+		disp_indev = bsp_display_indev_touch_init( disp );
+		if( disp_indev == NULL ) {
+            ESP_LOGE( TAG, "Touch input device initialization failed" );
+        }
+	}
+    
+#ifdef USE_LVGL_ADAPTER
+    ESP_ERROR_CHECK(esp_lv_adapter_start());
+#endif
 
     return disp;
 }

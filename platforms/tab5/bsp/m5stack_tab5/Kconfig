@@ -95,6 +95,13 @@ menu "Board Support Package(m5stack_tab5)"
         default y
         help
             Whether to enable double framebuf.
+	    
+        config BSP_LCD_USE_DMA2D
+            bool "Select whether to use DMA2D"
+            default "y"
+            help
+                Select whether to use DMA2D to draw the bitmap.
+	    
     endmenu
 
 endmenu

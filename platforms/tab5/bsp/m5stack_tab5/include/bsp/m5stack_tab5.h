@@ -131,7 +131,7 @@
 #define BSP_I2S_DSIN     ( GPIO_NUM_28 )
 #define BSP_POWER_AMP_IO ( GPIO_NUM_NC )
 #define BSP_SPEAKER_EN   ( IO_EXPANDER1_SPK_EN )
-#define BSP_I2S_SAMPLE_RATE    ( 48000 )
+#define BSP_I2S_SAMPLE_RATE    (44100)  //( 48000 )
 
 /** @} */ // end of audio
 

@@ -16,6 +16,7 @@ set(PROJECT_VER_PATCH 0)
 set(PROJECT_VER "${PROJECT_VER_MAJOR}.${PROJECT_VER_MINOR}.${PROJECT_VER_PATCH}")
 
 
+idf_build_set_property(COMPILE_OPTIONS "-Wno-missing-field-initializers" APPEND)
 
 # For LVGL code : custom config file setup
 idf_build_set_property(COMPILE_OPTIONS "-Wno-attributes" APPEND) 

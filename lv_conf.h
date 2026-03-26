@@ -70,7 +70,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /** Size of memory available for `lv_malloc()` in bytes (>= 2kB) */
-    #define LV_MEM_SIZE (1024 * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (64 * 1024U)          /**< [bytes] */
 
     /** Size of the memory expand for `lv_malloc()` in bytes */
     #define LV_MEM_POOL_EXPAND_SIZE 0
@@ -130,7 +130,7 @@
 #define LV_DRAW_BUF_STRIDE_ALIGN                1
 
 /** Align start address of draw_buf addresses to this bytes*/
-#define LV_DRAW_BUF_ALIGN                       64
+#define LV_DRAW_BUF_ALIGN                       128
 
 /** Using matrix for transformations.
  * Requirements:
@@ -416,7 +416,7 @@
 
 #if !defined(_WIN32) && !defined(_WIN64)
 /** Draw using espressif PPA accelerator */
-#define LV_USE_PPA  1
+#define LV_USE_PPA  0
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG 1
     #define LV_PPA_BURST_LENGTH    128
@@ -424,7 +424,7 @@
 #else
 #define LV_USE_PPA  0
 #if LV_USE_PPA
-    #define LV_USE_PPA_IMG 0
+    #define LV_USE_PPA_IMG 1
     #define LV_PPA_BURST_LENGTH    128
 #endif
 #endif
@@ -633,7 +633,7 @@
 
 /** Align VG_LITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE    64
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE    128
 
 /** Will be added where memory needs to be aligned (with -Os data might not be aligned to boundary by default).
  *  E.g. __attribute__((aligned(4)))*/
