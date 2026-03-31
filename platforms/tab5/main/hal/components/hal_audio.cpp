@@ -14,6 +14,7 @@
 #include <thread>
 #include <mutex>
 #include <audio_player.h>
+#include <assets/assets.h>
 
 static const char* TAG = "audio";
 
@@ -250,12 +251,7 @@ hal::HalBase::MicTestState_t HalEsp32::getHeadphoneMicRecordTestState()
 /* -------------------------------------------------------------------------- */
 /*                               Music play test                              */
 /* -------------------------------------------------------------------------- */
-extern const uint8_t canon_in_d_mp3_start[] asm("_binary_canon_in_d_mp3_start");
-extern const uint8_t canon_in_d_mp3_end[] asm("_binary_canon_in_d_mp3_end");
-extern const uint8_t startup_sfx_mp3_start[] asm("_binary_startup_sfx_mp3_start");
-extern const uint8_t startup_sfx_mp3_end[] asm("_binary_startup_sfx_mp3_end");
-extern const uint8_t shutdown_sfx_mp3_start[] asm("_binary_shutdown_sfx_mp3_start");
-extern const uint8_t shutdown_sfx_mp3_end[] asm("_binary_shutdown_sfx_mp3_end");
+
 
 enum Mp3PlayTarget_t {
     MP3_PLAY_TARGET_CANON_IN_D,
@@ -269,6 +265,7 @@ struct MusicTestData_t {
     hal::HalBase::MusicPlayState_t state = hal::HalBase::MUSIC_PLAY_IDLE;
     Mp3PlayTarget_t target               = MP3_PLAY_TARGET_CANON_IN_D;
 };
+
 static MusicTestData_t _music_test_data;
 
 static esp_err_t audio_mute_function(AUDIO_PLAYER_MUTE_SETTING setting)
