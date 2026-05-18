@@ -81,7 +81,7 @@ char *bsp_get_info()
 #define BOARD_INFO ( BOARD_VENDOR " " BOARD_NAME )
     return BOARD_INFO;
 }
-#if 0
+
 /* the list to change driver capability */
 static const gpio_num_t _driver_gpios[] = {
     // EXT I2C
@@ -115,11 +115,11 @@ static const gpio_num_t _driver_gpios[] = {
     GPIO_NUM_43,
     GPIO_NUM_44,
 };
-#endif
+
 /* initial gpio config */
 esp_err_t bsp_gpio_init( void )
 {
-#if 0
+
     // gpio_set_drive_capability((gpio_num_t)48, GPIO_DRIVE_CAP_0);
     for (int i = 0; i < sizeof(_driver_gpios) / sizeof(_driver_gpios[0]); i++) {
         gpio_num_t gpio = _driver_gpios[i];
@@ -130,7 +130,7 @@ esp_err_t bsp_gpio_init( void )
             ESP_LOGE(TAG, "Failed to set GPIO %d drive capability: %s", gpio, esp_err_to_name(ret));
         }
     }
-#endif
+
     return ESP_OK;
 }
 
