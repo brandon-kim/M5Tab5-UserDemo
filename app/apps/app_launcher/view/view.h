@@ -5,8 +5,9 @@
  */
 #pragma once
 #include <mooncake.h>
-#include <lvgl.h>
-#include <cstdint>
+#include <smooth_ui_toolkit.hpp>
+#include <uitk/short_namespace.hpp>
+#include <smooth_lvgl.hpp>
 #include <functional>
 #include <vector>
 #include <memory>

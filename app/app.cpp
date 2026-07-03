@@ -28,7 +28,7 @@ void app::Init(InitCallback_t callback)
 
     on_startup_anim();
     on_install_apps();
-    
+#if 0 //need not   
     // Open AppLauncher as default launcher
     auto& mc = GetMooncake();
     auto app_props = mc.getAllAppProps();
@@ -39,6 +39,7 @@ void app::Init(InitCallback_t callback)
             break;
         }
     }
+#endif    
 }
 
 void app::Update()
@@ -59,6 +60,8 @@ bool app::IsDone()
 
 void app::Destroy()
 {
+    // Uninstall all apps and destroy mooncake
+    GetMooncake().uninstallAllApps();    
     DestroyMooncake();
     hal::Destroy();
 }
