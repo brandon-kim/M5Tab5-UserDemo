@@ -13,6 +13,8 @@
 #include "app_startup_anim/app_startup_anim.h"
 #include "app_test/app_test.h"
 #include "app_no_smooth/app_no_smooth.h"
+#include "app_drawing_camera/app_drawing_camera.h"
+
 /* Header files locator (Don't remove) */
 
 // Start boot anim app and wait for it to finish
@@ -45,5 +47,6 @@ inline void on_install_apps()
     mooncake::GetMooncake().installApp(std::make_unique<AppDemo>());
     mooncake::GetMooncake().installApp(std::make_unique<AppTest>());
     mooncake::GetMooncake().installApp(std::make_unique<AppNoSmooth>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppDrawingCamera>());	
     /* Install app locator (Don't remove) */
 }
