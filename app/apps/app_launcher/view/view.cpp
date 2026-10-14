@@ -4,13 +4,18 @@
  * SPDX-License-Identifier: MIT
  */
 #include "view.h"
+#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <assets/assets.h>
+#include <smooth_ui_toolkit.hpp>
+#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 #include <cstdint>
 
 using namespace view;
+using namespace smooth_ui_toolkit;
+using namespace smooth_ui_toolkit::lvgl_cpp;
 
 static const std::string _tag = "launcher-view";
 
@@ -89,6 +94,7 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
 
 int LauncherView::consumeSelectedAppId()
 {
+    LvglLockGuard lock;
     int id = _selected_app_id;
     _selected_app_id = -1;
     return id;
@@ -108,17 +114,3 @@ void LauncherView::_card_event_handler(lv_event_t* e)
         self->_selected_app_id = app_id;
     }
 }
-
-void LauncherView::update()
-{
-    LvglLockGuard lock;
-    if (_selected_app_id != -1) {
-        if (onAppClicked) {
-            onAppClicked(_selected_app_id);
-        }
-        _selected_app_id = -1;
-    }
-    // Update logic if needed
-}
-
-

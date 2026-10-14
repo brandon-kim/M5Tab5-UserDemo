@@ -24,16 +24,15 @@ void AppLauncher::onLauncherOpen()
     //LvglLockGuard lock;
     _view = std::make_unique<view::LauncherView>();
     _view->init(getAppProps());
-    _view->onAppClicked = [&](int appID) {
-        mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
-        openApp(appID);
-    };	
 }
 
 void AppLauncher::onLauncherRunning()
 {
-    _view->update();
-
+    const int appID = _view->consumeSelectedAppId();
+    if (appID >= 0) {
+        mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
+        openApp(appID);
+    }
 }
 
 void AppLauncher::onLauncherClose()

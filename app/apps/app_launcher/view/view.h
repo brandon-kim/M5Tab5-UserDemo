@@ -8,7 +8,6 @@
 #include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
-#include <functional>
 #include <vector>
 #include <memory>
 
@@ -22,10 +21,8 @@ class LauncherView {
 public:
     ~LauncherView();
 
-    std::function<void(int appID)> onAppClicked;
     void init(std::vector<mooncake::AppProps_t> appProps);
-    void update();
-     int consumeSelectedAppId();
+    int consumeSelectedAppId();
 
 private:
     int _selected_app_id = -1;
