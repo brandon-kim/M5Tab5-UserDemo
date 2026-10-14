@@ -29,8 +29,6 @@ private:
     bool _is_stacked = false;
     lv_obj_t* _container = nullptr;
     
-    void _create_app_cards();
-    void _load_installed_apps();
     static void _card_event_handler(lv_event_t* e);
 };
 
