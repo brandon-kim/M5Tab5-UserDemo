@@ -7,14 +7,15 @@
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
-#include <smooth_lvgl.hpp>
 #include <assets/assets.h>
 
 using namespace mooncake;
 
 AppDemo::AppDemo()
 {
+    // Configure App name
     setAppInfo().name = "AppDemo";
+    // Configure App icon
     setAppInfo().icon = (void*)LV_SYMBOL_IMAGE;  // LVGL internal symbol, just for demo, not a real image
 }
 

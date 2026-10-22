@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
-#include <cstdint>
-#include <smooth_lvgl.hpp>
+#include <mooncake.h>
+#include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
+#include <smooth_lvgl.hpp>
+#include <cstdint>
 #include <string_view>
 #include <memory>
 #include <vector>
@@ -25,9 +27,10 @@ public:
 
 private:
     std::unique_ptr<uitk::lvgl_cpp::Container> _container;
-    std::function<void()>      _on_quit;
-    std::unique_ptr<uitk::lvgl_cpp::Label>     _label;
+	std::unique_ptr<uitk::lvgl_cpp::Label>     _label;
     std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
+    std::function<void()>      _on_quit;
+
 };
 
 }  // namespace view

@@ -4,12 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 #include "view.h"
-#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <assets/assets.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 #include <cstdint>
 
@@ -92,6 +89,11 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     }
 }
 
+void LauncherView::update()
+{
+    LvglLockGuard lock;
+    
+}
 int LauncherView::consumeSelectedAppId()
 {
     LvglLockGuard lock;

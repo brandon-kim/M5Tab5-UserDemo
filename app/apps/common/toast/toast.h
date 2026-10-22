@@ -6,9 +6,9 @@
 // Ref: https://www.heroui.com/docs/components/toast
 #include <cstdint>
 #include <string>
-#include <lvgl.h>
 #include <mooncake.h>
 #include <smooth_ui_toolkit.hpp>
+#include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
 #include <memory>
 #include <vector>

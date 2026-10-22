@@ -13,8 +13,8 @@
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
+//#include <smooth_lvgl.hpp>
 #include <assets/assets.h>
-#include <smooth_lvgl.hpp>
 
 using namespace mooncake;
 

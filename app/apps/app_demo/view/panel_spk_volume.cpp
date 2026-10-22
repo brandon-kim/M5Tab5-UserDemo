@@ -5,11 +5,8 @@
  */
 #include "view.h"
 #include <algorithm>
-#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
 
 using namespace view;

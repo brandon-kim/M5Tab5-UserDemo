@@ -53,8 +53,6 @@ target_link_libraries(app_desktop_build PUBLIC
     mooncake 
     mooncake_log
     lvgl 
-    lvgl_examples 
-    lvgl_demos 
     ${SDL2_LIBRARIES}
     smooth_ui_toolkit
     pthread

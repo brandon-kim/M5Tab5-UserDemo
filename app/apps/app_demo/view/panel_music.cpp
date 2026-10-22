@@ -3,13 +3,10 @@
  *
  * SPDX-License-Identifier: MIT
  */
-#include "lvgl_cpp/obj.hpp"
 #include "view.h"
-#include <lvgl.h>
 #include <hal/hal.h>
 #include <mooncake_log.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
+#include "lvgl_cpp/obj.hpp"
 #include <apps/utils/audio/audio.h>
 #include <apps/common/window/window.h>
 #include <apps/common/toast/toast.h>

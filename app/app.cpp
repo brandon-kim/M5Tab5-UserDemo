@@ -28,18 +28,6 @@ void app::Init(InitCallback_t callback)
 
     on_startup_anim();
     on_install_apps();
-#if 0 //need not   
-    // Open AppLauncher as default launcher
-    auto& mc = GetMooncake();
-    auto app_props = mc.getAllAppProps();
-    for (const auto& prop : app_props) {
-        if (prop.info.name == "AppLauncher") {
-            mclog::tagInfo(_tag, "Opening AppLauncher as default");
-            mc.openApp(prop.appID);
-            break;
-        }
-    }
-#endif    
 }
 
 void app::Update()

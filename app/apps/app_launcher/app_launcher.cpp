@@ -28,6 +28,7 @@ void AppLauncher::onLauncherOpen()
 
 void AppLauncher::onLauncherRunning()
 {
+    _view->update();
     const int appID = _view->consumeSelectedAppId();
     if (appID >= 0) {
         mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);

@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
-#include <lvgl.h>
-#include <smooth_lvgl.hpp>
+//#include <mooncake.h>
+#include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
+#include <smooth_lvgl.hpp>
 #include <apps/common/window/window.h>
-#include <cstdint>
-#include <memory>
-#include <vector>
 #include <functional>
 
 namespace view {
@@ -296,11 +294,11 @@ public:
     void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
 
 private:
+    std::unique_ptr<uitk::lvgl_cpp::Image> _img_bg;
     bool _is_stacked = false;
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Image> _img_bg;
-    std::vector<std::unique_ptr<PanelBase>> _panels;
     void update_anim();
     std::function<void()>      _on_quit;
+    std::vector<std::unique_ptr<PanelBase>>    _panels;
     std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
 };
 

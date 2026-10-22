@@ -4,14 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 #include "view.h"
+#include <hal/hal.h>
+#include <mooncake_log.h>
+#include <apps/utils/audio/audio.h>
 #include <algorithm>
 #include <cstdint>
 #include <lvgl.h>
-#include <hal/hal.h>
-#include <mooncake_log.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
-#include <apps/utils/audio/audio.h>
 
 using namespace view;
 using namespace smooth_ui_toolkit;

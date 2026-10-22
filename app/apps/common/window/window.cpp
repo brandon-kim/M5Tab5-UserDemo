@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 #include "window.h"
-#include <lvgl.h>
 #include <hal/hal.h>
-#include <smooth_ui_toolkit.hpp>
-#include <smooth_lvgl.hpp>
 #include <apps/utils/audio/audio.h>
+
 
 using namespace ui;
 using namespace smooth_ui_toolkit;

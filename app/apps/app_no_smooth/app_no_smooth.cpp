@@ -7,7 +7,6 @@
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
-#include <smooth_lvgl.hpp>
 
 using namespace mooncake;
 

@@ -5,11 +5,12 @@
  */
 #pragma once
 #include <mooncake.h>
-#include <memory>
-#include "lvgl_cpp/label.hpp"
 #include <smooth_ui_toolkit.hpp>
 #include <smooth_lvgl.hpp>
+//#include "lvgl_cpp/label.hpp"
 #include <stdint.h>
+#include <memory>
+
 
 /**
  * @brief derived App

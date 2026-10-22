@@ -8,8 +8,6 @@
 #include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
-#include <vector>
-#include <memory>
 
 namespace view {
 
@@ -22,13 +20,12 @@ public:
     ~LauncherView();
 
     void init(std::vector<mooncake::AppProps_t> appProps);
+    void update();
     int consumeSelectedAppId();
 
 private:
     int _selected_app_id = -1;
-    bool _is_stacked = false;
-    lv_obj_t* _container = nullptr;
-    
+    lv_obj_t* _container = nullptr;    
     static void _card_event_handler(lv_event_t* e);
 };
 
