@@ -21,6 +21,7 @@ AppTemplate::AppTemplate()
 void AppTemplate::onCreate()
 {
     mclog::tagInfo(getAppInfo().name, "on create");
+    //open();
 }
 
 void AppTemplate::onOpen()
