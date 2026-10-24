@@ -21,6 +21,13 @@ add_subdirectory(dependencies/smooth_ui_toolkit)
 # Lvgl
 set(LV_CONF_INCLUDE_SIMPLE OFF)
 set(LV_CONF_PATH ../../lv_conf.h)
+# ---------------------------------------------------------------------------
+#  Add LVGL (keep the build minimal: skip bundled demos/examples/ThorVG)
+# ---------------------------------------------------------------------------
+set(CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CONFIG_LV_BUILD_DEMOS OFF CACHE BOOL "" FORCE)
+# set(CONFIG_LV_USE_THORVG_INTERNAL OFF CACHE BOOL "" FORCE)
+
 add_subdirectory(dependencies/lvgl)
 
 # SDL

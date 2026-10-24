@@ -8,8 +8,8 @@
 #include <mooncake_log.h>
 #include "lvgl_cpp/obj.hpp"
 #include <apps/utils/audio/audio.h>
-#include <apps/common/window/window.h>
-#include <apps/common/toast/toast.h>
+#include <apps/utils/ui/window/window.h>
+#include <apps/utils/ui/toast/toast.h>
 
 using namespace view;
 using namespace smooth_ui_toolkit;
