@@ -7,8 +7,8 @@
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <apps/utils/audio/audio.h>
-#include <apps/utils/ui/window/window.h>
-#include <apps/utils/ui/toast/toast.h>
+#include <apps/utils/ui/window.h>
+#include <apps/utils/ui/toast.h>
 #include <array>
 #include <functional>
 

@@ -8,7 +8,7 @@
 #include <assets/assets.h>
 #include <mooncake_log.h>
 #include <apps/utils/audio/audio.h>
-#include <apps/utils/ui/toast/toast.h>
+#include <apps/utils/ui/toast.h>
 
 using namespace view;
 using namespace smooth_ui_toolkit;

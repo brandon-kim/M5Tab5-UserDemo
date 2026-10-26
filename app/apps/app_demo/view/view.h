@@ -8,7 +8,7 @@
 #include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
-#include <apps/utils/ui/window/window.h>
+#include <apps/utils/ui/window.h>
 #include <functional>
 
 namespace view {

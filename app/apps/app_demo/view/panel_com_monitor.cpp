@@ -9,8 +9,8 @@
 //#include "lvgl_cpp/button.hpp"
 //#include "lvgl_cpp/label.hpp"
 #include <apps/utils/audio/audio.h>
-#include <apps/utils/ui/window/window.h>
-#include <apps/utils/ui/toast/toast.h>
+#include <apps/utils/ui/window.h>
+#include <apps/utils/ui/toast.h>
 
 using namespace view;
 using namespace smooth_ui_toolkit;
