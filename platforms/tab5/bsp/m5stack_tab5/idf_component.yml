@@ -43,8 +43,8 @@ dependencies:
   lvgl/lvgl: '>=8,<10'
 
   espressif/esp_lvgl_port:
-    version: ^2.7.2
-#    override_path: "../../components/esp_lvgl_port"
+    #version: ^2.7.2
+    override_path: "../../components/esp_lvgl_port"
     public: true
 
   # need v5.5.0+ idf 

@@ -943,6 +943,86 @@ uint8_t bsp_codec_feed_channel( void )
 }
 
 //==================================================================================
+//
+//==================================================================================
+typedef enum {
+    BSP_DISPLAY_TYPE_UNKNOWN = 0,
+    BSP_DISPLAY_TYPE_ILI9881C_GT911,
+    BSP_DISPLAY_TYPE_ST7123,
+    BSP_DISPLAY_TYPE_ST7121
+} bsp_display_type_t;
+
+static bsp_display_type_t display_type = BSP_DISPLAY_TYPE_UNKNOWN;
+static lv_display_t* s_lv_display = NULL;
+
+static bsp_display_type_t bsp_detect_display_type(void)
+{
+#if 1//Fixed value for this board
+    if (display_type != BSP_DISPLAY_TYPE_UNKNOWN) {
+        return display_type;
+    }
+    display_type = BSP_DISPLAY_TYPE_ST7123;
+    return BSP_DISPLAY_TYPE_ST7123;
+#else
+    if (display_type != BSP_DISPLAY_TYPE_UNKNOWN) {
+        return display_type;
+    }
+
+    esp_err_t ret;
+
+    // 确保I2C已初始化
+    if (bsp_i2c_init() != ESP_OK) {
+        ESP_LOGE(TAG, "I2C init failed for display detection");
+        display_type = BSP_DISPLAY_TYPE_UNKNOWN;
+        return display_type;
+    }
+
+    // 检测GT911触摸屏
+    ret = i2c_master_probe(i2c_handle, ESP_LCD_TOUCH_IO_I2C_GT911_ADDRESS_BACKUP, 50);
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "Detected GT911 touch controller, using ST7703 display");
+        display_type = BSP_DISPLAY_TYPE_ILI9881C_GT911;
+        return display_type;
+    }
+
+    // 检测ST7123/ST7121触摸屏
+    ret = i2c_master_probe(i2c_handle, 0x55, 50);
+    if (ret == ESP_OK) {
+        esp_lcd_panel_io_handle_t tp_io_handle     = NULL;
+        esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_ST7123_CONFIG();
+        tp_io_config.scl_speed_hz                  = 100000;
+        if (esp_lcd_new_panel_io_i2c(i2c_handle, &tp_io_config, &tp_io_handle) == ESP_OK) {
+            uint8_t fw_version = 0;
+            if (esp_lcd_panel_io_rx_param(tp_io_handle, 0x0000, &fw_version, 1) == ESP_OK) {
+                if (fw_version == 1) {
+                    ESP_LOGI(TAG, "Detected ST7121 touch controller (FW version: %u), using ST7121 display",
+                             fw_version);
+                    display_type = BSP_DISPLAY_TYPE_ST7121;
+                    esp_lcd_panel_io_del(tp_io_handle);
+                    return BSP_DISPLAY_TYPE_ST7121;
+                } else if (fw_version == 3) {
+                    ESP_LOGI(TAG, "Detected ST7123 touch controller (FW version: %u), using ST7123 display",
+                             fw_version);
+                    display_type = BSP_DISPLAY_TYPE_ST7123;
+                    esp_lcd_panel_io_del(tp_io_handle);
+                    return BSP_DISPLAY_TYPE_ST7123;
+                }
+            }
+            esp_lcd_panel_io_del(tp_io_handle);
+        }
+
+        ESP_LOGI(TAG, "Detected 0x55 touch controller, fallback using ST7123 display");
+        display_type = BSP_DISPLAY_TYPE_ST7123;
+        return BSP_DISPLAY_TYPE_ST7123;
+    }
+
+    ESP_LOGW(TAG, "No known touch controller detected, defaulting to ILI9881C");
+    display_type = BSP_DISPLAY_TYPE_ILI9881C_GT911;
+    return display_type;
+#endif    
+}
+
+//==================================================================================
 // lcd st7703 1280x720  gt911
 //==================================================================================
 #if ( BSP_CONFIG_NO_GRAPHIC_LIB == 0 )
@@ -1695,6 +1775,22 @@ esp_err_t bsp_usb_host_stop( void )
 #endif
 
 
+//==================================================================================
+const char* bsp_display_get_panel_ic(void)
+{
+    bsp_detect_display_type();
+
+    switch (display_type) {
+        case BSP_DISPLAY_TYPE_ST7121:
+            return "ST7121";
+        case BSP_DISPLAY_TYPE_ST7123:
+            return "ST7123";
+        case BSP_DISPLAY_TYPE_ILI9881C_GT911:
+            return "ILI9881C";
+        default:
+            return "Unknown";
+    }
+}
 esp_err_t bsp_set_speaker_enable(bool enable)
 {   
     esp_err_t ret;
