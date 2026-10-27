@@ -5,17 +5,20 @@ dependencies:
     version: '>=5.4.0'
 
   m5stack_tab5:
-    path: ../bsp/m5stack_tab5
-    public: true
+    path: ../components/m5stack_tab5    
+
+  ina226:
+    path: ../components/ina226
+
+  rx8130:
+    path: ../components/rx8130
 
   espressif/esp-dsp: 
     version: ^1.7.0
-    public: true
     
   lvgl/lvgl:
   #  version: ^9.4.0
     override_path: ../../../dependencies/lvgl
-    public: true
 
   espressif/esp_lv_decoder: '*'
   #espressif/esp_mmap_assets: '*'
@@ -34,4 +37,5 @@ dependencies:
   #espressif/esp_image_effects: ^1.0.1
   #espressif/esp_audio_codec: ^2.4.1
 
-  
+  espressif/usb_host_hid: ^1.0.3
+  espressif/esp_tinyusb: ^2.1.1

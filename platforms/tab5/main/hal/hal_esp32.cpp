@@ -46,23 +46,24 @@ void HalEsp32::init()
 {
     mclog::tagInfo(_tag, "init");
 
-    mclog::tagInfo(_tag, "camera init");
-    bsp_cam_osc_init();
-
     mclog::tagInfo(_tag, "i2c init");
     bsp_i2c_init();
 
     mclog::tagInfo(_tag, "io expander init");
-    i2c_master_bus_handle_t i2c_bus_handle = bsp_i2c_get_handle();
-    bsp_io_expander_pi4ioe_init(i2c_bus_handle);
 
+    i2c_master_bus_handle_t i2c_bus_handle = bsp_i2c_get_handle();
+#if 0//old bsp    
+    bsp_io_expander_pi4ioe_init(i2c_bus_handle);
+#else
+
+#endif
     setChargeQcEnable(true);
     delay(50);
     setChargeEnable(true);
     // setChargeEnable(false);
-
+    
     mclog::tagInfo(_tag, "i2c scan");
-    bsp_i2c_scan(bsp_i2c_get_handle());
+    bsp_i2c_scan(i2c_bus_handle);
 
     mclog::tagInfo(_tag, "codec init");
     delay(200);
@@ -89,6 +90,8 @@ void HalEsp32::init()
     rx8130_initBat();
     clearRtcIrq();
     update_system_time();
+
+    bsp_feature_enable(BSP_FEATURE_WIFI, true);
 
     mclog::tagInfo(_tag, "display init");
     lvDisp = bsp_display_start();
@@ -262,13 +265,19 @@ std::vector<hal::HalBase::FileEntry_t> HalEsp32::scanSdCard(const std::string& d
     std::vector<hal::HalBase::FileEntry_t> file_entries;
 
     mclog::tagInfo(_tag, "init sd card");
+#if 0 //old bsp    
     if (bsp_sdcard_init("/sd", 25) != ESP_OK) {
+#else
+    if ( bsp_sdcard_mount() != ESP_OK ) {
+#endif        
         mclog::error("failed to mount sd card");
         return file_entries;
     }
-
+#if 0 //old bsp   
     std::string target_path = "/sd/" + dirPath;
-
+#else
+    std::string target_path = BSP_SD_MOUNT_POINT + dirPath;
+#endif
     DIR* dir = opendir(target_path.c_str());
     if (dir == nullptr) {
         mclog::error("failed to open directory: {}", target_path);
@@ -290,8 +299,11 @@ std::vector<hal::HalBase::FileEntry_t> HalEsp32::scanSdCard(const std::string& d
     closedir(dir);
 
     mclog::tagInfo(_tag, "deinit sd card");
+#if 0//old bsp    
     bsp_sdcard_deinit("/sd");
-
+#else
+    bsp_sdcard_unmount();
+#endif
     return file_entries;
 }
 
