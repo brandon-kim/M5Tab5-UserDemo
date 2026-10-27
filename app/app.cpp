@@ -37,6 +37,7 @@ void app::Update()
 #if defined ( __WIN32__ ) || ( defined(__APPLE__) && defined(__MACH__) )
     // 'nextEventMatchingMask should only be called from the Main Thread!'
     auto time_till_next = lv_timer_handler();
+    if( time_till_next < 1 ) time_till_next = 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(time_till_next));
 #endif
 }

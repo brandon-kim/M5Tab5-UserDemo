@@ -40,8 +40,11 @@
  * - LV_STDLIB_RTTHREAD:    RT-Thread implementation
  * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
+#if defined(ESP_PLATFORM)  //memory debugging
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
-
+#else
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN   //for debugging
+#endif
 /** Possible values
  * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
  * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
@@ -70,7 +73,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /** Size of memory available for `lv_malloc()` in bytes (>= 2kB) */
-    #define LV_MEM_SIZE (64 * 1024U)          /**< [bytes] */
+    #define LV_MEM_SIZE (1024 * 1024U)          /**< [bytes] */
 
     /** Size of the memory expand for `lv_malloc()` in bytes */
     #define LV_MEM_POOL_EXPAND_SIZE 0
@@ -155,7 +158,7 @@
 /** Stack size of drawing thread.
  * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
  */
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 #define LV_DRAW_THREAD_STACK_SIZE        (32 * 1024)     /**< [bytes]*/
 #else
 #define LV_DRAW_THREAD_STACK_SIZE        (128 * 1024)   /**[bytes]*/
@@ -414,9 +417,9 @@
     #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
 #endif
 
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 /** Draw using espressif PPA accelerator */
-#define LV_USE_PPA  0
+#define LV_USE_PPA  1
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG 1
     #define LV_PPA_BURST_LENGTH    128
@@ -484,7 +487,7 @@
 
     /** - 1: Print log with 'printf';
      *  - 0: User needs to register a callback with `lv_log_register_print_cb()`. */
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
      #define LV_LOG_PRINTF 0
 #else
      #define LV_LOG_PRINTF 1
@@ -523,7 +526,7 @@
  * If LV_USE_LOG is enabled, an error message will be printed on failure. */
 #define LV_USE_ASSERT_NULL          1   /**< Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 #define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
 #else
@@ -946,7 +949,7 @@
     #define LV_FS_POSIX_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_POSIX_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 /** API for CreateFile, ReadFile, etc. */
 #define LV_USE_FS_WIN32 0
 #if LV_USE_FS_WIN32
@@ -962,7 +965,7 @@
     #define LV_FS_WIN32_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_WIN32_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
-#endif//#if !defined(_WIN32) && !defined(_WIN64)
+#endif//#if defined(ESP_PLATFORM)  
 /** API for FATFS (needs to be added separately). Uses f_open, f_read, etc. */
 #define LV_USE_FS_FATFS 0
 #if LV_USE_FS_FATFS
@@ -1125,7 +1128,7 @@
 
 /** 1: Enable API to take snapshot for object */
 #define LV_USE_SNAPSHOT 0
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 /** 1: Enable system monitor component */
 #define LV_USE_SYSMON   0
 #if LV_USE_SYSMON
@@ -1159,7 +1162,11 @@
 #endif /*LV_USE_SYSMON*/
 #else
 /** 1: Enable system monitor component */
+#if defined(ESP_PLATFORM)  //memory debugging
 #define LV_USE_SYSMON   0
+#else
+#define LV_USE_SYSMON   1
+#endif
 #if LV_USE_SYSMON
     /** Get the idle percentage. E.g. uint32_t my_get_idle(void); */
     #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
@@ -1331,7 +1338,7 @@
  *==================*/
 
 /** Use SDL to open window on PC and handle mouse and keyboard. */
-#if !defined(_WIN32) && !defined(_WIN64)
+#if defined(ESP_PLATFORM)  
 #define LV_USE_SDL              0
 #else
 #define LV_USE_SDL              1

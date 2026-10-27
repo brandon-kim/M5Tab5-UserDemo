@@ -6,21 +6,27 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DPLATFORM_BUILD_DESKTOP)
 
-# Mooncake 
+# This file is included by the repository root CMakeLists.txt. Resolve paths
+# from this list file, rather than from CMAKE_CURRENT_SOURCE_DIR, so desktop
+# builds work both from the primary checkout and a linked Git worktree.
+set(TAB5_PROJECT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../..")
+set(TAB5_DEPENDENCIES_DIR "${TAB5_PROJECT_ROOT}/dependencies")
+
+# Mooncake
 set(MOONCAKE_BUILD_EXAMPLE OFF)
-add_subdirectory(dependencies/mooncake)
+add_subdirectory("${TAB5_DEPENDENCIES_DIR}/mooncake" ${CMAKE_BINARY_DIR}/mooncake)
 
 # Mooncake log
 set(MOONCAKE_LOG_BUILD_EXAMPLE OFF)
-add_subdirectory(dependencies/mooncake_log)
+add_subdirectory("${TAB5_DEPENDENCIES_DIR}/mooncake_log" ${CMAKE_BINARY_DIR}/mooncake_log)
 
-# Smooth ui shit
+# Smooth UI toolkit
 set(SMOOTH_UI_TOOLKIT_BUILD_EXAMPLE OFF)
-add_subdirectory(dependencies/smooth_ui_toolkit)
+add_subdirectory("${TAB5_DEPENDENCIES_DIR}/smooth_ui_toolkit" ${CMAKE_BINARY_DIR}/smooth_ui_toolkit)
 
-# Lvgl
+# LVGL
 set(LV_CONF_INCLUDE_SIMPLE OFF)
-set(LV_CONF_PATH ../../lv_conf.h)
+set(LV_CONF_PATH "${TAB5_PROJECT_ROOT}/lv_conf.h")
 # ---------------------------------------------------------------------------
 #  Add LVGL (keep the build minimal: skip bundled demos/examples/ThorVG)
 # ---------------------------------------------------------------------------
@@ -28,7 +34,7 @@ set(CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CONFIG_LV_BUILD_DEMOS OFF CACHE BOOL "" FORCE)
 # set(CONFIG_LV_USE_THORVG_INTERNAL OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(dependencies/lvgl)
+add_subdirectory("${TAB5_DEPENDENCIES_DIR}/lvgl" ${CMAKE_BINARY_DIR}/lvgl)
 
 # SDL
 find_package(SDL2 REQUIRED)
@@ -37,23 +43,37 @@ target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS})
 #message(STATUS "SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
 list(REMOVE_ITEM SDL2_LIBRARIES SDL2::SDL2main)
 
+# CURL for HA HTTP client
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIRS})
+
+# libjpeg-turbo for desktop wallpaper decode (mirrors P4 HW JPEG decoder).
+# Homebrew keeps it keg-only, so point at its prefix explicitly if present.
+find_package(JPEG REQUIRED)
+include_directories(${JPEG_INCLUDE_DIRS})
+
+# nlohmann json (header only) — include parent so #include <nlohmann/json.hpp> resolves
+include_directories("${TAB5_DEPENDENCIES_DIR}")
 
 # App layer
 file(GLOB_RECURSE APP_LAYER_SRCS
-    app/*.c
-    app/*.cc
-    app/*.cpp
+    "${TAB5_PROJECT_ROOT}/app/*.c"
+    "${TAB5_PROJECT_ROOT}/app/*.cc"
+    "${TAB5_PROJECT_ROOT}/app/*.cpp"
 )
 set(APP_LAYER_INCS
-    app/
+    "${TAB5_PROJECT_ROOT}/app/"
+    "${CMAKE_CURRENT_LIST_DIR}/compat/"
 )
 
-# 桌面端源文件
+# (exclude any build/ subtree to avoid picking up CMake's own
+# CompilerId test sources, which collide on link)
 file(GLOB_RECURSE APP_DESKTOP_BUILD_SRCS
-    platforms/desktop/*.cpp
-    platforms/desktop/*.cc
-    platforms/desktop/*.c
+    "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/*.c"
 )
+list(FILTER APP_DESKTOP_BUILD_SRCS EXCLUDE REGEX "build.*/.*")
 add_executable(app_desktop_build ${APP_DESKTOP_BUILD_SRCS} ${APP_LAYER_SRCS})
 target_include_directories(app_desktop_build PUBLIC ${APP_LAYER_INCS})
 target_link_libraries(app_desktop_build PUBLIC 
@@ -61,6 +81,8 @@ target_link_libraries(app_desktop_build PUBLIC
     mooncake_log
     lvgl 
     ${SDL2_LIBRARIES}
+    ${CURL_LIBRARIES}
+    ${JPEG_LIBRARIES}
     smooth_ui_toolkit
     pthread
 )

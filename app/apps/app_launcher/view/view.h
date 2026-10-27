@@ -25,7 +25,7 @@ public:
 
 private:
     int _selected_app_id = -1;
-    lv_obj_t* _container = nullptr;    
+    lv_obj_t* _base = nullptr;
     static void _card_event_handler(lv_event_t* e);
 };
 

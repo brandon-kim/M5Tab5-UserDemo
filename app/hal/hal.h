@@ -5,15 +5,15 @@
  */
 #pragma once
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <queue>
 #include <string>
 #include <lvgl.h>
 #include <mutex>
+#include <thread>
 #include <vector>
 
-// 변경 사항 : https://qiita.com/nak435/items/ccceb21f307d671e9a55
-#define  USE_WIFI_AP   0  // 1 station
 /**
  * @brief Hardware abstraction layer
  *
@@ -192,6 +192,22 @@ public:
     };
     HidMouseData_t hidMouseData;
 
+    // LVGL keypad input-device group — created by hid_init() on device.
+    // Apps add widgets to this group so physical keyboard events reach them.
+    lv_group_t* lvKbGroup = nullptr;
+
+    // Apps register this to be notified when Enter is pressed on a focused
+    // widget via the physical keyboard (bypasses LVGL's key-event pipeline
+    // so it doesn't suffer from the textarea class default adding '\n'
+    // first). Used by chat-style apps so Enter triggers Send rather than
+    // inserting a newline. Cleared in onClose.
+    std::function<void()> onEnterPressed = nullptr;
+
+    virtual bool usbKeyboardDetect()
+    {
+        return false;
+    }
+
     /* ---------------------------------- Audio --------------------------------- */
     virtual void setSpeakerVolume(uint8_t volume)
     {
@@ -264,10 +280,63 @@ public:
     virtual void startWifiAp()
     {
     }
-#if USE_WIFI_AP == 0
-    virtual std::string getWifiSSID(){ return ""; }
-    virtual std::string getWifiIPv4(){ return ""; }
-#endif
+    // True once the STA has an IP. Default true so non-device platforms (e.g.
+    // desktop sim) never trigger the "no WiFi" config flow.
+    virtual bool isWifiConnected()
+    {
+        return true;
+    }
+
+    // Scan for nearby WiFi access points (STA scan). Returns unique SSIDs,
+    // strongest signal first. Empty if scan unsupported/failed.
+    struct WifiAp_t {
+        std::string ssid;
+        int8_t rssi;
+        bool locked;  // requires a password (not open)
+    };
+    virtual std::vector<WifiAp_t> wifiScan()
+    {
+        return {};
+    }
+
+    /* ------------------------- Persistent config (NVS) ------------------------ */
+    // Simple string key/value store backed by NVS on device. Used for
+    // runtime-configurable WiFi credentials and HA server address so the user
+    // can change them on-screen without reflashing.
+    virtual std::string getConfig(const std::string& key, const std::string& defaultValue = "")
+    {
+        return defaultValue;
+    }
+    virtual void setConfig(const std::string& key, const std::string& value)
+    {
+    }
+
+    /* --------------------------------- System --------------------------------- */
+    virtual void reboot()
+    {
+    }
+
+    /**
+     * @brief Spawn a detached background worker, failing gracefully.
+     *
+     * On device a std::thread maps to a pthread whose stack
+     * (CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT = 16 KB) must come from a
+     * contiguous internal-RAM block. When internal RAM is momentarily
+     * fragmented (e.g. just after leaving xiaozhi, whose audio task stacks are
+     * still being reclaimed), pthread_create fails — and with C++ exceptions
+     * disabled, std::thread would abort() the whole device. This helper lets the
+     * caller detect that failure (returns false) and skip the work instead.
+     *
+     * Default (desktop sim) implementation just uses std::thread.
+     *
+     * @return true if the worker was started, false if it could not be spawned.
+     */
+    virtual bool tryRunDetached(std::function<void()> fn)
+    {
+        std::thread(std::move(fn)).detach();
+        return true;
+    }
+
     /* --------------------------------- SD Card -------------------------------- */
     struct FileEntry_t {
         std::string name;
@@ -314,6 +383,36 @@ public:
     }
     virtual void gpioReset(uint8_t pin)
     {
+    }
+
+    /* ---------------------------------- HTTP ---------------------------------- */
+    struct HttpResponse_t {
+        int status = 0;
+        std::string body;
+        bool ok = false;
+    };
+    virtual HttpResponse_t httpGet(const std::string& url,
+        const std::vector<std::pair<std::string, std::string>>& headers = {})
+    {
+        return {};
+    }
+    virtual HttpResponse_t httpPost(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {})
+    {
+        return {};
+    }
+    virtual HttpResponse_t httpPut(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {})
+    {
+        return {};
+    }
+    // Same contract as httpPost, but implementations may reuse a persistent
+    // connection. Intended for high-frequency callers (e.g. the mobile-base
+    // 20 Hz lease frames) where per-request TCP handshakes dominate latency.
+    virtual HttpResponse_t httpPostKeepAlive(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {})
+    {
+        return httpPost(url, body, headers);
     }
 
     /* ------------------------------ UART monitor ------------------------------ */
