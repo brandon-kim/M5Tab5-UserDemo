@@ -289,6 +289,8 @@ private:
  */
 class AppDemoView {
 public:
+    ~AppDemoView();
+
     void init();
     void update();
     void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }

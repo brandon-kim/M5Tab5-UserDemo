@@ -50,6 +50,5 @@ void AppNoSmooth::onRunning()
 void AppNoSmooth::onClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
-    //LvglLockGuard lock;// view.reset() has no lvgl lock
     _view.reset();            
 }

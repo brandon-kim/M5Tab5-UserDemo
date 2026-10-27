@@ -75,7 +75,10 @@ file(GLOB_RECURSE APP_DESKTOP_BUILD_SRCS
 )
 list(FILTER APP_DESKTOP_BUILD_SRCS EXCLUDE REGEX "build.*/.*")
 add_executable(app_desktop_build ${APP_DESKTOP_BUILD_SRCS} ${APP_LAYER_SRCS})
-target_include_directories(app_desktop_build PUBLIC ${APP_LAYER_INCS})
+target_include_directories(app_desktop_build PUBLIC
+    ${APP_LAYER_INCS}
+    "${TAB5_DEPENDENCIES_DIR}/nlohmann_json/single_include"
+)
 target_link_libraries(app_desktop_build PUBLIC 
     mooncake 
     mooncake_log

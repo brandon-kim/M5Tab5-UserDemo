@@ -123,7 +123,7 @@ void AppStartupAnim::onClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
 
-    LvglLockGuard lock;
+    LvglLockGuard lock;//need?
 
     _logo_tab.reset();
     _logo_5.reset();

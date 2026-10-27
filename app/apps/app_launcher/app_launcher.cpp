@@ -21,7 +21,6 @@ void AppLauncher::onLauncherOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
-    //LvglLockGuard lock;
     _view = std::make_unique<view::LauncherView>();
     _view->init(getAppProps());
 }
@@ -39,8 +38,6 @@ void AppLauncher::onLauncherRunning()
 void AppLauncher::onLauncherClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
-
-    //LvglLockGuard lock;
 
     _view.reset();
 }

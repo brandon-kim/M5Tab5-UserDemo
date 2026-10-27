@@ -48,6 +48,5 @@ void AppDemo::onClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
 
-    LvglLockGuard lock;// view.reset() has no lvgl lock
     _view.reset();
 }

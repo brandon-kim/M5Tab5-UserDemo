@@ -14,10 +14,9 @@ static const std::string _tag = "no-smooth-view";
 
 NoSmoothView::~NoSmoothView()
 {
-    LvglLockGuard lock;
     // Clear callbacks to avoid accidental calls
     _on_quit = nullptr;
-
+    LvglLockGuard lock;
     if (_container) {
         lv_obj_delete(_container);
         _container = nullptr;

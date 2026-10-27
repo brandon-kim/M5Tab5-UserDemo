@@ -16,6 +16,14 @@ using namespace smooth_ui_toolkit::lvgl_cpp;
 
 static const std::string _tag = "demo-view";
 
+AppDemoView::~AppDemoView()
+{
+    LvglLockGuard lock;
+    _button_quit.reset();
+    _panels.clear();
+    _img_bg.reset();
+}
+
 void AppDemoView::init()
 {
     mclog::tagInfo(_tag, "init");
