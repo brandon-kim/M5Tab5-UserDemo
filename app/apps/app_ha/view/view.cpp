@@ -127,7 +127,7 @@ static lv_obj_t* _make_card(lv_obj_t* parent, int x, int y, int w, int h,
     lv_obj_set_style_radius(obj, radius, 0);
     lv_obj_set_style_border_width(obj, 0, 0);
     lv_obj_set_style_pad_all(obj, 0, 0);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     return obj;
 }
 
@@ -149,7 +149,7 @@ static void _add_lightbulb_icon(lv_obj_t* parent, uint32_t color)
     lv_obj_set_style_border_width(bulb, 3, 0);
     lv_obj_set_style_border_color(bulb, c, 0);
     lv_obj_set_style_radius(bulb, 15, 0);
-    lv_obj_clear_flag(bulb, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(bulb, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_align(bulb, LV_ALIGN_CENTER, 0, -7);
 
     lv_obj_t* neck = lv_obj_create(parent);
@@ -157,7 +157,7 @@ static void _add_lightbulb_icon(lv_obj_t* parent, uint32_t color)
     lv_obj_set_style_bg_color(neck, c, 0);
     lv_obj_set_style_border_width(neck, 0, 0);
     lv_obj_set_style_radius(neck, 3, 0);
-    lv_obj_clear_flag(neck, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(neck, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_align(neck, LV_ALIGN_CENTER, 0, 13);
 
     lv_obj_t* base = lv_obj_create(parent);
@@ -165,7 +165,7 @@ static void _add_lightbulb_icon(lv_obj_t* parent, uint32_t color)
     lv_obj_set_style_bg_color(base, c, 0);
     lv_obj_set_style_border_width(base, 0, 0);
     lv_obj_set_style_radius(base, 2, 0);
-    lv_obj_clear_flag(base, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(base, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_align(base, LV_ALIGN_CENTER, 0, 21);
 }
 
@@ -185,7 +185,7 @@ static void _build_device_card(lv_obj_t* parent, int x, int y, int w, int h,
     lv_obj_set_style_bg_color(ic, lv_color_hex(card.is_offline ? 0x16242E
                                   : (card.is_on ? C_ACCENT_SOFT : 0x1A2C42)), 0);
     lv_obj_align(ic, LV_ALIGN_LEFT_MID, 14, 0);
-    lv_obj_clear_flag(ic, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ic, LV_OBJ_FLAG_SCROLLABLE);
 
     const char* icon_text = card.icon.empty() ? LV_SYMBOL_HOME : card.icon.c_str();
     uint32_t icon_color = card.is_offline ? 0x46586C : (card.is_on ? C_ACCENT : 0x4A6A8C);
@@ -217,7 +217,7 @@ static void _build_device_card(lv_obj_t* parent, int x, int y, int w, int h,
     lv_obj_set_style_bg_color(dot, lv_color_hex(card.is_offline ? C_RED
                                   : (card.is_on ? C_GREEN : 0x3A4A5C)), 0);
     lv_obj_align(dot, LV_ALIGN_TOP_RIGHT, -10, 10);
-    lv_obj_clear_flag(dot, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(dot, LV_OBJ_FLAG_SCROLLABLE);
 
     if (card.is_offline) {
         // Offline: show a "Disconnected" badge and make the card non-interactive so a
@@ -246,10 +246,7 @@ uint32_t HaView::_get_millis() const
 
 HaView::~HaView()
 {
-    if (_container) {
-        _container->removeSwipeGesture();
-        lv_obj_clean(_container->get());
-    }
+    _container.reset();
     _scr = nullptr;
 }
 
@@ -265,7 +262,7 @@ void HaView::_build_skeleton()
     _container = std::make_unique<ui::PageBaseContainer>();
     _scr = _container->get();
     lv_obj_set_style_bg_color(_scr, lv_color_hex(C_BG), 0);
-    lv_obj_clear_flag(_scr, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_scr, LV_OBJ_FLAG_SCROLLABLE);
 
     // _build_header(); removed — top status/weather bar dropped
 
@@ -276,7 +273,7 @@ void HaView::_build_skeleton()
     lv_obj_set_style_bg_opa(_content_area, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(_content_area, 0, 0);
     lv_obj_set_style_pad_all(_content_area, 0, 0);
-    lv_obj_clear_flag(_content_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_content_area, LV_OBJ_FLAG_SCROLLABLE);
 
 }
 

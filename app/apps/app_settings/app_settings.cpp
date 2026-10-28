@@ -156,13 +156,8 @@ void AppSettings::onRunning()
 
 void AppSettings::onClose()
 {
-    mclog::tagInfo(_tag, "close");
-    
-    
-    if (_base_container) {
-        _base_container->removeSwipeGesture();
-        lv_obj_clean(_base);
-    }
+    mclog::tagInfo(_tag, "on close");
+
     _base_container.reset();
     _base = nullptr;
     _tools_page = _calc_page = _fx_page = _unit_page = nullptr;
@@ -203,7 +198,7 @@ void AppSettings::_buildToolsPage()
     lv_obj_set_style_bg_opa(_tools_page, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(_tools_page, 0, 0);
     lv_obj_set_style_pad_all(_tools_page, 0, 0);
-    lv_obj_clear_flag(_tools_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_tools_page, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t* title = lv_label_create(_tools_page);
     lv_label_set_text(title, "Tools");
@@ -234,7 +229,7 @@ void AppSettings::_buildToolsPage()
         lv_obj_set_style_shadow_opa(tile, LV_OPA_30, 0);
         lv_obj_set_style_shadow_ofs_y(tile, 4, 0);
         lv_obj_set_style_bg_color(tile, lv_color_hex(C_CARD_PR), LV_STATE_PRESSED);
-        lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_remove_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(tile, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event_cb(tile, cb, LV_EVENT_CLICKED, this);
 
@@ -272,8 +267,8 @@ void AppSettings::_buildToolsPage()
                 lv_obj_set_style_border_width(env_body, 0, 0);
                 lv_obj_set_style_shadow_width(env_body, 0, 0);
                 lv_obj_set_style_pad_all(env_body, 0, 0);
-                lv_obj_clear_flag(env_body, LV_OBJ_FLAG_SCROLLABLE);
-                lv_obj_clear_flag(env_body, LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_remove_flag(env_body, LV_OBJ_FLAG_SCROLLABLE);
+                lv_obj_remove_flag(env_body, LV_OBJ_FLAG_CLICKABLE);
                 // Let clicks bubble from the envelope body to the parent tile.
                 lv_obj_add_flag(env_body, LV_OBJ_FLAG_EVENT_BUBBLE);
                 // Envelope flap line.
@@ -286,8 +281,8 @@ void AppSettings::_buildToolsPage()
                 lv_obj_set_style_radius(flap, 0, 0);
                 lv_obj_set_style_shadow_width(flap, 0, 0);
                 lv_obj_set_style_pad_all(flap, 0, 0);
-                lv_obj_clear_flag(flap, LV_OBJ_FLAG_SCROLLABLE);
-                lv_obj_clear_flag(flap, LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_remove_flag(flap, LV_OBJ_FLAG_SCROLLABLE);
+                lv_obj_remove_flag(flap, LV_OBJ_FLAG_CLICKABLE);
                 // Let clicks bubble from the flap to the parent tile.
                 lv_obj_add_flag(flap, LV_OBJ_FLAG_EVENT_BUBBLE);
                 // Align the label at 160 px, matching image tiles.
@@ -308,8 +303,8 @@ void AppSettings::_buildToolsPage()
                     lv_obj_set_style_border_color(ring, lv_color_hex(C_ACCENT), 0);
                     lv_obj_set_style_shadow_width(ring, 0, 0);
                     lv_obj_set_style_pad_all(ring, 0, 0);
-                    lv_obj_clear_flag(ring, LV_OBJ_FLAG_SCROLLABLE);
-                    lv_obj_clear_flag(ring, LV_OBJ_FLAG_CLICKABLE);
+                    lv_obj_remove_flag(ring, LV_OBJ_FLAG_SCROLLABLE);
+                    lv_obj_remove_flag(ring, LV_OBJ_FLAG_CLICKABLE);
                     // Let clicks bubble from the ring to the parent tile.
                     lv_obj_add_flag(ring, LV_OBJ_FLAG_EVENT_BUBBLE);
                 }
@@ -323,8 +318,8 @@ void AppSettings::_buildToolsPage()
                 lv_obj_set_style_border_width(chip, 0, 0);
                 lv_obj_set_style_shadow_width(chip, 0, 0);
                 lv_obj_set_style_pad_all(chip, 0, 0);
-                lv_obj_clear_flag(chip, LV_OBJ_FLAG_SCROLLABLE);
-                lv_obj_clear_flag(chip, LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_remove_flag(chip, LV_OBJ_FLAG_SCROLLABLE);
+                lv_obj_remove_flag(chip, LV_OBJ_FLAG_CLICKABLE);
                 lv_obj_add_flag(chip, LV_OBJ_FLAG_EVENT_BUBBLE);
                 // Align the label at 160 px, matching image tiles (icon_x+130+16=158).
                 lv_obj_align(name, LV_ALIGN_LEFT_MID, icon_x + 130 + 18, 0);
@@ -350,8 +345,8 @@ void AppSettings::_buildToolsPage()
                         lv_obj_set_style_border_width(dot, 0, 0);
                         lv_obj_set_style_shadow_width(dot, 0, 0);
                         lv_obj_set_style_pad_all(dot, 0, 0);
-                        lv_obj_clear_flag(dot, LV_OBJ_FLAG_SCROLLABLE);
-                        lv_obj_clear_flag(dot, LV_OBJ_FLAG_CLICKABLE);
+                        lv_obj_remove_flag(dot, LV_OBJ_FLAG_SCROLLABLE);
+                        lv_obj_remove_flag(dot, LV_OBJ_FLAG_CLICKABLE);
                         // Let clicks bubble from the dots to the parent tile.
                         // The LED-matrix tile uses this same make_tile helper.
                         lv_obj_add_flag(dot, LV_OBJ_FLAG_EVENT_BUBBLE);
@@ -392,7 +387,7 @@ void AppSettings::_buildToolsPage()
         lv_obj_set_style_shadow_opa(tile, LV_OPA_30, 0);
         lv_obj_set_style_shadow_ofs_y(tile, 4, 0);
         lv_obj_set_style_bg_color(tile, lv_color_hex(C_CARD_PR), LV_STATE_PRESSED);
-        lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_remove_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(tile, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event_cb(tile, _toolLoraChat_cb, LV_EVENT_CLICKED, this);
 
@@ -402,7 +397,7 @@ void AppSettings::_buildToolsPage()
         lv_image_set_scale(icon, 256);  // 130×130 native, 1:1
         lv_obj_align(icon, LV_ALIGN_LEFT_MID, 12, 0);
         lv_obj_add_flag(icon, LV_OBJ_FLAG_EVENT_BUBBLE);
-        lv_obj_clear_flag(icon, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_remove_flag(icon, LV_OBJ_FLAG_CLICKABLE);
 
         lv_obj_t* name = lv_label_create(tile);
         lv_label_set_text(name, "LoRa Chat");
@@ -520,7 +515,7 @@ void AppSettings::_openCalculator()
     lv_obj_set_style_border_width(_calc_page, 0, 0);
     lv_obj_set_style_radius(_calc_page, 0, 0);
     lv_obj_set_style_pad_all(_calc_page, 0, 0);
-    lv_obj_clear_flag(_calc_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_calc_page, LV_OBJ_FLAG_SCROLLABLE);
 
     // ── Display: expression (small, grey) over result (big, white), right-aligned.
     _calc_expr_lbl = lv_label_create(_calc_page);
@@ -568,7 +563,7 @@ void AppSettings::_openCalculator()
                 lv_color_hex(k.color == CALC_OP ? 0xFFBE5C
                            : k.color == CALC_NUM ? 0x5A5A5C : 0x6E6E70),
                 LV_STATE_PRESSED);
-            lv_obj_clear_flag(b, LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_remove_flag(b, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_add_flag(b, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_set_user_data(b, (void*)k.code);
             lv_obj_add_event_cb(b, _calcKey_cb, LV_EVENT_CLICKED, this);
@@ -596,7 +591,7 @@ void AppSettings::_closeCalculator()
         _calc_page = nullptr;
         _calc_expr_lbl = _calc_res_lbl = nullptr;
     }
-    if (_tools_page) lv_obj_clear_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
+    if (_tools_page) lv_obj_remove_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
 }
 
 // ── Calculator logic ─────────────────────────────────────────────────────────
@@ -801,7 +796,7 @@ void AppSettings::_openFx()
     lv_obj_set_style_border_width(_fx_page, 0, 0);
     lv_obj_set_style_radius(_fx_page, 0, 0);
     lv_obj_set_style_pad_all(_fx_page, 0, 0);
-    lv_obj_clear_flag(_fx_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_fx_page, LV_OBJ_FLAG_SCROLLABLE);
 
     // Title.
     lv_obj_t* title = lv_label_create(_fx_page);
@@ -829,7 +824,7 @@ void AppSettings::_openFx()
         lv_obj_set_style_shadow_color(c, lv_color_hex(0x5A7A9C), 0);
         lv_obj_set_style_shadow_opa(c, LV_OPA_30, 0);
         lv_obj_set_style_shadow_ofs_y(c, 4, 0);
-        lv_obj_clear_flag(c, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_remove_flag(c, LV_OBJ_FLAG_SCROLLABLE);
 
         lv_obj_t* dd = lv_dropdown_create(c);
         lv_obj_set_size(dd, 130, 60);
@@ -864,7 +859,7 @@ void AppSettings::_openFx()
     lv_obj_set_style_radius(swap, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_border_width(swap, 3, 0);
     lv_obj_set_style_border_color(swap, lv_color_hex(C_BG), 0);
-    lv_obj_clear_flag(swap, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(swap, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(swap, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(swap, _fxSwap_cb, LV_EVENT_CLICKED, this);
     lv_obj_t* swap_lbl = lv_label_create(swap);
@@ -890,7 +885,7 @@ void AppSettings::_openFx()
     lv_obj_set_style_radius(ac, 16, 0);
     lv_obj_set_style_border_width(ac, 0, 0);
     lv_obj_set_style_bg_color(ac, lv_color_hex(0x6E6E70), LV_STATE_PRESSED);
-    lv_obj_clear_flag(ac, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ac, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(ac, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_user_data(ac, (void*)"AC");
     lv_obj_add_event_cb(ac, _fxKey_cb, LV_EVENT_CLICKED, this);
@@ -920,7 +915,7 @@ void AppSettings::_openFx()
             lv_obj_set_style_radius(b, bh / 2, 0);
             lv_obj_set_style_border_width(b, 0, 0);
             lv_obj_set_style_bg_color(b, lv_color_hex(0x5A5A5C), LV_STATE_PRESSED);
-            lv_obj_clear_flag(b, LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_remove_flag(b, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_add_flag(b, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_set_user_data(b, (void*)k.code);
             lv_obj_add_event_cb(b, _fxKey_cb, LV_EVENT_CLICKED, this);
@@ -992,7 +987,7 @@ void AppSettings::_closeFx()
         _fx_page = nullptr;
         _fx_from_dd = _fx_to_dd = _fx_amt_lbl = _fx_res_lbl = _fx_rate_lbl = nullptr;
     }
-    if (_tools_page) lv_obj_clear_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
+    if (_tools_page) lv_obj_remove_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
 }
 
 void AppSettings::_fxRecompute()
@@ -1177,7 +1172,7 @@ void AppSettings::_openUnit()
     lv_obj_set_style_border_width(_unit_page, 0, 0);
     lv_obj_set_style_radius(_unit_page, 0, 0);
     lv_obj_set_style_pad_all(_unit_page, 0, 0);
-    lv_obj_clear_flag(_unit_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_unit_page, LV_OBJ_FLAG_SCROLLABLE);
 
     // Title.
     lv_obj_t* title = lv_label_create(_unit_page);
@@ -1225,7 +1220,7 @@ void AppSettings::_openUnit()
         lv_obj_set_style_shadow_color(c, lv_color_hex(0x5A7A9C), 0);
         lv_obj_set_style_shadow_opa(c, LV_OPA_30, 0);
         lv_obj_set_style_shadow_ofs_y(c, 4, 0);
-        lv_obj_clear_flag(c, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_remove_flag(c, LV_OBJ_FLAG_SCROLLABLE);
 
         lv_obj_t* dd = lv_dropdown_create(c);
         lv_obj_set_size(dd, 140, 60);
@@ -1266,7 +1261,7 @@ void AppSettings::_openUnit()
     lv_obj_set_style_radius(swap, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_border_width(swap, 3, 0);
     lv_obj_set_style_border_color(swap, lv_color_hex(C_BG), 0);
-    lv_obj_clear_flag(swap, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(swap, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(swap, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(swap, _unitSwap_cb, LV_EVENT_CLICKED, this);
     lv_obj_t* swap_lbl = lv_label_create(swap);
@@ -1291,7 +1286,7 @@ void AppSettings::_openUnit()
     lv_obj_set_style_radius(ac, 16, 0);
     lv_obj_set_style_border_width(ac, 0, 0);
     lv_obj_set_style_bg_color(ac, lv_color_hex(0x6E6E70), LV_STATE_PRESSED);
-    lv_obj_clear_flag(ac, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ac, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(ac, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_user_data(ac, (void*)"AC");
     lv_obj_add_event_cb(ac, _unitKey_cb, LV_EVENT_CLICKED, this);
@@ -1321,7 +1316,7 @@ void AppSettings::_openUnit()
             lv_obj_set_style_radius(b, bh / 2, 0);
             lv_obj_set_style_border_width(b, 0, 0);
             lv_obj_set_style_bg_color(b, lv_color_hex(0x5A5A5C), LV_STATE_PRESSED);
-            lv_obj_clear_flag(b, LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_remove_flag(b, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_add_flag(b, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_set_user_data(b, (void*)k.code);
             lv_obj_add_event_cb(b, _unitKey_cb, LV_EVENT_CLICKED, this);
@@ -1442,7 +1437,7 @@ void AppSettings::_closeUnit()
         _unit_cat_dd = _unit_from_dd = _unit_to_dd = nullptr;
         _unit_amt_lbl = _unit_res_lbl = _unit_eq_lbl = nullptr;
     }
-    if (_tools_page) lv_obj_clear_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
+    if (_tools_page) lv_obj_remove_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
 }
 
 // ── Static callbacks ───────────────────────────────────────────────────────
@@ -1514,7 +1509,7 @@ void AppSettings::_openEmail()
     lv_obj_set_style_border_width(_email_page, 0, 0);
     lv_obj_set_style_radius(_email_page, 0, 0);
     lv_obj_set_style_pad_all(_email_page, 0, 0);
-    lv_obj_clear_flag(_email_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_email_page, LV_OBJ_FLAG_SCROLLABLE);
 
     // Page title: "Email" or "Email (N unread)".
     _email_title = lv_label_create(_email_page);
@@ -1570,7 +1565,7 @@ void AppSettings::_closeEmail()
         lv_obj_delete(_email_page);
         _email_page = _email_title = _email_status = _email_list = nullptr;
     }
-    if (_tools_page) lv_obj_clear_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
+    if (_tools_page) lv_obj_remove_flag(_tools_page, LV_OBJ_FLAG_HIDDEN);
 }
 
 void AppSettings::fetchEmail()
@@ -1702,7 +1697,7 @@ void AppSettings::_emailRefresh()
         lv_obj_set_style_radius(row, 10, 0);
         lv_obj_set_style_border_width(row, 0, 0);
         lv_obj_set_style_pad_all(row, 0, 0);
-        lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_remove_flag(row, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_t* lbl = lv_label_create(row);
         lv_label_set_text(lbl, row_text);
         lv_obj_set_style_text_font(lbl, zh_font_30(), 0);

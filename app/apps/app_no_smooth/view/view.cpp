@@ -14,10 +14,6 @@ static const std::string _tag = "no-smooth-view";
 
 NoSmoothView::~NoSmoothView()
 {
-    if (_container) {
-        _container->removeSwipeGesture();
-        lv_obj_clean(_container->get());
-    }
 }
 
 void NoSmoothView::init()

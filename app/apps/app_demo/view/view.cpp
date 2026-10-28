@@ -19,11 +19,7 @@ static const std::string _tag = "demo-view";
 AppDemoView::~AppDemoView()
 {
     _panels.clear();
-    _img_bg.reset();
-    if (_container) {
-        _container->removeSwipeGesture();
-        lv_obj_clean(_container->get());
-    }
+    _container.reset();
 }
 
 void AppDemoView::init()
@@ -40,9 +36,9 @@ void AppDemoView::init()
     lv_obj_remove_flag(base, LV_OBJ_FLAG_SCROLLABLE);
 
     // Background image
-    _img_bg = std::make_unique<Image>(_container->get());
-    _img_bg->setAlign(LV_ALIGN_CENTER);
-    _img_bg->setSrc(&launcher_bg);
+    lv_obj_t* img_bg = lv_image_create(base);
+    lv_obj_set_align(img_bg, LV_ALIGN_CENTER);
+    lv_image_set_src(img_bg,  &launcher_bg );
 
     // Install panels
     _panels.push_back(std::make_unique<PanelRtc>());

@@ -59,7 +59,7 @@ lv_obj_t* make_card(lv_obj_t* parent, int w, int h, const mooncake::AppProps_t& 
     lv_obj_set_style_shadow_color(card, lv_color_hex(0x2E8BE6), 0);
     lv_obj_set_style_shadow_width(card, 18, 0);
     lv_obj_set_style_shadow_opa(card, LV_OPA_40, 0);
-    lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(card, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(card, LV_OBJ_FLAG_CLICKABLE);
         
     // App icon
@@ -147,7 +147,7 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     lv_obj_set_style_border_width(sbar, 0, 0);
     lv_obj_set_style_radius(sbar, 0, 0);
     lv_obj_set_style_pad_all(sbar, 0, 0);
-    lv_obj_clear_flag(sbar, (lv_obj_flag_t)(LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE));
+    lv_obj_remove_flag(sbar, (lv_obj_flag_t)(LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE));
 
     lv_obj_t* status_time = lv_label_create(sbar);
     lv_obj_set_style_text_font(status_time, &lv_font_montserrat_28, 0);

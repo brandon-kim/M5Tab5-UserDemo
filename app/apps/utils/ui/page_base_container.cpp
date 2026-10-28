@@ -7,16 +7,18 @@ PageBaseContainer::PageBaseContainer(lv_obj_t* screen)
     if (!screen) {
         screen = lv_screen_active();
     }
-    _container = screen;
+    //_container = screen;
+    _container = lv_obj_create(screen);
     lv_obj_remove_style_all(_container);
     lv_obj_set_size(_container, lv_pct(100), lv_pct(100));
     lv_obj_set_pos(_container, 0, 0);
-    lv_obj_clear_flag(_container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(_container, LV_OBJ_FLAG_SCROLLABLE);
 }
 
 PageBaseContainer::~PageBaseContainer()
 {
     removeSwipeGesture();
+    lv_obj_delete(_container);
     _container = nullptr;
 }
 

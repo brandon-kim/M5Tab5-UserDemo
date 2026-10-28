@@ -17,8 +17,6 @@ AppNoSmooth::AppNoSmooth()
     setAppInfo().icon = (void*)LV_SYMBOL_FILE;
 }
 
-AppNoSmooth::~AppNoSmooth() = default;
-
 void AppNoSmooth::onCreate()
 {
     mclog::tagInfo(getAppInfo().name, "on create");

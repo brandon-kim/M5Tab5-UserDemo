@@ -20,7 +20,6 @@
 class AppNoSmooth : public mooncake::AppAbility {
 public:
     AppNoSmooth();
-	~AppNoSmooth();
 
     // Override lifecycle callbacks
     void onCreate() override;

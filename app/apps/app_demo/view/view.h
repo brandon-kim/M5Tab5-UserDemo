@@ -301,10 +301,9 @@ public:
 
 private:
     std::unique_ptr<ui::PageBaseContainer> _container;
-    std::unique_ptr<uitk::lvgl_cpp::Image> _img_bg;
     bool _is_stacked = false;
     void update_anim();
-    std::vector<std::unique_ptr<PanelBase>>    _panels;
+    std::vector<std::unique_ptr<PanelBase>> _panels;
 };
 
 }  // namespace view
