@@ -20,11 +20,13 @@ PageBaseContainer::~PageBaseContainer()
     _container = nullptr;
 }
 
-void PageBaseContainer::installSwipeGesture(std::function<void()> callback, lv_dir_t direction)
+void PageBaseContainer::installSwipeGesture(std::function<void()> callback, lv_dir_t direction,
+                                            bool oneShot)
 {
     removeSwipeGesture();
     _gesture_callback = std::move(callback);
     _gesture_direction = direction;
+    _gesture_one_shot = oneShot;
 
     lv_indev_t* indev = lv_indev_get_next(nullptr);
     while (indev) {
@@ -53,7 +55,14 @@ void PageBaseContainer::_gestureEventCb(lv_event_t* event)
 
     lv_indev_t* indev = static_cast<lv_indev_t*>(lv_event_get_target(event));
     if (lv_indev_get_gesture_dir(indev) == container->_gesture_direction) {
-        container->_gesture_callback();
+        auto callback = container->_gesture_callback;
+        lv_indev_reset(indev, nullptr);
+        lv_indev_wait_release(indev);
+        lv_indev_stop_processing(indev);
+        if (container->_gesture_one_shot) {
+            container->removeSwipeGesture();
+        }
+        callback();
     }
 }
 

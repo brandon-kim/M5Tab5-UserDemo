@@ -130,7 +130,7 @@ void AppSettings::onOpen()
     _buildToolsPage();
     _base_container->installSwipeGesture([this]() {
         _handlePageBack();
-    });
+    }, LV_DIR_TOP, false);
 }
 
 void AppSettings::onRunning()
