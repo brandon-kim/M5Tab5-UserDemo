@@ -14,12 +14,10 @@ static const std::string _tag = "no-smooth-view";
 
 NoSmoothView::~NoSmoothView()
 {
-    // Clear callbacks to avoid accidental calls
-    _on_quit = nullptr;
     LvglLockGuard lock;
     if (_container) {
-        lv_obj_delete(_container);
-        _container = nullptr;
+        _container->removeSwipeGesture();
+        lv_obj_clean(_container->get());
     }
 }
 
@@ -29,35 +27,17 @@ void NoSmoothView::init()
 
     LvglLockGuard lock;
 
-    // Base screen
-    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_SCROLLABLE);
-    
-    // Create card container (horizontal scrollable)
-    _container = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(_container, lv_pct(100), lv_pct(100));
-    lv_obj_set_pos(_container, 0, 0);
-    lv_obj_set_style_pad_all(_container, 10, 0);
-    lv_obj_set_style_bg_color(_container, lv_color_hex(0x1a1a1a), 0);
-    lv_obj_set_style_bg_opa(_container, LV_OPA_COVER, 0);
+    _container = std::make_unique<ui::PageBaseContainer>();
+    lv_obj_t *base = _container->get();
+    lv_obj_set_style_pad_all(base, 10, 0);
+    lv_obj_set_style_bg_color(base, lv_color_hex(0x1a1a1a), 0);
+    lv_obj_set_style_bg_opa(base, LV_OPA_COVER, 0);
 
-    // test code
-    lv_obj_t *label = lv_label_create(_container);
-    lv_label_set_text(label, "Hello, AppTest!");
-    lv_obj_set_pos(label, 10, 10);
+    lv_obj_t* label = lv_label_create(base);
+    lv_label_set_text(label, "Hello, AppTest!\nSwipe Up to Close");
+    lv_obj_center(label);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_14, 0);
-
-    // Create a quit button
-    lv_obj_t *button_quit = lv_btn_create(_container);
-    lv_obj_align(button_quit, LV_ALIGN_TOP_RIGHT, -10, 10);
-    lv_obj_t *label_quit = lv_label_create(button_quit);
-    lv_label_set_text(label_quit, "QUIT");
-    lv_obj_center(label_quit);
-    lv_obj_add_event_cb(button_quit, [](lv_event_t * e) {
-        NoSmoothView *view = static_cast<NoSmoothView *>(lv_event_get_user_data(e));
-        if (view->_on_quit) {  view->_on_quit();}
-    }, LV_EVENT_CLICKED, this);
-
 
 }
 

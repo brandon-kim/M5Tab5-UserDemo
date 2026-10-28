@@ -13,7 +13,7 @@ using namespace mooncake;
 AppNoSmooth::AppNoSmooth()
 {
     // Configure App Info
-    setAppInfo().name = "AppNoSmooth";
+    setAppInfo().name = "No Smooth";
     setAppInfo().icon = (void*)LV_SYMBOL_FILE;
 }
 
@@ -22,6 +22,9 @@ AppNoSmooth::~AppNoSmooth() = default;
 void AppNoSmooth::onCreate()
 {
     mclog::tagInfo(getAppInfo().name, "on create");
+
+    // App is ready, but won't auto-open
+    // Will be opened by AppLauncher when user clicks the card
 }
 
 void AppNoSmooth::onOpen()

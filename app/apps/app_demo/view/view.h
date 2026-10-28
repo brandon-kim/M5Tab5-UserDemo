@@ -9,6 +9,7 @@
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
 #include <apps/utils/ui/window.h>
+#include <apps/utils/ui/page_base_container.h>
 #include <functional>
 
 namespace view {
@@ -23,8 +24,11 @@ public:
     {
     }
 
-    virtual void init()                 = 0;
+    virtual void init(lv_obj_t* parent) = 0;
     virtual void update(bool isStacked) = 0;
+
+protected:
+    lv_obj_t* _parent = nullptr;
 };
 
 /**
@@ -33,7 +37,7 @@ public:
  */
 class PanelRtc : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -50,7 +54,7 @@ private:
  */
 class PanelLcdBacklight : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -67,7 +71,7 @@ private:
  */
 class PanelSpeakerVolume : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -83,7 +87,7 @@ private:
  */
 class PanelPowerMonitor : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -102,7 +106,7 @@ private:
  */
 class PanelImu : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -122,7 +126,7 @@ private:
  */
 class PanelSwitches : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -160,7 +164,7 @@ private:
  */
 class PanelPower : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -177,7 +181,7 @@ private:
  */
 class PanelCamera : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -191,7 +195,7 @@ private:
  */
 class PanelDualMic : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -205,7 +209,7 @@ private:
  */
 class PanelHeadphone : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -219,7 +223,7 @@ private:
  */
 class PanelSdCard : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -233,7 +237,7 @@ private:
  */
 class PanelI2cScan : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -247,7 +251,7 @@ private:
  */
 class PanelGpioTest : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -261,7 +265,7 @@ private:
  */
 class PanelMusic : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -275,7 +279,7 @@ private:
  */
 class PanelComMonitor : public PanelBase {
 public:
-    void init() override;
+    void init(lv_obj_t* parent) override;
     void update(bool isStacked) override;
 
 private:
@@ -293,15 +297,14 @@ public:
 
     void init();
     void update();
-    void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
+    void setOnQuit(std::function<void()> cb) { _container->installSwipeGesture(std::move(cb)); }
 
 private:
+    std::unique_ptr<ui::PageBaseContainer> _container;
     std::unique_ptr<uitk::lvgl_cpp::Image> _img_bg;
     bool _is_stacked = false;
     void update_anim();
-    std::function<void()>      _on_quit;
     std::vector<std::unique_ptr<PanelBase>>    _panels;
-    std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
 };
 
 }  // namespace view

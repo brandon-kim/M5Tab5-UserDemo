@@ -122,18 +122,15 @@ void AppSettings::onOpen()
     mclog::tagInfo(_tag, "open");
     
     LvglLockGuard lock;
-    lv_obj_t *scr = lv_screen_active();
-    _base = lv_obj_create(scr);
-    lv_obj_remove_style_all(_base);
-    lv_obj_set_size(_base, lv_pct(100), lv_pct(100));
-    lv_obj_set_pos(_base, 0, 0);
+    _base_container = std::make_unique<ui::PageBaseContainer>();
+    _base = _base_container->get();
     lv_obj_set_style_bg_color(_base, lv_color_hex(C_BG), 0);
     lv_obj_set_style_bg_opa(_base, LV_OPA_COVER, 0);
-    lv_obj_clear_flag(_base, LV_OBJ_FLAG_SCROLLABLE);
 
     _buildToolsPage();
-    //lv_screen_load(_scr);
-    _installSwipeGesture();
+    _base_container->installSwipeGesture([this]() {
+        _handlePageBack();
+    });
 }
 
 void AppSettings::onRunning()
@@ -164,11 +161,12 @@ void AppSettings::onClose()
     
     LvglLockGuard lock;
     
-    _removeSwipeGesture();
-    if (_base) {
-        lv_obj_delete(_base);
-        _base = nullptr;
+    if (_base_container) {
+        _base_container->removeSwipeGesture();
+        lv_obj_clean(_base);
     }
+    _base_container.reset();
+    _base = nullptr;
     _tools_page = _calc_page = _fx_page = _unit_page = nullptr;
     _calc_expr_lbl = _calc_res_lbl = nullptr;
     _fx_from_dd = _fx_to_dd = _fx_amt_lbl = _fx_res_lbl = _fx_rate_lbl = nullptr;
@@ -185,47 +183,15 @@ void AppSettings::onClose()
     if (_close_cb) _close_cb();
 }
 
-// ─── Swipe-up gesture closes the whole app (back to home) ───────────────────
-void AppSettings::_installSwipeGesture()
+void AppSettings::_handlePageBack()
 {
-    _removeSwipeGesture();
-    lv_indev_t* indev = lv_indev_get_next(NULL);
-    while (indev) {
-        if (lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
-            lv_indev_add_event_cb(indev, [](lv_event_t* e) {
-                lv_indev_t* dev = static_cast<lv_indev_t*>(lv_event_get_target(e));
-                if (lv_indev_get_gesture_dir(dev) == LV_DIR_TOP) {
-                    lv_async_call([](void* udata) {
-                        auto* app = static_cast<AppSettings*>(udata);
-                        if (!app) return;
-                        // Only act when our screen is actually on display. This
-                        // hook stays installed while another app opened from
-                        // the tools page (e.g. the YRobot cockpit) owns the
-                        // foreground — its joystick drags must not close us.
-                        //if (!app->_scr || lv_screen_active() != app->_src) return;
-                        if (!app->_base ) return;
-                        // Back out of the deepest open sub-page first.
-                        if (app->_email_page)   app->_closeEmail();
-                        else if (app->_unit_page)   app->_closeUnit();
-                        else if (app->_fx_page) app->_closeFx();
-                        else if (app->_calc_page) app->_closeCalculator();
-                        else                     app->close();
-                    }, lv_event_get_user_data(e));
-                }
-            }, LV_EVENT_GESTURE, this);
-            _gesture_indev = indev;
-            break;
-        }
-        indev = lv_indev_get_next(indev);
-    }
-}
+    if (!_base) return;
 
-void AppSettings::_removeSwipeGesture()
-{
-    if (_gesture_indev) {
-        lv_indev_remove_event_cb_with_user_data(_gesture_indev, nullptr, this);
-        _gesture_indev = nullptr;
-    }
+    if (_email_page) _closeEmail();
+    else if (_unit_page) _closeUnit();
+    else if (_fx_page) _closeFx();
+    else if (_calc_page) _closeCalculator();
+    else close();
 }
 
 // ════════════════════════════════════════════════════════════════════════════

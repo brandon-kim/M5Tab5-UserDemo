@@ -135,9 +135,10 @@ private:
     }
 };
 
-void PanelDualMic::init()
+void PanelDualMic::init(lv_obj_t* parent)
 {
-    _btn_mic_test = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_mic_test = std::make_unique<Container>(_parent);
     _btn_mic_test->align(LV_ALIGN_CENTER, -154, -311);
     _btn_mic_test->setSize(103, 95);
     _btn_mic_test->setOpa(0);
@@ -146,7 +147,7 @@ void PanelDualMic::init()
 
         // Create window
         _window = std::make_unique<MicTestWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

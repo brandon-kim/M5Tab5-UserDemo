@@ -166,24 +166,25 @@ private:
     }
 };
 
-void PanelSwitches::init()
+void PanelSwitches::init(lv_obj_t* parent)
 {
-    _img_charge_en_sw = std::make_unique<Image>(lv_screen_active());
+    _parent = parent;
+    _img_charge_en_sw = std::make_unique<Image>(_parent);
     _img_charge_en_sw->align(LV_ALIGN_CENTER, 285, -73);
 
-    _img_charge_qc_en_sw = std::make_unique<Image>(lv_screen_active());
+    _img_charge_qc_en_sw = std::make_unique<Image>(_parent);
     _img_charge_qc_en_sw->align(LV_ALIGN_CENTER, 285, -181);
 
-    _img_ext_5v_en_sw = std::make_unique<Image>(lv_screen_active());
+    _img_ext_5v_en_sw = std::make_unique<Image>(_parent);
     _img_ext_5v_en_sw->align(LV_ALIGN_CENTER, -107, 64);
 
-    _img_usba_5v_en_sw = std::make_unique<Image>(lv_screen_active());
+    _img_usba_5v_en_sw = std::make_unique<Image>(_parent);
     _img_usba_5v_en_sw->align(LV_ALIGN_CENTER, -202, -27);
 
-    _img_ext_antenna_en_sw = std::make_unique<Image>(lv_screen_active());
+    _img_ext_antenna_en_sw = std::make_unique<Image>(_parent);
     _img_ext_antenna_en_sw->align(LV_ALIGN_CENTER, -383, -191);
 
-    _btn_charge_en_sw = std::make_unique<Container>(lv_screen_active());
+    _btn_charge_en_sw = std::make_unique<Container>(_parent);
     _btn_charge_en_sw->align(LV_ALIGN_CENTER, 285, -73);
     _btn_charge_en_sw->setSize(130, 75);
     _btn_charge_en_sw->setOpa(0);
@@ -195,7 +196,7 @@ void PanelSwitches::init()
         update_images();
     });
 
-    _btn_charge_qc_en_sw = std::make_unique<Container>(lv_screen_active());
+    _btn_charge_qc_en_sw = std::make_unique<Container>(_parent);
     _btn_charge_qc_en_sw->align(LV_ALIGN_CENTER, 285, -181);
     _btn_charge_qc_en_sw->setSize(130, 75);
     _btn_charge_qc_en_sw->setOpa(0);
@@ -207,7 +208,7 @@ void PanelSwitches::init()
         update_images();
     });
 
-    _btn_ext_5v_en_sw = std::make_unique<Container>(lv_screen_active());
+    _btn_ext_5v_en_sw = std::make_unique<Container>(_parent);
     _btn_ext_5v_en_sw->align(LV_ALIGN_CENTER, -107, 64);
     _btn_ext_5v_en_sw->setSize(130, 75);
     _btn_ext_5v_en_sw->setOpa(0);
@@ -219,7 +220,7 @@ void PanelSwitches::init()
         update_images();
     });
 
-    _btn_usba_5v_en_sw = std::make_unique<Container>(lv_screen_active());
+    _btn_usba_5v_en_sw = std::make_unique<Container>(_parent);
     _btn_usba_5v_en_sw->align(LV_ALIGN_CENTER, -202, -27);
     _btn_usba_5v_en_sw->setSize(130, 75);
     _btn_usba_5v_en_sw->setOpa(0);
@@ -231,7 +232,7 @@ void PanelSwitches::init()
         update_images();
     });
 
-    _btn_ext_antenna_en_sw = std::make_unique<Container>(lv_screen_active());
+    _btn_ext_antenna_en_sw = std::make_unique<Container>(_parent);
     _btn_ext_antenna_en_sw->align(LV_ALIGN_CENTER, -383, -191);
     _btn_ext_antenna_en_sw->setSize(130, 75);
     _btn_ext_antenna_en_sw->setOpa(0);
@@ -245,12 +246,12 @@ void PanelSwitches::init()
 
         if (!_window) {
             _window = std::make_unique<WifiApMsgWindow>();
-            _window->init(lv_screen_active());
+            _window->init(_parent);
             _window->open();
         }
     });
 
-    _btn_ap_msg = std::make_unique<Container>(lv_screen_active());
+    _btn_ap_msg = std::make_unique<Container>(_parent);
     _btn_ap_msg->align(LV_ALIGN_CENTER, -309, -187);
     _btn_ap_msg->setSize(60, 60);
     _btn_ap_msg->setOpa(0);
@@ -259,22 +260,22 @@ void PanelSwitches::init()
 
         if (!_window) {
             _window = std::make_unique<WifiApMsgWindow>();
-            _window->init(lv_screen_active());
+            _window->init(_parent);
             _window->open();
         }
     });
 
     update_images();
 
-    _img_usb_c_detect = std::make_unique<Image>(lv_screen_active());
+    _img_usb_c_detect = std::make_unique<Image>(_parent);
     _img_usb_c_detect->align(LV_ALIGN_CENTER, -627, 0);
     _img_usb_c_detect->setSrc(&arrow_state_on);
 
-    _img_usb_a_detect = std::make_unique<Image>(lv_screen_active());
+    _img_usb_a_detect = std::make_unique<Image>(_parent);
     _img_usb_a_detect->align(LV_ALIGN_CENTER, -627, -175);
     _img_usb_a_detect->setSrc(&arrow_state_on);
 
-    _img_hp_detect = std::make_unique<Image>(lv_screen_active());
+    _img_hp_detect = std::make_unique<Image>(_parent);
     _img_hp_detect->align(LV_ALIGN_CENTER, -627, 151);
     _img_hp_detect->setSrc(&arrow_state_on);
 

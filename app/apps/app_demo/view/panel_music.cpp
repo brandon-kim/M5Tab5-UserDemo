@@ -150,9 +150,10 @@ private:
     }
 };
 
-void PanelMusic::init()
+void PanelMusic::init(lv_obj_t* parent)
 {
-    _btn_music_test = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_music_test = std::make_unique<Container>(_parent);
     _btn_music_test->align(LV_ALIGN_CENTER, 225, 279);
     _btn_music_test->setSize(100, 100);
     _btn_music_test->setOpa(0);
@@ -161,7 +162,7 @@ void PanelMusic::init()
 
         // Create window
         _window = std::make_unique<MusicTestWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

@@ -148,7 +148,8 @@ private:
 
 class ExtPortWindow : public ui::Window {
 public:
-    ExtPortWindow()
+    explicit ExtPortWindow(lv_obj_t* parent)
+        : _parent(parent)
     {
         config.title    = "Ext.Port1";
         config.kfClosed = _kf_ext_port_close;
@@ -168,7 +169,7 @@ public:
 
         // Create mbus window
         _mbus_window = std::make_unique<MbusWindow>();
-        _mbus_window->init(lv_screen_active());
+        _mbus_window->init(_parent);
         _mbus_window->open();
     }
 
@@ -210,6 +211,7 @@ public:
     }
 
 private:
+    lv_obj_t* _parent;
     std::vector<std::unique_ptr<GpioOutputTestPanel>> _io_panels;
     std::unique_ptr<Label> _label_msg;
     const std::array<uint8_t, 6> _io_pins = {49, 50, 0, 1, 54, 53};
@@ -217,9 +219,10 @@ private:
     std::unique_ptr<ui::Window> _mbus_window;
 };
 
-void PanelGpioTest::init()
+void PanelGpioTest::init(lv_obj_t* parent)
 {
-    _btn_gpio_test = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_gpio_test = std::make_unique<Container>(_parent);
     _btn_gpio_test->align(LV_ALIGN_CENTER, 413, -115);
     _btn_gpio_test->setSize(100, 100);
     _btn_gpio_test->setOpa(0);
@@ -227,8 +230,8 @@ void PanelGpioTest::init()
         audio::play_next_tone_progression();
 
         // Create window
-        _window = std::make_unique<ExtPortWindow>();
-        _window->init(lv_screen_active());
+        _window = std::make_unique<ExtPortWindow>(_parent);
+        _window->init(_parent);
         _window->open();
     });
 }

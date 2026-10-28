@@ -19,9 +19,12 @@ static const std::string _tag = "demo-view";
 AppDemoView::~AppDemoView()
 {
     LvglLockGuard lock;
-    _button_quit.reset();
     _panels.clear();
     _img_bg.reset();
+    if (_container) {
+        _container->removeSwipeGesture();
+        lv_obj_clean(_container->get());
+    }
 }
 
 void AppDemoView::init()
@@ -33,11 +36,13 @@ void AppDemoView::init()
 
     LvglLockGuard lock;
 
-    // Base screen
-    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_SCROLLABLE);
+    _container = std::make_unique<ui::PageBaseContainer>();
+
+    lv_obj_t* base = _container->get();
+    lv_obj_remove_flag(base, LV_OBJ_FLAG_SCROLLABLE);
 
     // Background image
-    _img_bg = std::make_unique<Image>(lv_screen_active());
+    _img_bg = std::make_unique<Image>(_container->get());
     _img_bg->setAlign(LV_ALIGN_CENTER);
     _img_bg->setSrc(&launcher_bg);
 
@@ -61,17 +66,9 @@ void AppDemoView::init()
 
 
     for (auto& panel : _panels) {
-        panel->init();
+        panel->init(_container->get());
     }
 
-    // Create a quit button
-    _button_quit = std::make_unique<uitk::lvgl_cpp::Button>(lv_screen_active());
-    //_button_quit->setAlign(LV_ALIGN_CENTER);
-    _button_quit->align(LV_ALIGN_TOP_MID, 0, 0);
-    _button_quit->label().setText("QUIT");
-    _button_quit->onClick().connect([this]() {
-        if (_on_quit) {  _on_quit();}
-    });
 }
 
 void AppDemoView::update()

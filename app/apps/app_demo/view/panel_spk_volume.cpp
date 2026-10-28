@@ -26,15 +26,16 @@ static constexpr int16_t _midi_up   = 64 + 24;
 static constexpr int16_t _midi_down = 60 + 24;
 static constexpr int16_t _midi_top  = 64 + 8 + 24;
 
-void PanelSpeakerVolume::init()
+void PanelSpeakerVolume::init(lv_obj_t* parent)
 {
-    _label_volume = std::make_unique<Label>(lv_screen_active());
+    _parent = parent;
+    _label_volume = std::make_unique<Label>(_parent);
     _label_volume->align(LV_ALIGN_CENTER, _label_pos_x, _label_pos_y);
     _label_volume->setTextFont(&lv_font_montserrat_24);
     _label_volume->setTextColor(lv_color_hex(0xFEFEFE));
     _label_volume->setText(fmt::format("{}", GetHAL()->getSpeakerVolume()));
 
-    _btn_up = std::make_unique<Container>(lv_screen_active());
+    _btn_up = std::make_unique<Container>(_parent);
     _btn_up->align(LV_ALIGN_CENTER, _btn_up_pos_x, _btn_up_pos_y);
     _btn_up->setSize(81, 85);
     _btn_up->setOpa(0);
@@ -58,7 +59,7 @@ void PanelSpeakerVolume::init()
         audio::play_tone_from_midi(_midi_up);
     });
 
-    _btn_down = std::make_unique<Container>(lv_screen_active());
+    _btn_down = std::make_unique<Container>(_parent);
     _btn_down->align(LV_ALIGN_CENTER, _btn_down_pos_x, _btn_down_pos_y);
     _btn_down->setSize(81, 85);
     _btn_down->setOpa(0);

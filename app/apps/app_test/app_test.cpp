@@ -5,8 +5,6 @@
  * @version 0.1
  * @date 2025-12-18
  *
- * @copyright Copyright (c) 2024
- *
  */
 #include "app_test.h"
 
@@ -20,8 +18,8 @@ using namespace mooncake;
 
 AppTest::AppTest()
 {
-    // 配置 App 信息
-    setAppInfo().name = "AppTest";
+    // Configure App Info
+    setAppInfo().name = "App Test";
     setAppInfo().icon = (void*)LV_SYMBOL_FILE;
 }
 

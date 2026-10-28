@@ -13,8 +13,10 @@
 #include <functional>
 #include <string>
 #include <atomic>
+#include <memory>
 #include <mutex>
 #include <vector>
+#include <apps/utils/ui/page_base_container.h>
 
 // Single shared email cache, populated by the worker in
 // AppSettings::fetchEmail() and read by both the email sub-page and the
@@ -82,7 +84,7 @@ private:
     int _reachy_id    = -1;
     int _rfid_id      = -1;
 
-    lv_indev_t* _gesture_indev = nullptr;
+    std::unique_ptr<ui::PageBaseContainer> _base_container;
     lv_obj_t*   _base        = nullptr;
     lv_obj_t*   _tools_page = nullptr;  // tools launcher (calculator tile)
     lv_obj_t*   _calc_page  = nullptr;  // calculator (built on first open)
@@ -146,8 +148,7 @@ private:
     void _emailRefresh();  // UI thread: rebuild lv_list from email_list
     void _emailShowError();
 
-    void _installSwipeGesture();
-    void _removeSwipeGesture();
+    void _handlePageBack();
 
     static void _toolBtn_cb(lv_event_t* e);  // tools tile → open calculator
     static void _calcKey_cb(lv_event_t* e);  // a calculator key

@@ -21,33 +21,18 @@ void TestView::init()
     LvglLockGuard lock;
 
     // Base screen
-    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_SCROLLABLE);
-    
-    // Create card container (horizontal scrollable)
-    _container = std::make_unique<uitk::lvgl_cpp::Container>(lv_screen_active());
-    _container->setSize(lv_pct(100), lv_pct(100));
-    _container->setPos(0, 0);
-    _container->setPadding(10, 0, 15, 0);
-    _container->setBgColor(lv_color_hex(0x1a1a1a)); 
-    _container->setBgOpa(LV_OPA_COVER, 0);  
+    _container = std::make_unique<ui::PageBaseContainer>();
+    lv_obj_set_style_bg_color(_container->get(), lv_color_hex(0x1a1a1a), 0);
+    lv_obj_set_style_bg_opa(_container->get(), LV_OPA_COVER, 0);
+    lv_obj_set_style_pad_left(_container->get(), 10, 0);
+    lv_obj_set_style_pad_right(_container->get(), 15, 0);
 
     // test code
     _label = std::make_unique<uitk::lvgl_cpp::Label>(_container->get());
-    _label->setText("Hello, AppTest!");
-    _label->setPos(10, 10);
+    _label->setText("Hello, AppTest!\nSwipe Up to Close");
+    _label->align(LV_ALIGN_CENTER, 0, 0);
     _label->setTextColor(lv_color_hex(0xFFFFFF));
     _label->setTextFont(&lv_font_montserrat_14, 0);
-
-    // Create a quit button
-    _button_quit = std::make_unique<uitk::lvgl_cpp::Button>(_container->get());
-    //_button_quit->setAlign(LV_ALIGN_CENTER);
-    _button_quit->align(LV_ALIGN_TOP_RIGHT, 0, 0);
-    _button_quit->label().setText("QUIT");
-    _button_quit->onClick().connect([this]() {
-        if (_on_quit) _on_quit();
-    });
-
-
 }
 
 

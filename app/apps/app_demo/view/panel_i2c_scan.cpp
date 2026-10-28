@@ -163,9 +163,10 @@ private:
     }
 };
 
-void PanelI2cScan::init()
+void PanelI2cScan::init(lv_obj_t* parent)
 {
-    _btn_i2c_scan = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_i2c_scan = std::make_unique<Container>(_parent);
     _btn_i2c_scan->align(LV_ALIGN_CENTER, -505, 229);
     _btn_i2c_scan->setSize(100, 100);
     _btn_i2c_scan->setOpa(0);
@@ -174,7 +175,7 @@ void PanelI2cScan::init()
 
         // Create window
         _window = std::make_unique<I2cScanWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

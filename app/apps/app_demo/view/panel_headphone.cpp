@@ -146,9 +146,10 @@ private:
     }
 };
 
-void PanelHeadphone::init()
+void PanelHeadphone::init(lv_obj_t* parent)
 {
-    _btn_headphone_test = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_headphone_test = std::make_unique<Container>(_parent);
     _btn_headphone_test->align(LV_ALIGN_CENTER, -310, 301);
     _btn_headphone_test->setSize(100, 100);
     _btn_headphone_test->setOpa(0);
@@ -157,7 +158,7 @@ void PanelHeadphone::init()
 
         // Create window
         _window = std::make_unique<HeadphoneTestWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

@@ -108,9 +108,10 @@ private:
     bool _is_scanned = false;
 };
 
-void PanelSdCard::init()
+void PanelSdCard::init(lv_obj_t* parent)
 {
-    _btn_sd_card_scan = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_sd_card_scan = std::make_unique<Container>(_parent);
     _btn_sd_card_scan->align(LV_ALIGN_CENTER, -46, 300);
     _btn_sd_card_scan->setSize(100, 100);
     _btn_sd_card_scan->setOpa(0);
@@ -119,7 +120,7 @@ void PanelSdCard::init()
 
         // Create window
         _window = std::make_unique<SdCardScanWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

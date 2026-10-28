@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
-#include <mooncake.h>
 #include <smooth_ui_toolkit.hpp>
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
@@ -13,6 +12,7 @@
 #include <memory>
 #include <vector>
 #include <functional>
+#include <apps/utils/ui/page_base_container.h>
 
 namespace view {
 
@@ -23,13 +23,11 @@ class TestView {
 public:
     void init();
     void update();
-    void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
+    void setOnQuit(std::function<void()> cb) { _container->installSwipeGesture(std::move(cb)); }
 
 private:
-    std::unique_ptr<uitk::lvgl_cpp::Container> _container;
-	std::unique_ptr<uitk::lvgl_cpp::Label>     _label;
-    std::unique_ptr<uitk::lvgl_cpp::Button>    _button_quit;
-    std::function<void()>      _on_quit;
+    std::unique_ptr<ui::PageBaseContainer> _container;
+    std::unique_ptr<uitk::lvgl_cpp::Label> _label;
 
 };
 

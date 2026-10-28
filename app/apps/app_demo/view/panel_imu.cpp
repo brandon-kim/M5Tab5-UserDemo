@@ -28,27 +28,28 @@ static constexpr int16_t _accel_dot_pos_y     = 198;
 static constexpr uint32_t _label_color        = 0x606060;
 static constexpr uint32_t _accel_dot_color    = 0xFF589D;
 
-void PanelImu::init()
+void PanelImu::init(lv_obj_t* parent)
 {
-    _label_accel_x = std::make_unique<Label>(lv_screen_active());
+    _parent = parent;
+    _label_accel_x = std::make_unique<Label>(_parent);
     _label_accel_x->align(LV_ALIGN_LEFT_MID, _label_accel_x_pos_x, _label_accel_x_pos_y);
     _label_accel_x->setTextColor(lv_color_hex(_label_color));
     _label_accel_x->setTextFont(&lv_font_montserrat_16);
     _label_accel_x->setText("..");
 
-    _label_accel_y = std::make_unique<Label>(lv_screen_active());
+    _label_accel_y = std::make_unique<Label>(_parent);
     _label_accel_y->align(LV_ALIGN_LEFT_MID, _label_accel_y_pos_x, _label_accel_y_pos_y);
     _label_accel_y->setTextColor(lv_color_hex(_label_color));
     _label_accel_y->setTextFont(&lv_font_montserrat_16);
     _label_accel_y->setText("..");
 
-    _label_accel_z = std::make_unique<Label>(lv_screen_active());
+    _label_accel_z = std::make_unique<Label>(_parent);
     _label_accel_z->align(LV_ALIGN_LEFT_MID, _label_accel_z_pos_x, _label_accel_z_pos_y);
     _label_accel_z->setTextColor(lv_color_hex(_label_color));
     _label_accel_z->setTextFont(&lv_font_montserrat_16);
     _label_accel_z->setText("..");
 
-    _accel_dot = std::make_unique<Container>(lv_screen_active());
+    _accel_dot = std::make_unique<Container>(_parent);
     _accel_dot->align(LV_ALIGN_CENTER, _accel_dot_pos_x, _accel_dot_pos_y);
     _accel_dot->setSize(32, 32);
     _accel_dot->setRadius(233);

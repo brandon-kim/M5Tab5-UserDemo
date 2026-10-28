@@ -206,9 +206,10 @@ public:
     }
 };
 
-void PanelPower::init()
+void PanelPower::init(lv_obj_t* parent)
 {
-    _btn_power_off = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_power_off = std::make_unique<Container>(_parent);
     _btn_power_off->align(LV_ALIGN_CENTER, 562, -319);
     _btn_power_off->setSize(146, 70);
     _btn_power_off->setOpa(0);
@@ -217,11 +218,11 @@ void PanelPower::init()
 
         // Create window
         _window = std::make_unique<PowerOffWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 
-    _btn_sleep_touch_wakeup = std::make_unique<Container>(lv_screen_active());
+    _btn_sleep_touch_wakeup = std::make_unique<Container>(_parent);
     _btn_sleep_touch_wakeup->align(LV_ALIGN_CENTER, 562, -245);
     _btn_sleep_touch_wakeup->setSize(146, 70);
     _btn_sleep_touch_wakeup->setOpa(0);
@@ -230,11 +231,11 @@ void PanelPower::init()
 
         // Create window
         _window = std::make_unique<SleepTouchWakeupWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 
-    _btn_sleep_shake_wakeup = std::make_unique<Container>(lv_screen_active());
+    _btn_sleep_shake_wakeup = std::make_unique<Container>(_parent);
     _btn_sleep_shake_wakeup->align(LV_ALIGN_CENTER, 562, -172);
     _btn_sleep_shake_wakeup->setSize(146, 70);
     _btn_sleep_shake_wakeup->setOpa(0);
@@ -243,11 +244,11 @@ void PanelPower::init()
 
         // Create window
         _window = std::make_unique<SleepShakeWakeupWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 
-    _btn_sleep_rtc_wakeup = std::make_unique<Container>(lv_screen_active());
+    _btn_sleep_rtc_wakeup = std::make_unique<Container>(_parent);
     _btn_sleep_rtc_wakeup->align(LV_ALIGN_CENTER, 562, -98);
     _btn_sleep_rtc_wakeup->setSize(146, 70);
     _btn_sleep_rtc_wakeup->setOpa(0);
@@ -256,7 +257,7 @@ void PanelPower::init()
 
         // Create window
         _window = std::make_unique<SleepRtcWakeupWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

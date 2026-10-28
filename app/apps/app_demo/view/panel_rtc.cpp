@@ -151,21 +151,22 @@ private:
     }
 };
 
-void PanelRtc::init()
+void PanelRtc::init(lv_obj_t* parent)
 {
-    _label_time = std::make_unique<Label>(lv_screen_active());
+    _parent = parent;
+    _label_time = std::make_unique<Label>(_parent);
     _label_time->align(LV_ALIGN_CENTER, 335, -249);
     _label_time->setTextFont(&lv_font_montserrat_22);
     _label_time->setTextColor(lv_color_hex(0xD86037));
     _label_time->setText("..");
 
-    _label_date = std::make_unique<Label>(lv_screen_active());
+    _label_date = std::make_unique<Label>(_parent);
     _label_date->align(LV_ALIGN_CENTER, 335, -223);
     _label_date->setTextFont(&lv_font_montserrat_18);
     _label_date->setTextColor(lv_color_hex(0xD86037));
     _label_date->setText("..");
 
-    _btn_rtc_setting = std::make_unique<Container>(lv_screen_active());
+    _btn_rtc_setting = std::make_unique<Container>(_parent);
     _btn_rtc_setting->align(LV_ALIGN_CENTER, 422, -228);
     _btn_rtc_setting->setSize(103, 95);
     _btn_rtc_setting->setOpa(0);
@@ -174,7 +175,7 @@ void PanelRtc::init()
 
         // Create window
         _window = std::make_unique<RtcSettingWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

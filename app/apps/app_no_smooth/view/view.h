@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
+#include <lvgl.h>
 #include <cstdint>
 #include <memory>
-#include <lvgl.h>
 #include <vector>
 #include <functional>
+#include <apps/utils/ui/page_base_container.h>
 
 namespace view {
 
@@ -20,12 +21,10 @@ public:
     ~NoSmoothView();
     void init();
     void update();
-    void setOnQuit(std::function<void()> cb) { _on_quit = std::move(cb); }
+    void setOnQuit(std::function<void()> cb) { _container->installSwipeGesture(std::move(cb)); }
 
 private:
-    lv_obj_t* _container = nullptr;
-
-    std::function<void()> _on_quit;
+    std::unique_ptr<ui::PageBaseContainer> _container;
     
 };
 

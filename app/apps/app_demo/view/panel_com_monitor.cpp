@@ -94,9 +94,10 @@ private:
     std::unique_ptr<Button> _btn_send_msg;
 };
 
-void PanelComMonitor::init()
+void PanelComMonitor::init(lv_obj_t* parent)
 {
-    _btn_com_monitor = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_com_monitor = std::make_unique<Container>(_parent);
     _btn_com_monitor->align(LV_ALIGN_CENTER, 497, 5);
     _btn_com_monitor->setSize(100, 100);
     _btn_com_monitor->setOpa(0);
@@ -105,7 +106,7 @@ void PanelComMonitor::init()
 
         // Create window
         _window = std::make_unique<ComMonitorWindow>();
-        _window->init(lv_screen_active());
+        _window->init(_parent);
         _window->open();
     });
 }

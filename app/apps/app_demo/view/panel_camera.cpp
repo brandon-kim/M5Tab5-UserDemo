@@ -19,7 +19,8 @@ static const ui::Window::KeyFrame_t _kf_camera_open  = {141, 0, 800, 480, 255};
 
 class CameraWindow : public ui::Window {
 public:
-    CameraWindow()
+    explicit CameraWindow(lv_obj_t* parent)
+        : _parent(parent)
     {
         config.kfClosed = _kf_camera_close;
         config.kfOpened = _kf_camera_open;
@@ -49,7 +50,7 @@ public:
         _label_msg->setTextFont(&lv_font_montserrat_24);
         _label_msg->setText("Opening Camera ...");
 
-        _camera_canvas = std::make_unique<Canvas>(lv_screen_active());
+        _camera_canvas = std::make_unique<Canvas>(_parent);
         _camera_canvas->setAlign(LV_ALIGN_CENTER);
         _camera_canvas->addFlag(LV_OBJ_FLAG_CLICKABLE);
         _camera_canvas->setOpa(0);
@@ -89,6 +90,7 @@ public:
     }
 
 private:
+    lv_obj_t* _parent;
     std::unique_ptr<Label> _label_msg;
     std::unique_ptr<Canvas> _camera_canvas;
     bool _is_camera_opened    = false;
@@ -109,9 +111,10 @@ private:
     }
 };
 
-void PanelCamera::init()
+void PanelCamera::init(lv_obj_t* parent)
 {
-    _btn_camera = std::make_unique<Container>(lv_screen_active());
+    _parent = parent;
+    _btn_camera = std::make_unique<Container>(_parent);
     _btn_camera->align(LV_ALIGN_CENTER, 598, 10);
     _btn_camera->setSize(83, 97);
     _btn_camera->setOpa(0);
@@ -119,8 +122,8 @@ void PanelCamera::init()
         audio::play_next_tone_progression();
 
         // Create window
-        _window = std::make_unique<CameraWindow>();
-        _window->init(lv_screen_active());
+        _window = std::make_unique<CameraWindow>(_parent);
+        _window->init(_parent);
         _window->open();
     });
 }
