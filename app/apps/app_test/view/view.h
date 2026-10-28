@@ -14,6 +14,8 @@
 #include <functional>
 #include <apps/utils/ui/page_base_container.h>
 
+#define  USE_APP_LOADING_ANIMATION  0
+
 namespace view {
 
 /**
