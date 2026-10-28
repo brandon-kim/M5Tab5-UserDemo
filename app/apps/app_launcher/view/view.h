@@ -5,9 +5,10 @@
  */
 #pragma once
 #include <mooncake.h>
-#include <smooth_ui_toolkit.hpp>
-#include <uitk/short_namespace.hpp>
-#include <smooth_lvgl.hpp>
+//#include <smooth_ui_toolkit.hpp>
+//#include <uitk/short_namespace.hpp>
+//#include <smooth_lvgl.hpp>
+#include <lvgl.h>
 
 #ifndef APP_LAUNCHER_EXIT_ANIMATION
 #define APP_LAUNCHER_EXIT_ANIMATION 1
@@ -37,13 +38,11 @@ public:
 private:
     int _selected_app_id = -1;
     lv_obj_t* _base = nullptr;
-#if APP_LAUNCHER_EXIT_ANIMATION
-    bool _exit_animating = false;
-    std::function<void()> _exit_completed;
-#endif
 
     static void _card_event_handler(lv_event_t* e);
 #if APP_LAUNCHER_EXIT_ANIMATION
+    bool _exit_animating = false;
+    std::function<void()> _exit_completed;
     static void _exitAnimationExec(void* var, int32_t value);
     static void _exitAnimationCompleted(lv_anim_t* anim);
 #endif

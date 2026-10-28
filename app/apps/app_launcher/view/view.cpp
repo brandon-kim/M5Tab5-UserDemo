@@ -12,8 +12,8 @@
 #include <cstdint>
 
 using namespace view;
-using namespace smooth_ui_toolkit;
-using namespace smooth_ui_toolkit::lvgl_cpp;
+//using namespace smooth_ui_toolkit;
+//using namespace smooth_ui_toolkit::lvgl_cpp;
 
 static const std::string _tag = "launcher-view";
 
@@ -23,7 +23,10 @@ LauncherView::~LauncherView()
     lv_anim_delete(_base, _exitAnimationExec);
 #endif
     if (_base) {
-        lv_obj_delete(_base);  // child objects will be deleted automatically
+        if(lv_obj_get_parent(_base)!= NULL)
+            lv_obj_delete(_base);  // child objects will be deleted automatically
+        else
+            lv_obj_clean(_base);  // screen !!!
         _base = nullptr;
     }
 }
@@ -89,7 +92,6 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
 {
     mclog::tagInfo(_tag, "init");
 
-
     // Base screen
     lv_obj_t *scr = lv_screen_active();
     lv_obj_remove_flag(scr, LV_OBJ_FLAG_SCROLLABLE);
@@ -97,6 +99,7 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     // Base object 
     _base = lv_obj_create(scr);
     lv_obj_remove_style_all(_base);
+    lv_obj_remove_flag(_base, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_size(_base, lv_pct(100), lv_pct(100));
     lv_obj_set_pos(_base, 0, 0);
 
@@ -107,8 +110,7 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     lv_obj_remove_flag(bg, LV_OBJ_FLAG_CLICKABLE);
 
     // Create card container (horizontal scrollable)
-    lv_obj_t* container = nullptr;    
-    container = lv_obj_create(_base);
+    lv_obj_t* container = lv_obj_create(_base);
     lv_obj_set_size(container, lv_pct(100), lv_pct(100));
     lv_obj_set_pos(container, 0, 0);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
