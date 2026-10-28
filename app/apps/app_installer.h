@@ -14,6 +14,7 @@
 #include "app_test/app_test.h"
 #include "app_no_smooth/app_no_smooth.h"
 #include "app_settings/app_settings.h"
+#include "app_ha/app_ha.h"
 
 /* Header files locator (Don't remove) */
 
@@ -48,5 +49,6 @@ inline void on_install_apps()
     mooncake::GetMooncake().installApp(std::make_unique<AppTest>());
     mooncake::GetMooncake().installApp(std::make_unique<AppNoSmooth>());
     mooncake::GetMooncake().installApp(std::make_unique<AppSettings>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppHA>());
     /* Install app locator (Don't remove) */
 }
