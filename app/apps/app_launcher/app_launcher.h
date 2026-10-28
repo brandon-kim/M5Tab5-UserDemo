@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
+#ifndef APP_LAUNCHER_EXIT_ANIMATION
+#define APP_LAUNCHER_EXIT_ANIMATION 1
+#endif
+
 #include "view/view.h"
 #include <mooncake.h>
 #include <mooncake_templates.h>
@@ -24,4 +28,7 @@ public:
 
 private:
     std::unique_ptr<view::LauncherView> _view;
+#if APP_LAUNCHER_EXIT_ANIMATION
+    bool _app_open_transition_started = false;
+#endif
 };

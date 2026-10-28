@@ -9,6 +9,14 @@
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
 
+#ifndef APP_LAUNCHER_EXIT_ANIMATION
+#define APP_LAUNCHER_EXIT_ANIMATION 1
+#endif
+
+#if APP_LAUNCHER_EXIT_ANIMATION
+#include <functional>
+#endif
+
 namespace view {
 
 /**
@@ -22,11 +30,23 @@ public:
     void init(std::vector<mooncake::AppProps_t> appProps);
     void update();
     int consumeSelectedAppId();
+#if APP_LAUNCHER_EXIT_ANIMATION
+    void animateOut(std::function<void()> completed);
+#endif
 
 private:
     int _selected_app_id = -1;
     lv_obj_t* _base = nullptr;
+#if APP_LAUNCHER_EXIT_ANIMATION
+    bool _exit_animating = false;
+    std::function<void()> _exit_completed;
+#endif
+
     static void _card_event_handler(lv_event_t* e);
+#if APP_LAUNCHER_EXIT_ANIMATION
+    static void _exitAnimationExec(void* var, int32_t value);
+    static void _exitAnimationCompleted(lv_anim_t* anim);
+#endif
 };
 
 }  // namespace view

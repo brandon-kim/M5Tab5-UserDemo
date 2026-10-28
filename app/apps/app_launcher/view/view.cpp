@@ -20,6 +20,9 @@ static const std::string _tag = "launcher-view";
 LauncherView::~LauncherView()
 {
     LvglLockGuard lock;
+#if APP_LAUNCHER_EXIT_ANIMATION
+    lv_anim_delete(_base, _exitAnimationExec);
+#endif
     if (_base) {
         lv_obj_delete(_base);  // child objects will be deleted automatically
         _base = nullptr;
@@ -177,6 +180,43 @@ int LauncherView::consumeSelectedAppId()
     return id;
 }
 
+#if APP_LAUNCHER_EXIT_ANIMATION
+void LauncherView::animateOut(std::function<void()> completed)
+{
+    if (_exit_animating || !_base) return;
+
+    _exit_animating = true;
+    _exit_completed = std::move(completed);
+
+    LvglLockGuard lock;
+    lv_anim_delete(_base, _exitAnimationExec);
+
+    lv_anim_t anim;
+    lv_anim_init(&anim);
+    lv_anim_set_var(&anim, _base);
+    lv_anim_set_exec_cb(&anim, _exitAnimationExec);
+    lv_anim_set_values(&anim, LV_OPA_COVER, LV_OPA_TRANSP);
+    lv_anim_set_duration(&anim, 180);
+    lv_anim_set_completed_cb(&anim, _exitAnimationCompleted);
+    lv_anim_set_user_data(&anim, this);
+    lv_anim_start(&anim);
+}
+
+void LauncherView::_exitAnimationExec(void* var, int32_t value)
+{
+    lv_obj_set_style_opa(static_cast<lv_obj_t*>(var), static_cast<lv_opa_t>(value), 0);
+}
+
+void LauncherView::_exitAnimationCompleted(lv_anim_t* anim)
+{
+    auto* self = static_cast<LauncherView*>(lv_anim_get_user_data(anim));
+    if (!self || !self->_exit_completed) return;
+
+    auto completed = std::move(self->_exit_completed);
+    self->_exit_completed = {};
+    completed();
+}
+#endif
 
 void LauncherView::_card_event_handler(lv_event_t* e)
 {

@@ -21,6 +21,9 @@ void AppLauncher::onLauncherOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
+#if APP_LAUNCHER_EXIT_ANIMATION
+    _app_open_transition_started = false;
+#endif
     _view = std::make_unique<view::LauncherView>();
     _view->init(getAppProps());
 }
@@ -28,10 +31,21 @@ void AppLauncher::onLauncherOpen()
 void AppLauncher::onLauncherRunning()
 {
     _view->update();
+#if APP_LAUNCHER_EXIT_ANIMATION
+    if (_app_open_transition_started) return;
+#endif
+
     const int appID = _view->consumeSelectedAppId();
     if (appID >= 0) {
         mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
+#if APP_LAUNCHER_EXIT_ANIMATION
+        _app_open_transition_started = true;
+        _view->animateOut([this, appID]() {
+            openApp(appID);
+        });
+#else
         openApp(appID);
+#endif
     }
 }
 
