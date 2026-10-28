@@ -14,7 +14,6 @@ static const std::string _tag = "no-smooth-view";
 
 NoSmoothView::~NoSmoothView()
 {
-    LvglLockGuard lock;
     if (_container) {
         _container->removeSwipeGesture();
         lv_obj_clean(_container->get());
@@ -25,7 +24,6 @@ void NoSmoothView::init()
 {
     mclog::tagInfo(_tag, "init");
 
-    LvglLockGuard lock;
 
     _container = std::make_unique<ui::PageBaseContainer>();
     lv_obj_t *base = _container->get();
@@ -44,7 +42,6 @@ void NoSmoothView::init()
 
 void NoSmoothView::update()
 {
-    LvglLockGuard lock;
     // Update logic if needed
 }
 

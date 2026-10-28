@@ -32,6 +32,7 @@ void app::Init(InitCallback_t callback)
 
 void app::Update()
 {
+    LvglLockGuard lock;
     GetMooncake().update();
 
 #if defined ( __WIN32__ ) || ( defined(__APPLE__) && defined(__MACH__) )

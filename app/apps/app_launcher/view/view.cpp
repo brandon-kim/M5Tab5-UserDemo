@@ -19,7 +19,6 @@ static const std::string _tag = "launcher-view";
 
 LauncherView::~LauncherView()
 {
-    LvglLockGuard lock;
 #if APP_LAUNCHER_EXIT_ANIMATION
     lv_anim_delete(_base, _exitAnimationExec);
 #endif
@@ -90,7 +89,6 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
 {
     mclog::tagInfo(_tag, "init");
 
-    LvglLockGuard lock;
 
     // Base screen
     lv_obj_t *scr = lv_screen_active();
@@ -169,12 +167,10 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
 
 void LauncherView::update()
 {
-    LvglLockGuard lock;
     
 }
 int LauncherView::consumeSelectedAppId()
 {
-    LvglLockGuard lock;
     int id = _selected_app_id;
     _selected_app_id = -1;
     return id;
@@ -188,7 +184,6 @@ void LauncherView::animateOut(std::function<void()> completed)
     _exit_animating = true;
     _exit_completed = std::move(completed);
 
-    LvglLockGuard lock;
     lv_anim_delete(_base, _exitAnimationExec);
 
     lv_anim_t anim;

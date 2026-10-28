@@ -111,6 +111,7 @@ std::vector<EmailItem>  AppSettings::email_list;
 AppSettings::AppSettings()
 {
     setAppInfo().name = "Tools";
+    setAppInfo().icon = (void *)LV_SYMBOL_SETTINGS;
 }
 
 void AppSettings::onCreate() {
@@ -121,7 +122,6 @@ void AppSettings::onOpen()
 {
     mclog::tagInfo(_tag, "open");
     
-    LvglLockGuard lock;
     _base_container = std::make_unique<ui::PageBaseContainer>();
     _base = _base_container->get();
     lv_obj_set_style_bg_color(_base, lv_color_hex(C_BG), 0);
@@ -135,7 +135,6 @@ void AppSettings::onOpen()
 
 void AppSettings::onRunning()
 {
-    LvglLockGuard lock;
     // Apply freshly fetched live rates (worker thread only flips the flag; the
     // label/recompute must happen on the UI loop).
     if (g_fx_updated.exchange(false) && _fx_page) {
@@ -159,7 +158,6 @@ void AppSettings::onClose()
 {
     mclog::tagInfo(_tag, "close");
     
-    LvglLockGuard lock;
     
     if (_base_container) {
         _base_container->removeSwipeGesture();

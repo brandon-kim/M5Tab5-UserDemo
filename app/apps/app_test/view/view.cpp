@@ -18,7 +18,6 @@ void TestView::init()
 {
     mclog::tagInfo(_tag, "init test view with card layout");
 
-    LvglLockGuard lock;
 
     // Base screen
     _container = std::make_unique<ui::PageBaseContainer>();
@@ -38,7 +37,6 @@ void TestView::init()
 
 void TestView::update()
 {
-    LvglLockGuard lock;
     // Update logic if needed
 }
 

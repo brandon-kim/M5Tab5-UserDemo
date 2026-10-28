@@ -18,7 +18,6 @@ static const std::string _tag = "demo-view";
 
 AppDemoView::~AppDemoView()
 {
-    LvglLockGuard lock;
     _panels.clear();
     _img_bg.reset();
     if (_container) {
@@ -34,7 +33,6 @@ void AppDemoView::init()
     ui::signal_window_opened().clear();
     ui::signal_window_opened().connect([&](bool opened) { _is_stacked = opened; });
 
-    LvglLockGuard lock;
 
     _container = std::make_unique<ui::PageBaseContainer>();
 
@@ -73,7 +71,6 @@ void AppDemoView::init()
 
 void AppDemoView::update()
 {
-    LvglLockGuard lock;
 
     for (auto& panel : _panels) {
         panel->update(_is_stacked);
