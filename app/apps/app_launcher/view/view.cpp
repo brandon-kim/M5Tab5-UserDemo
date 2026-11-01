@@ -43,6 +43,11 @@ lv_obj_t* make_card(lv_obj_t* parent, int w, int h, const mooncake::AppProps_t& 
 {
     lv_obj_t* card = lv_obj_create(parent);
     lv_obj_set_size(card, w, h);
+    // Create flexbox for card content
+    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(card, LV_FLEX_ALIGN_CENTER, 
+                                    LV_FLEX_ALIGN_CENTER, 
+                                    LV_FLEX_ALIGN_CENTER);
 
     // Electric-blue gradient pill matching the background artwork's palette.
     lv_obj_set_style_bg_color(card, lv_color_hex(0x1E6FC2), 0);          // top: electric blue
@@ -64,7 +69,7 @@ lv_obj_t* make_card(lv_obj_t* parent, int w, int h, const mooncake::AppProps_t& 
     lv_obj_set_style_shadow_opa(card, LV_OPA_40, 0);
     lv_obj_remove_flag(card, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(card, LV_OBJ_FLAG_CLICKABLE);
-        
+
     // App icon
     lv_obj_t* icon = lv_label_create(card);
     if (app_prop.info.icon) {
@@ -133,10 +138,6 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
         // Add event listener
         lv_obj_add_event_cb(card, _card_event_handler, LV_EVENT_CLICKED, this);
         
-        // Create flexbox for card content
-        lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
-        lv_obj_set_flex_align(card, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
         mclog::tagInfo(_tag, "Created card for app: {} (ID: {})", app_prop.info.name, app_prop.appID);
     }
 
