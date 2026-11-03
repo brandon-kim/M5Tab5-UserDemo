@@ -5,21 +5,22 @@
  */
 #pragma once
 #include <mooncake.h>
-#include <memory>
-#include "lvgl_cpp/label.h"
-#include <smooth_ui_toolkit.h>
-#include <smooth_lvgl.h>
+#include <smooth_ui_toolkit.hpp>
+#include <smooth_lvgl.hpp>
+//#include "lvgl_cpp/label.hpp"
 #include <stdint.h>
+#include <memory>
+
 
 /**
- * @brief 派生 App
+ * @brief derived App
  *
  */
 class AppStartupAnim : public mooncake::AppAbility {
 public:
     AppStartupAnim();
 
-    // 重写生命周期回调
+    // Override lifecycle callbacks
     void onCreate() override;
     void onOpen() override;
     void onRunning() override;

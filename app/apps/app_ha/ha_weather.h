@@ -1,0 +1,113 @@
+#pragma once
+#include <string>
+#include <hal/hal.h>
+
+// secrets.h is gitignored (see .gitignore + secrets.h.example) — a local-only
+// compile-time fallback for the HA token, since it's too long to type on the
+// on-screen keyboard. Falls back to "" if the file doesn't exist (fresh
+// clone), which just means NVS "ha_token" must be set some other way (e.g.
+// a one-off script over serial/USB — there's no on-device UI for it).
+#if __has_include("secrets.h")
+#include "secrets.h"
+#else
+inline const char* LOCAL_HA_TOKEN_DEFAULT = "";
+#endif
+
+// Shared Home Assistant access for weather, used by both the HA app (app_ha)
+// and the home status bar (app_home). Weather now comes straight from HA's
+// weather.* entity instead of the Mac-side Hermes :8766 service.
+namespace ha_weather {
+
+// HA long-lived access token. Preferred path: NVS key "ha_token". Falls back
+// to LOCAL_HA_TOKEN_DEFAULT (secrets.h, gitignored) when NVS is empty — see
+// that file for why this exists instead of just hardcoding it here again: a
+// real token got committed to this exact spot once before (leaked to the
+// public fork, since revoked).
+inline std::string token() { return GetHAL()->getConfig("ha_token", LOCAL_HA_TOKEN_DEFAULT); }
+
+inline std::string _strip_scheme_path(std::string host)
+{
+    if (host.rfind("http://", 0) == 0) host.erase(0, 7);
+    else if (host.rfind("https://", 0) == 0) host.erase(0, 8);
+
+    auto slash = host.find('/');
+    if (slash != std::string::npos) host.erase(slash);
+    while (!host.empty() && (host.back() == ' ' || host.back() == '\t')) host.pop_back();
+    while (!host.empty() && (host.front() == ' ' || host.front() == '\t')) host.erase(0, 1);
+    return host;
+}
+
+inline std::string hostOnly(const std::string& input)
+{
+    std::string host = _strip_scheme_path(input);
+    auto colon = host.find(':');
+    if (colon != std::string::npos) host.erase(colon);
+    return host;
+}
+
+inline std::string baseUrl(const std::string& input)
+{
+    std::string host = _strip_scheme_path(input);
+    if (host.find(':') == std::string::npos) host += ":8123";
+    return "http://" + host;
+}
+
+// Local home forecast entity (和风天气 HeWeather, °C, has temperature + humidity).
+inline const char* ENTITY = "weather.he_feng_tian_qi_heweather";
+
+// HA weather condition (English state string) → short Chinese label.
+inline std::string condZh(const std::string& s)
+{
+    if (s == "sunny")            return "晴";
+    if (s == "clear-night")      return "晴";
+    if (s == "partlycloudy")     return "多云";
+    if (s == "cloudy")           return "阴";
+    if (s == "fog")              return "雾";
+    if (s == "rainy")            return "小雨";
+    if (s == "pouring")          return "大雨";
+    if (s == "lightning")        return "雷阵雨";
+    if (s == "lightning-rainy")  return "雷雨";
+    if (s == "snowy")            return "雪";
+    if (s == "snowy-rainy")      return "雨夹雪";
+    if (s == "hail")             return "冰雹";
+    if (s == "windy")            return "大风";
+    if (s == "windy-variant")    return "大风";
+    if (s == "exceptional")      return "异常";
+    return s;  // fallback: show raw state rather than nothing
+}
+
+inline std::string condEn(const std::string& s)
+{
+    if (s == "sunny")            return "Sunny";
+    if (s == "clear-night")      return "Clear";
+    if (s == "partlycloudy")     return "Partly cloudy";
+    if (s == "cloudy")           return "Cloudy";
+    if (s == "fog")              return "Fog";
+    if (s == "rainy")            return "Rain";
+    if (s == "pouring")          return "Heavy rain";
+    if (s == "lightning")        return "Thunderstorms";
+    if (s == "lightning-rainy")  return "Thunderstorms";
+    if (s == "snowy")            return "Snow";
+    if (s == "snowy-rainy")      return "Sleet";
+    if (s == "hail")             return "Hail";
+    if (s == "windy")            return "Windy";
+    if (s == "windy-variant")    return "Windy";
+    if (s == "exceptional")      return "Unusual";
+    return s;
+}
+
+inline std::string windDirectionEn(const std::string& s)
+{
+    if (s == "北风") return "N";
+    if (s == "东北风") return "NE";
+    if (s == "东风") return "E";
+    if (s == "东南风") return "SE";
+    if (s == "南风") return "S";
+    if (s == "西南风") return "SW";
+    if (s == "西风") return "W";
+    if (s == "西北风") return "NW";
+    if (s == "无持续风向" || s == "旋转风") return "Variable";
+    return s;
+}
+
+}  // namespace ha_weather

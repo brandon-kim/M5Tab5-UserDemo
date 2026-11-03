@@ -5,198 +5,246 @@
  */
 #include "hal/hal_esp32.h"
 #include <mooncake_log.h>
-#include <vector>
-#include <memory>
 #include <string.h>
+#include <algorithm>
 #include <bsp/m5stack_tab5.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
 #include <esp_wifi.h>
 #include <nvs_flash.h>
+#include <nvs.h>
 #include <esp_event.h>
 #include <esp_log.h>
-#include <nvs_flash.h>
 #include <esp_netif.h>
-#include <esp_wifi_default.h>
-#include <esp_wifi_netif.h>
-#include <esp_private/wifi.h>
-#include <esp_http_server.h>
+#include <esp_system.h>
+
+// ─── WiFi credentials (compile-time defaults) ─────────────────────────────────
+// These are only used the very first time, before the user sets WiFi on-screen.
+// Runtime values live in NVS ("devcfg" namespace) and override these.
+// Leave empty — configure via Settings app (stored in NVS).
+#define WIFI_STA_SSID  ""
+#define WIFI_STA_PASS  ""
+#define WIFI_MAX_RETRY 10
+
+// NVS namespace + keys for runtime device config (WiFi + HA server, etc.)
+#define DEVCFG_NS "devcfg"
 
 #define TAG "wifi"
 
-#define WIFI_SSID    "M5Tab5-UserDemo-WiFi"
-#define WIFI_PASS    ""
-#define MAX_STA_CONN 4
+// True once the STA has an IP. Defined here (early) so isWifiConnected() and
+// the event handler below can both see it.
+static bool s_wifi_initialized = false;
 
-static bool s_wifi_ap_netif_started = false;
-
-static void wifi_remote_ap_start_handler(void* arg, esp_event_base_t base, int32_t event_id, void* data)
+// Make sure NVS flash is initialized exactly once before any nvs_open.
+static void ensure_nvs_ready()
 {
-    auto* netif = static_cast<esp_netif_t*>(arg);
-    if (s_wifi_ap_netif_started || esp_netif_is_netif_up(netif)) {
-        ESP_LOGW(TAG, "ignore duplicate Wi-Fi AP start event");
-        return;
-    }
-
-    auto driver = static_cast<wifi_netif_driver_t>(esp_netif_get_io_driver(netif));
-    uint8_t mac[6];
-    esp_err_t ret = esp_wifi_get_if_mac(driver, mac);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "esp_wifi_get_if_mac failed: %s", esp_err_to_name(ret));
-        return;
-    }
-
-    if (esp_wifi_is_if_ready_when_started(driver)) {
-        ret = esp_wifi_register_if_rxcb(driver, esp_netif_receive, netif);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "esp_wifi_register_if_rxcb failed: %s", esp_err_to_name(ret));
-            return;
-        }
-    }
-
-    ret = esp_wifi_internal_reg_netstack_buf_cb(esp_netif_netstack_buf_ref, esp_netif_netstack_buf_free);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "netstack cb register failed: %s", esp_err_to_name(ret));
-        return;
-    }
-
-    esp_netif_set_mac(netif, mac);
-    esp_netif_action_start(netif, base, event_id, data);
-    s_wifi_ap_netif_started = true;
-}
-
-static void wifi_remote_ap_stop_handler(void* arg, esp_event_base_t base, int32_t event_id, void* data)
-{
-    auto* netif = static_cast<esp_netif_t*>(arg);
-    if (!s_wifi_ap_netif_started && !esp_netif_is_netif_up(netif)) {
-        ESP_LOGW(TAG, "ignore duplicate Wi-Fi AP stop event");
-        return;
-    }
-
-    esp_netif_action_stop(netif, base, event_id, data);
-    s_wifi_ap_netif_started = false;
-}
-
-static esp_netif_t* create_wifi_remote_ap_netif()
-{
-    esp_netif_config_t cfg = ESP_NETIF_DEFAULT_WIFI_AP();
-    esp_netif_t* netif     = esp_netif_new(&cfg);
-    assert(netif);
-
-    ESP_ERROR_CHECK(esp_netif_attach_wifi_ap(netif));
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_START, wifi_remote_ap_start_handler, netif));
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STOP, wifi_remote_ap_stop_handler, netif));
-
-    return netif;
-}
-
-// HTTP 处理函数
-esp_err_t hello_get_handler(httpd_req_t* req)
-{
-    const char* html_response = R"rawliteral(
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Hello</title>
-            <style>
-                body {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    font-family: sans-serif;
-                    background-color: #f0f0f0;
-                }
-                h1 {
-                    font-size: 48px;
-                    color: #333;
-                    margin: 0;
-                }
-                p {
-                    font-size: 18px;
-                    color: #666;
-                    margin-top: 10px;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Hello World</h1>
-            <p>From M5Tab5</p>
-        </body>
-        </html>
-    )rawliteral";
-
-    httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, html_response, HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
-
-// URI 路由
-httpd_uri_t hello_uri = {.uri = "/", .method = HTTP_GET, .handler = hello_get_handler, .user_ctx = nullptr};
-
-// 启动 Web Server
-httpd_handle_t start_webserver()
-{
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    httpd_handle_t server = nullptr;
-
-    if (httpd_start(&server, &config) == ESP_OK) {
-        httpd_register_uri_handler(server, &hello_uri);
-    }
-    return server;
-}
-
-// 初始化 Wi-Fi AP 模式
-void wifi_init_softap()
-{
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-
-    create_wifi_remote_ap_netif();
-
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    wifi_config_t wifi_config = {};
-    std::strncpy(reinterpret_cast<char*>(wifi_config.ap.ssid), WIFI_SSID, sizeof(wifi_config.ap.ssid));
-    std::strncpy(reinterpret_cast<char*>(wifi_config.ap.password), WIFI_PASS, sizeof(wifi_config.ap.password));
-    wifi_config.ap.ssid_len       = std::strlen(WIFI_SSID);
-    wifi_config.ap.max_connection = MAX_STA_CONN;
-    wifi_config.ap.authmode       = WIFI_AUTH_OPEN;
-
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
-
-    ESP_LOGI(TAG, "Wi-Fi AP started. SSID:%s password:%s", WIFI_SSID, WIFI_PASS);
-}
-
-static void wifi_ap_test_task(void* param)
-{
-    wifi_init_softap();
-    start_webserver();
-
-    while (1) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-    vTaskDelete(NULL);
-}
-
-bool HalEsp32::wifi_init()
-{
-    mclog::tagInfo(TAG, "wifi init");
-
+    static bool s_nvs_ready = false;
+    if (s_nvs_ready) return;
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    s_nvs_ready = true;
+}
 
-    xTaskCreate(wifi_ap_test_task, "ap", 4096, nullptr, 5, nullptr);
-    return true;
+std::string HalEsp32::getConfig(const std::string& key, const std::string& defaultValue)
+{
+    ensure_nvs_ready();
+    nvs_handle_t h;
+    if (nvs_open(DEVCFG_NS, NVS_READONLY, &h) != ESP_OK) {
+        return defaultValue;
+    }
+    size_t len = 0;
+    esp_err_t err = nvs_get_str(h, key.c_str(), nullptr, &len);
+    if (err != ESP_OK || len == 0) {
+        nvs_close(h);
+        return defaultValue;
+    }
+    std::string out(len, '\0');
+    err = nvs_get_str(h, key.c_str(), out.data(), &len);
+    nvs_close(h);
+    if (err != ESP_OK) {
+        return defaultValue;
+    }
+    if (!out.empty() && out.back() == '\0') out.pop_back();  // drop NUL terminator
+    return out;
+}
+
+void HalEsp32::setConfig(const std::string& key, const std::string& value)
+{
+    ensure_nvs_ready();
+    nvs_handle_t h;
+    if (nvs_open(DEVCFG_NS, NVS_READWRITE, &h) != ESP_OK) {
+        ESP_LOGW(TAG, "setConfig: nvs_open failed for %s", key.c_str());
+        return;
+    }
+    nvs_set_str(h, key.c_str(), value.c_str());
+    nvs_commit(h);
+    nvs_close(h);
+    bool is_secret = (key == "wifi_pass" || key == "ha_token");
+    ESP_LOGI(TAG, "setConfig: %s = %s", key.c_str(), is_secret ? "***" : value.c_str());
+}
+
+void HalEsp32::reboot()
+{
+    ESP_LOGI(TAG, "reboot requested");
+    esp_restart();
+}
+
+bool HalEsp32::isWifiConnected()
+{
+    return s_wifi_initialized;
+}
+
+std::vector<hal::HalBase::WifiAp_t> HalEsp32::wifiScan()
+{
+    std::vector<WifiAp_t> result;
+
+    // STA must be started (wifi_init() does this at boot). A blocking scan works
+    // even while connected to an AP.
+    wifi_scan_config_t scan_cfg = {};
+    scan_cfg.show_hidden = false;
+    esp_err_t err = esp_wifi_scan_start(&scan_cfg, true /* block */);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "wifiScan: scan_start failed: %s", esp_err_to_name(err));
+        return result;
+    }
+
+    uint16_t num = 0;
+    esp_wifi_scan_get_ap_num(&num);
+    if (num == 0) return result;
+    if (num > 32) num = 32;
+
+    std::vector<wifi_ap_record_t> records(num);
+    if (esp_wifi_scan_get_ap_records(&num, records.data()) != ESP_OK) {
+        return result;
+    }
+
+    // Dedupe by SSID, keeping the strongest. Skip empty SSIDs.
+    for (uint16_t i = 0; i < num; i++) {
+        const char* ssid = (const char*)records[i].ssid;
+        if (ssid[0] == '\0') continue;
+        auto it = std::find_if(result.begin(), result.end(),
+            [&](const WifiAp_t& a) { return a.ssid == ssid; });
+        bool locked = records[i].authmode != WIFI_AUTH_OPEN;
+        if (it == result.end()) {
+            result.push_back({ssid, records[i].rssi, locked});
+        } else if (records[i].rssi > it->rssi) {
+            it->rssi = records[i].rssi;
+            it->locked = locked;
+        }
+    }
+    std::sort(result.begin(), result.end(),
+        [](const WifiAp_t& a, const WifiAp_t& b) { return a.rssi > b.rssi; });
+    ESP_LOGI(TAG, "wifiScan: %d unique APs", (int)result.size());
+    return result;
+}
+
+// Defined in hal_esp32.cpp — SNTP time sync (needed for TLS to xiaozhi cloud).
+void sync_network_time();
+
+static EventGroupHandle_t s_wifi_event_group = nullptr;
+#define WIFI_CONNECTED_BIT BIT0
+#define WIFI_FAIL_BIT      BIT1
+
+static int s_retry_num = 0;
+
+static void sta_event_handler(void* arg, esp_event_base_t event_base,
+                               int32_t event_id, void* event_data)
+{
+    if (event_base == WIFI_EVENT) {
+        if (event_id == WIFI_EVENT_STA_START) {
+            esp_wifi_connect();
+        } else if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
+            if (s_retry_num < WIFI_MAX_RETRY) {
+                esp_wifi_connect();
+                s_retry_num++;
+                ESP_LOGI(TAG, "retry WiFi connect (%d/%d)", s_retry_num, WIFI_MAX_RETRY);
+            } else {
+                xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
+                ESP_LOGW(TAG, "WiFi connection failed after %d retries", WIFI_MAX_RETRY);
+            }
+        }
+    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+        auto* event = (ip_event_got_ip_t*)event_data;
+        ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
+        s_retry_num = 0;
+        xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+    }
+}
+
+bool HalEsp32::wifi_init()
+{
+    if (s_wifi_initialized) return true;
+
+    // Runtime credentials from NVS, falling back to the compile-time defaults
+    // the first time (before the user sets WiFi via the on-screen Settings app).
+    std::string ssid = getConfig("wifi_ssid", WIFI_STA_SSID);
+    std::string pass = getConfig("wifi_pass", WIFI_STA_PASS);
+    ESP_LOGI(TAG, "WiFi STA init: connecting to %s", ssid.c_str());
+
+    // NVS required by WiFi (getConfig above already ensured init, but be safe).
+    ensure_nvs_ready();
+
+    s_wifi_event_group = xEventGroupCreate();
+
+    // netif and event loop may already be initialized by BSP
+    esp_err_t ni = esp_netif_init();
+    if (ni != ESP_OK && ni != ESP_ERR_INVALID_STATE)
+        ESP_ERROR_CHECK(ni);
+
+    esp_err_t el = esp_event_loop_create_default();
+    if (el != ESP_OK && el != ESP_ERR_INVALID_STATE)
+        ESP_ERROR_CHECK(el);
+
+    esp_netif_create_default_wifi_sta();
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+
+    esp_event_handler_instance_t inst_any;
+    esp_event_handler_instance_t inst_ip;
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(
+        WIFI_EVENT, ESP_EVENT_ANY_ID, &sta_event_handler, nullptr, &inst_any));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(
+        IP_EVENT, IP_EVENT_STA_GOT_IP, &sta_event_handler, nullptr, &inst_ip));
+
+    wifi_config_t wifi_config = {};
+    strncpy((char*)wifi_config.sta.ssid,     ssid.c_str(), sizeof(wifi_config.sta.ssid) - 1);
+    strncpy((char*)wifi_config.sta.password, pass.c_str(), sizeof(wifi_config.sta.password) - 1);
+    // Open networks have an empty password; don't force WPA2-only in that case.
+    wifi_config.sta.threshold.authmode = pass.empty() ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
+
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_start());
+
+    // Wait up to 15s for connection
+    EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
+                                            WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
+                                            pdFALSE, pdFALSE,
+                                            pdMS_TO_TICKS(15000));
+
+    esp_event_handler_instance_unregister(IP_EVENT,  IP_EVENT_STA_GOT_IP, inst_ip);
+    esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID,   inst_any);
+    vEventGroupDelete(s_wifi_event_group);
+    s_wifi_event_group = nullptr;
+
+    bool ok = (bits & WIFI_CONNECTED_BIT) != 0;
+    s_wifi_initialized = ok;
+
+    if (ok) {
+        ESP_LOGI(TAG, "WiFi connected");
+        // Sync system clock via SNTP. Without this the RTC reads year 2002,
+        // which breaks TLS cert validation (e.g. api.tenclass.net for xiaozhi).
+        // Also serves as a DNS/internet reachability check (uses ntp.aliyun.com).
+        sync_network_time();
+    } else {
+        ESP_LOGW(TAG, "WiFi NOT connected");
+    }
+    return ok;
 }
 
 void HalEsp32::setExtAntennaEnable(bool enable)
@@ -213,5 +261,6 @@ bool HalEsp32::getExtAntennaEnable()
 
 void HalEsp32::startWifiAp()
 {
+    // STA mode only — AP not used
     wifi_init();
 }

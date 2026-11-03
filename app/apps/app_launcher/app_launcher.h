@@ -4,24 +4,31 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
+#ifndef APP_LAUNCHER_EXIT_ANIMATION
+#define APP_LAUNCHER_EXIT_ANIMATION 1
+#endif
+
 #include "view/view.h"
 #include <mooncake.h>
+#include <mooncake_templates.h>
+#include <cstdint>
 #include <memory>
 
 /**
- * @brief 派生 App
+ * @brief Derived App
  *
  */
-class AppLauncher : public mooncake::AppAbility {
+class AppLauncher : public mooncake::templates::AppLauncherBase {
 public:
-    AppLauncher();
-
-    // 重写生命周期回调
-    void onCreate() override;
-    void onOpen() override;
-    void onRunning() override;
-    void onClose() override;
+    void onLauncherCreate() override;
+    void onLauncherOpen() override;
+    void onLauncherRunning() override;
+    void onLauncherClose() override;
+    void onLauncherDestroy() override;
 
 private:
-    std::unique_ptr<launcher_view::LauncherView> _view;
+    std::unique_ptr<view::LauncherView> _view;
+#if APP_LAUNCHER_EXIT_ANIMATION
+    bool _app_open_transition_started = false;
+#endif
 };

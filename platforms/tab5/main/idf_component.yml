@@ -1,10 +1,50 @@
 ## IDF Component Manager Manifest File
 dependencies:
   ## Required IDF version
-  idf: '>=5.3'
+  idf:
+    version: '>=5.4.0'
+
+  m5stack_tab5:
+    version: "*"
+    path: ../components/m5stack_tab5
+
+  ina226:
+    path: ../components/ina226
+
+  rx8130:
+    path: ../components/rx8130
+
+#  tab5_keyboard:
+#    path: ../components/tab5_keyboard
+
+  lvgl/lvgl:
+    #version: ^9.5.0
+    path: ../../../dependencies/lvgl
+
+  espressif/esp_lv_decoder: '*'
+  #espressif/esp_mmap_assets: '*'
+  #espressif/esp_lv_fs: '*'
+
+  #espressif/esp_wifi_remote: ^1.2.2
+  espressif/esp_wifi_remote: 0.8.5    
+  #esp_hosted(and esp_wifi_remote) version should be matched with C6 firmware version
+  #espressif/esp_hosted: ^2.8.3 
   espressif/esp_hosted: 1.4.0
-  espressif/esp_wifi_remote: 0.8.5
-  chmorgan/esp-audio-player: 1.0.7
-  chmorgan/esp-file-iterator: 1.0.0
-  espressif/led_strip: 3.0.0
-  espressif/esp_lcd_ili9881c: ^1.0.1
+  
+  
+  chmorgan/esp-audio-player: ^1.0.7
+  chmorgan/esp-file-iterator: ^1.0.0
+  #espressif/esp-modbus: ^2.1.1
+  #chmorgan/esp-libhelix-mp3: ^1.0.3
+  #espressif2022/image_player: ^1.1.1
+  #espressif/esp_image_effects: ^1.0.1
+  #espressif/esp_audio_codec: ^2.4.1
+
+  espressif/usb_host_hid: ^1.0.3
+  espressif/esp_tinyusb: ^2.1.1
+  espressif/esp-dsp: 
+    version: ^1.7.0
+    
+  # use fies in the dependencies folder
+  #johboh/nlohmann-json: "^3.12.0"
+

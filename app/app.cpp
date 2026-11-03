@@ -32,11 +32,13 @@ void app::Init(InitCallback_t callback)
 
 void app::Update()
 {
+    LvglLockGuard lock;
     GetMooncake().update();
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined ( __WIN32__ ) || ( defined(__APPLE__) && defined(__MACH__) )
     // 'nextEventMatchingMask should only be called from the Main Thread!'
     auto time_till_next = lv_timer_handler();
+    if( time_till_next < 1 ) time_till_next = 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(time_till_next));
 #endif
 }
@@ -48,6 +50,8 @@ bool app::IsDone()
 
 void app::Destroy()
 {
+    // Uninstall all apps and destroy mooncake
+    GetMooncake().uninstallAllApps();    
     DestroyMooncake();
     hal::Destroy();
 }

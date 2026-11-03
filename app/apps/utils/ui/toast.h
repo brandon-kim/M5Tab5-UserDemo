@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 // Ref: https://www.heroui.com/docs/components/toast
+#pragma once
 #include <cstdint>
 #include <string>
-#include <lvgl.h>
 #include <mooncake.h>
-#include <smooth_ui_toolkit.h>
-#include <smooth_lvgl.h>
+#include <smooth_ui_toolkit.hpp>
+#include <uitk/short_namespace.hpp>
+#include <smooth_lvgl.hpp>
 #include <memory>
 #include <vector>
 

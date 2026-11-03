@@ -8,16 +8,21 @@
 #include <vector>
 #include <memory>
 #include <string.h>
-#include <bsp/m5stack_tab5.h>
+#include <bsp/esp-bsp.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <thread>
 #include <mutex>
 #include <audio_player.h>
+#include <assets/assets.h>
 
 static const char* TAG = "audio";
 
 static uint8_t _current_speaker_volume = 60;
+
+static bool _codec_ready() {
+    return bsp_get_codec_handle()->set_volume != nullptr;
+}
 
 void HalEsp32::setSpeakerVolume(uint8_t volume)
 {
@@ -32,13 +37,14 @@ uint8_t HalEsp32::getSpeakerVolume()
 
 void HalEsp32::audioRecord(std::vector<int16_t>& data, uint16_t durationMs, float gain)
 {
-    data.resize(48000 * 4 * durationMs / 1000);
+    if (!_codec_ready()) return;
+    data.resize(BSP_I2S_SAMPLE_RATE * 4 * durationMs / 1000);
 
     // ESP_LOGI(TAG, "start record");
     bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
     codec_handle->set_in_gain(gain);
     size_t bytes_read = 0;
-    codec_handle->i2s_read((char*)data.data(), (48000 * 4 * durationMs / 1000) * sizeof(uint16_t), &bytes_read,
+    codec_handle->i2s_read((char*)data.data(), (BSP_I2S_SAMPLE_RATE * 4 * durationMs / 1000) * sizeof(uint16_t), &bytes_read,
                            portMAX_DELAY);
     // ESP_LOGI(TAG, "record done, %d bytes", bytes_read);
 }
@@ -63,9 +69,17 @@ void _audio_play_task(void* param)
             _audio_task_data.is_audio_playing = true;
             _audio_task_data.mutex.unlock();
 
+            if (!_codec_ready()) {
+                _audio_task_data.mutex.lock();
+                _audio_task_data.is_audio_playing = false;
+                _audio_task_data.is_audio_ready   = false;
+                _audio_task_data.mutex.unlock();
+                continue;
+            }
+
             bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
             codec_handle->set_volume(_current_speaker_volume);
-            codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+            codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
             codec_handle->i2s_write(_audio_task_data.audio_data.data(),
                                     _audio_task_data.audio_data.size() * sizeof(uint16_t), &bytes_written,
                                     portMAX_DELAY);
@@ -101,10 +115,11 @@ void HalEsp32::audioPlay(std::vector<int16_t>& data, bool async)
         _audio_task_data.audio_data     = data;
         _audio_task_data.is_audio_ready = true;
     } else {
+        if (!_codec_ready()) return;
         bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
         codec_handle->set_volume(_current_speaker_volume);
         size_t bytes_written = 0;
-        codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+        codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
         codec_handle->i2s_write(data.data(), data.size() * sizeof(uint16_t), &bytes_written, portMAX_DELAY);
     }
 }
@@ -125,8 +140,8 @@ static void _rec_test_task(void* param)
 {
     mclog::tagInfo(TAG, "start record test");
 
-    const size_t read_buffer_size  = 48000 * 4 * 3;
-    const size_t audio_buffer_size = 48000 * 2 * 3;
+    const size_t read_buffer_size  = BSP_I2S_SAMPLE_RATE * 4 * 3;
+    const size_t audio_buffer_size = BSP_I2S_SAMPLE_RATE * 2 * 3;
 
     // Create buffers
     if (_rec_test_data.audio_buffer == nullptr) {
@@ -136,7 +151,7 @@ static void _rec_test_task(void* param)
         _rec_test_data.read_buffer = new int16_t[read_buffer_size](0);
     }
 
-    const size_t sample_rate   = 48000;
+    const size_t sample_rate   = BSP_I2S_SAMPLE_RATE;
     const size_t total_samples = sample_rate * 4 * 3;  // 4通道，3秒
     const size_t chunk_samples = 4096 * 4;             // 4通道一帧
     const size_t chunk_bytes   = chunk_samples * sizeof(int16_t);
@@ -190,10 +205,10 @@ static void _rec_test_task(void* param)
 
     size_t bytes_written = 0;
     codec_handle->set_volume(_current_speaker_volume);
-    codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+    codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
 
     mclog::tagInfo(TAG, "start playback");
-    codec_handle->i2s_write(_rec_test_data.audio_buffer, (48000 * 2 * 3) * sizeof(uint16_t), &bytes_written,
+    codec_handle->i2s_write(_rec_test_data.audio_buffer, (BSP_I2S_SAMPLE_RATE * 2 * 3) * sizeof(uint16_t), &bytes_written,
                             portMAX_DELAY);
     mclog::tagInfo(TAG, "playback done");
 
@@ -250,12 +265,7 @@ hal::HalBase::MicTestState_t HalEsp32::getHeadphoneMicRecordTestState()
 /* -------------------------------------------------------------------------- */
 /*                               Music play test                              */
 /* -------------------------------------------------------------------------- */
-extern const uint8_t canon_in_d_mp3_start[] asm("_binary_canon_in_d_mp3_start");
-extern const uint8_t canon_in_d_mp3_end[] asm("_binary_canon_in_d_mp3_end");
-extern const uint8_t startup_sfx_mp3_start[] asm("_binary_startup_sfx_mp3_start");
-extern const uint8_t startup_sfx_mp3_end[] asm("_binary_startup_sfx_mp3_end");
-extern const uint8_t shutdown_sfx_mp3_start[] asm("_binary_shutdown_sfx_mp3_start");
-extern const uint8_t shutdown_sfx_mp3_end[] asm("_binary_shutdown_sfx_mp3_end");
+
 
 enum Mp3PlayTarget_t {
     MP3_PLAY_TARGET_CANON_IN_D,
@@ -273,6 +283,7 @@ static MusicTestData_t _music_test_data;
 
 static esp_err_t audio_mute_function(AUDIO_PLAYER_MUTE_SETTING setting)
 {
+    if (!_codec_ready()) return ESP_OK;
     bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
     codec_handle->set_mute(setting == AUDIO_PLAYER_MUTE ? true : false);
     return ESP_OK;
@@ -292,9 +303,10 @@ static void audio_player_callback(audio_player_cb_ctx_t* ctx)
 
 static void _music_play_task(void* param)
 {
+    if (!_codec_ready()) { vTaskDelete(NULL); return; }
     bsp_codec_config_t* codec_handle = bsp_get_codec_handle();
     codec_handle->set_volume(_current_speaker_volume);
-    codec_handle->i2s_reconfig_clk_fn(48000, 16, I2S_SLOT_MODE_STEREO);
+    codec_handle->i2s_reconfig_clk_fn(BSP_I2S_SAMPLE_RATE, 16, I2S_SLOT_MODE_STEREO);
 
     audio_player_config_t config = {
         .mute_fn    = audio_mute_function,
@@ -387,12 +399,10 @@ void HalEsp32::stopPlayMusicTest()
 /* -------------------------------------------------------------------------- */
 void HalEsp32::playStartupSfx()
 {
-    std::lock_guard<std::mutex> lock(_music_test_data.mutex);
-    try_create_music_play_task(MP3_PLAY_TARGET_STARTUP_SFX);
+    // codec not initialized (bsp_codec_init skipped); no-op for HA panel
 }
 
 void HalEsp32::playShutdownSfx()
 {
-    std::lock_guard<std::mutex> lock(_music_test_data.mutex);
-    try_create_music_play_task(MP3_PLAY_TARGET_SHUTDOWN_SFX);
+    // codec not initialized (bsp_codec_init skipped); no-op for HA panel
 }

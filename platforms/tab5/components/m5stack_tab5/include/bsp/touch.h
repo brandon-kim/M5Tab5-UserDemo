@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,12 +21,16 @@
 extern "C" {
 #endif
 
+/** \addtogroup g04_display
+ *  @{
+ */
+
 /**
  * @brief BSP touch configuration structure
  *
  */
 typedef struct {
-    void *dummy; /*!< Prepared for future use. */
+    void *dummy;    /*!< Prepared for future use. */
 } bsp_touch_config_t;
 
 /**
@@ -46,6 +50,7 @@ typedef struct {
  */
 esp_err_t bsp_touch_new(const bsp_touch_config_t *config, esp_lcd_touch_handle_t *ret_touch);
 
+/** @} */ // end of display
 #ifdef __cplusplus
 }
 #endif

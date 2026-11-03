@@ -9,7 +9,15 @@
 #include <hal/hal.h>
 #include "app_template/app_template.h"
 #include "app_launcher/app_launcher.h"
+#include "app_demo/app_demo.h"
 #include "app_startup_anim/app_startup_anim.h"
+#include "app_test/app_test.h"
+#include "app_no_smooth/app_no_smooth.h"
+#include "app_settings/app_settings.h"
+#include "app_ha/app_ha.h"
+#include "app_idle_screen/app_idle_screen.h"
+#include "app_voice_input/app_voice_input.h"
+
 /* Header files locator (Don't remove) */
 
 // Start boot anim app and wait for it to finish
@@ -28,14 +36,24 @@ inline void on_startup_anim()
 }
 
 /**
- * @brief App 安装回调
+ * @brief App install callback (App Installation Callback)
+ * Plan to add a new AppLauncher when time permits
  *
  * @param mooncake
  */
 inline void on_install_apps()
 {
-    // 安装 App
+    // Install App
+    // Currently using card-based AppLauncher as the default launcher
     // mooncake::GetMooncake().installApp(std::make_unique<AppTemplate>());
-    mooncake::GetMooncake().installApp(std::make_unique<AppLauncher>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppLauncher>());  // Card-based app launcher
+    mooncake::GetMooncake().installApp(std::make_unique<AppDemo>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppTest>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppNoSmooth>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppSettings>());
+    mooncake::GetMooncake().installApp(std::make_unique<AppHA>());
+    //run in background 
+    mooncake::GetMooncake().createExtension( std::make_unique<AppIdleScreen>());
+    mooncake::GetMooncake().createExtension( std::make_unique<AppVoiceInput>());
     /* Install app locator (Don't remove) */
 }

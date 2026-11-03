@@ -4,19 +4,64 @@
  * SPDX-License-Identifier: MIT
  */
 #include "hal/hal_esp32.h"
-extern "C" {
-#include "utils/rx8130/rx8130.h"
-}
+#include "rx8130.h"
 #include <mooncake_log.h>
 #include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <bsp/m5stack_tab5.h>
+#include <esp_netif_sntp.h>
+#include <bsp/esp-bsp.h>
 #include <lv_demos.h>
-
-extern esp_lcd_touch_handle_t _lcd_touch_handle;
+#include <cstdlib>
+#include <ctime>
+#include <functional>
+#include <new>
+#include <pthread.h>
 
 static const std::string _tag = "hal";
+static void set_local_timezone()
+{
+    setenv("TZ", "CST-8", 1);
+    tzset();
+}
+
+void sync_network_time()
+{
+    set_local_timezone();
+
+    static bool sntp_initialized = false;
+    if (!sntp_initialized) {
+        esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("ntp.aliyun.com");
+        esp_err_t ret = esp_netif_sntp_init(&config);
+        if (ret == ESP_OK || ret == ESP_ERR_INVALID_STATE) {
+            sntp_initialized = true;
+        } else {
+            mclog::tagWarn(_tag, "sntp init failed: {}", esp_err_to_name(ret));
+            return;
+        }
+    }
+
+    esp_err_t ret = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(10000));
+    if (ret == ESP_OK) {
+        time_t now = time(nullptr);
+        struct tm local_now;
+        localtime_r(&now, &local_now);
+        mclog::tagInfo(_tag, "network time synced: {:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}",
+                       local_now.tm_year + 1900, local_now.tm_mon + 1, local_now.tm_mday,
+                       local_now.tm_hour, local_now.tm_min, local_now.tm_sec);
+        // Persist network time into the hardware RTC (RX8130) so the clock stays
+        // correct across reboots and before WiFi reconnects on the next boot.
+        // Without this the system clock is right only this session; on the next
+        // cold boot update_system_time() would read the stale RTC again.
+        GetHAL()->setRtcTime(local_now);
+    } else {
+        mclog::tagWarn(_tag, "sntp sync timeout: {}", esp_err_to_name(ret));
+    }
+}
+
+
+#if 0
+extern esp_lcd_touch_handle_t _lcd_touch_handle;
 
 static void lvgl_read_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
@@ -43,28 +88,37 @@ static void lvgl_read_cb(lv_indev_t* indev, lv_indev_data_t* data)
         data->point.y = touch_y[0];
     }
 }
-
+#endif
 void HalEsp32::init()
 {
     mclog::tagInfo(_tag, "init");
 
-    mclog::tagInfo(_tag, "camera init");
-    bsp_cam_osc_init();
+	// NC in the checkmatic
+    //mclog::tagInfo(_tag, "camera init");
+    //bsp_cam_osc_init();
 
     mclog::tagInfo(_tag, "i2c init");
     bsp_i2c_init();
 
     mclog::tagInfo(_tag, "io expander init");
+
     i2c_master_bus_handle_t i2c_bus_handle = bsp_i2c_get_handle();
+#if 0//old bsp    
     bsp_io_expander_pi4ioe_init(i2c_bus_handle);
+#else
+
+#endif
+    mclog::tagInfo(_tag, "wifi power on");
+    bsp_set_wifi_power_enable(true);
+    delay(500);  // give C6 time to boot before SDIO transport connects
 
     setChargeQcEnable(true);
     delay(50);
     setChargeEnable(true);
     // setChargeEnable(false);
-
+    
     mclog::tagInfo(_tag, "i2c scan");
-    bsp_i2c_scan();
+    bsp_i2c_scan(i2c_bus_handle);
 
     mclog::tagInfo(_tag, "codec init");
     delay(200);
@@ -72,48 +126,33 @@ void HalEsp32::init()
 
     mclog::tagInfo(_tag, "imu init");
     imu_init();
-
+    
     mclog::tagInfo(_tag, "ina226 init");
-    ina226.begin(i2c_bus_handle, 0x41);
-    ina226.configure(INA226_AVERAGES_16, INA226_BUS_CONV_TIME_1100US, INA226_SHUNT_CONV_TIME_1100US,
+    ina226_init(i2c_bus_handle, 0x41);
+    ina226_configure(INA226_AVERAGES_16, INA226_BUS_CONV_TIME_1100US, INA226_SHUNT_CONV_TIME_1100US,
                      INA226_MODE_SHUNT_BUS_CONT);
-    ina226.calibrate(0.005, 8.192);
-    mclog::tagInfo(_tag, "bus voltage: {}", ina226.readBusVoltage());
+    ina226_calibrate(0.005, 8.192);
+    mclog::tagInfo(_tag, "bus voltage: {}", ina226_readBusVoltage());
+
+    mclog::tagInfo(_tag, "tsense init");
+    bsp_tsense_init();
+
+    //mclog::tagInfo(_tag, "camera init");
+    //bsp_camera_start(NULL);
 
     mclog::tagInfo(_tag, "rx8130 init");
-    rx8130.begin(i2c_bus_handle, 0x32);
-    rx8130.initBat();
+    rx8130_init(i2c_bus_handle, 0x32);
+    rx8130_initBat();
     clearRtcIrq();
     update_system_time();
 
     mclog::tagInfo(_tag, "display init");
-    bsp_reset_tp();
-    bsp_display_cfg_t cfg = {.lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
-                             .buffer_size   = BSP_LCD_H_RES * BSP_LCD_V_RES,
-                             .double_buffer = true,
-                             .flags         = {
-#if CONFIG_BSP_LCD_COLOR_FORMAT_RGB888
-                                 .buff_dma = false,
-#else
-                                 .buff_dma = true,
-#endif
-                                 .buff_spiram = true,
-                                 .sw_rotate   = true,
-                             }};
-    lvDisp = bsp_display_start_with_config(&cfg);
+    lvDisp = bsp_display_start();
     lv_display_set_rotation(lvDisp, LV_DISPLAY_ROTATION_90);
     bsp_display_backlight_on();
-
-    // // Touchpad lvgl indev
-    // mclog::tagInfo(_tag, "create lvgl touchpad indev");
-    // lvTouchpad = lv_indev_create();
-    // lv_indev_set_type(lvTouchpad, LV_INDEV_TYPE_POINTER);
-    // lv_indev_set_read_cb(lvTouchpad, lvgl_read_cb);
-    // lv_indev_set_display(lvTouchpad, lvDisp);
-
+    
     mclog::tagInfo(_tag, "usb host init");
     bsp_usb_host_start(BSP_USB_HOST_POWER_MODE_USB_DEV, true);
-
     mclog::tagInfo(_tag, "hid init");
     hid_init();
 
@@ -176,8 +215,7 @@ void HalEsp32::set_gpio_output_capability()
 /* -------------------------------------------------------------------------- */
 /*                                   System                                   */
 /* -------------------------------------------------------------------------- */
-#include <driver/temperature_sensor.h>
-static temperature_sensor_handle_t _temp_sensor = nullptr;
+
 
 void HalEsp32::delay(uint32_t ms)
 {
@@ -191,19 +229,13 @@ uint32_t HalEsp32::millis()
 
 int HalEsp32::getCpuTemp()
 {
-    if (_temp_sensor == nullptr) {
-        temperature_sensor_config_t temp_sensor_config = {
-            .range_min = 20,
-            .range_max = 100,
-        };
-        temperature_sensor_install(&temp_sensor_config, &_temp_sensor);
-        temperature_sensor_enable(_temp_sensor);
+
+    uint32_t temp_x100;
+    if( ESP_OK == bsp_tsense_read_x100(&temp_x100) ) {
+        return (temp_x100 + 50) / 100;
     }
-
-    float temp = 0;
-    temperature_sensor_get_celsius(_temp_sensor, &temp);
-
-    return temp;
+    
+    return 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -242,31 +274,68 @@ void HalEsp32::lvglUnlock()
 void HalEsp32::clearRtcIrq()
 {
     mclog::tagInfo(_tag, "clear rtc irq");
-    rx8130.clearIrqFlags();
-    rx8130.disableIrq();
+    rx8130_clearIrqFlags();
+    rx8130_disableIrq();
 }
 
 void HalEsp32::setRtcTime(tm time)
 {
     mclog::tagInfo(_tag, "set rtc time to {}/{}/{} {:02d}:{:02d}:{:02d}", time.tm_year + 1900, time.tm_mon + 1,
                    time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
-    rx8130.setTime(&time);
+    rx8130_setTime(&time);
     delay(50);
 
     update_system_time();
 }
 
+bool HalEsp32::tryRunDetached(std::function<void()> fn)
+{
+    // Heap-own the functor so it survives until the worker runs it.
+    auto* heap_fn = new (std::nothrow) std::function<void()>(std::move(fn));
+    if (!heap_fn) {
+        return false;
+    }
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    // 8 KB instead of the 16 KB pthread default: these workers do plain-HTTP
+    // fetches (no TLS), so 8 KB is ample and a contiguous 8 KB internal block is
+    // far easier to find than 16 KB when RAM is fragmented (e.g. right after
+    // leaving xiaozhi). Stack size set on the attr so we don't perturb the
+    // task-global esp_pthread cfg used by other threads (e.g. HaClient poll).
+    pthread_attr_setstacksize(&attr, 8192);
+
+    pthread_t tid;
+    int ret = pthread_create(&tid, &attr, [](void* arg) -> void* {
+        auto* f = static_cast<std::function<void()>*>(arg);
+        (*f)();
+        delete f;
+        return nullptr;
+    }, heap_fn);
+    pthread_attr_destroy(&attr);
+
+    if (ret != 0) {
+        // pthread_create failed (e.g. ENOMEM). Returning false lets the caller
+        // skip this work instead of aborting like std::thread would.
+        delete heap_fn;
+        mclog::tagWarn(_tag, "tryRunDetached: pthread_create failed ({})", ret);
+        return false;
+    }
+    return true;
+}
+
 void HalEsp32::update_system_time()
 {
-    mclog::tagInfo(_tag, "update system time");
-    struct tm time;
-    rx8130.getTime(&time);
-    mclog::tagInfo(_tag, "sync to rtc time: {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}", time.tm_year + 1900,
-                   time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+    struct tm rtc_time;
+    time_t    rtc_time_sec;
+    rx8130_getTime(&rtc_time);
+    rtc_time_sec = mktime(&rtc_time);
     struct timeval now;
-    now.tv_sec  = mktime(&time);
+    now.tv_sec  = rtc_time_sec;
     now.tv_usec = 0;
     settimeofday(&now, NULL);
+    mclog::tagInfo(_tag, "update system time %s", asctime(&rtc_time));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -285,13 +354,19 @@ std::vector<hal::HalBase::FileEntry_t> HalEsp32::scanSdCard(const std::string& d
     std::vector<hal::HalBase::FileEntry_t> file_entries;
 
     mclog::tagInfo(_tag, "init sd card");
+#if 0 //old bsp    
     if (bsp_sdcard_init("/sd", 25) != ESP_OK) {
+#else
+    if ( bsp_sdcard_mount() != ESP_OK ) {
+#endif        
         mclog::error("failed to mount sd card");
         return file_entries;
     }
-
+#if 0 //old bsp   
     std::string target_path = "/sd/" + dirPath;
-
+#else
+    std::string target_path = BSP_SD_MOUNT_POINT + dirPath;
+#endif
     DIR* dir = opendir(target_path.c_str());
     if (dir == nullptr) {
         mclog::error("failed to open directory: {}", target_path);
@@ -313,8 +388,11 @@ std::vector<hal::HalBase::FileEntry_t> HalEsp32::scanSdCard(const std::string& d
     closedir(dir);
 
     mclog::tagInfo(_tag, "deinit sd card");
+#if 0//old bsp    
     bsp_sdcard_deinit("/sd");
-
+#else
+    bsp_sdcard_unmount();
+#endif
     return file_entries;
 }
 

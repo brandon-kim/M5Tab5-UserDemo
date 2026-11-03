@@ -17,7 +17,7 @@ using namespace smooth_ui_toolkit::lvgl_cpp;
 
 AppStartupAnim::AppStartupAnim()
 {
-    // 配置 App 信息
+    // Configure App Info
     setAppInfo().name = "AppStartupAnim";
 }
 
@@ -123,11 +123,12 @@ void AppStartupAnim::onClose()
 {
     mclog::tagInfo(getAppInfo().name, "on close");
 
-    LvglLockGuard lock;
+    LvglLockGuard lock;//need?
 
     _logo_tab.reset();
     _logo_5.reset();
     _label_version.reset();
 
-    GetHAL()->setSpeakerVolume(60);
+    GetHAL()->setDisplayBrightness(60);
+    GetHAL()->setSpeakerVolume(70);
 }

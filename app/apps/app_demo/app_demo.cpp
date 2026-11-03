@@ -1,0 +1,52 @@
+/*
+ * SPDX-FileCopyrightText: 2025 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
+#include "app_demo.h"
+#include <hal/hal.h>
+#include <mooncake.h>
+#include <mooncake_log.h>
+#include <assets/assets.h>
+
+using namespace mooncake;
+
+AppDemo::AppDemo()
+{
+    // Configure App name
+    setAppInfo().name = "AppDemo";
+    // Configure App icon
+    setAppInfo().icon = (void*)LV_SYMBOL_IMAGE;  // LVGL internal symbol, just for demo, not a real image
+}
+
+void AppDemo::onCreate()
+{
+    mclog::tagInfo(getAppInfo().name, "on create");
+
+    // App is ready, but won't auto-open
+    // Will be opened by AppLauncher when user clicks the card
+}
+
+void AppDemo::onOpen()
+{
+    mclog::tagInfo(getAppInfo().name, "on open");
+
+    _view = std::make_unique<view::AppDemoView>();
+    _view->init();
+    _view->setOnQuit([this]() {
+        close();
+    });
+
+}
+
+void AppDemo::onRunning()
+{
+    _view->update();
+}
+
+void AppDemo::onClose()
+{
+    mclog::tagInfo(getAppInfo().name, "on close");
+
+    _view.reset();
+}

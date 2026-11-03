@@ -5,9 +5,9 @@
  */
 #pragma once
 #include <hal/hal.h>
-#include <ina226.hpp>
+#include <ina226.h>
 #include <lvgl.h>
-#include "utils/rx8130/rx8130.h"
+#include "rx8130.h"
 
 class HalEsp32 : public hal::HalBase {
 public:
@@ -22,8 +22,10 @@ public:
     uint32_t millis() override;
     int getCpuTemp() override;
 
-    INA226 ina226;
-    RX8130_Class rx8130;
+    /* INA226 converted to C API. Use ina226_init(), ina226_readBusVoltage(), etc.
+       (call-sites must be updated separately) */
+    /* RX8130 converted to C API. Use rx8130_init(), rx8130_get_time(), etc.
+       (call-sites must be updated separately) */
     lv_disp_t* lvDisp      = nullptr;
     lv_indev_t* lvKeyboard = nullptr;
 
@@ -75,12 +77,21 @@ public:
     void setExtAntennaEnable(bool enable) override;
     bool getExtAntennaEnable() override;
     void startWifiAp() override;
+    bool isWifiConnected() override;
+    std::vector<WifiAp_t> wifiScan() override;
+
+    std::string getConfig(const std::string& key, const std::string& defaultValue = "") override;
+    void setConfig(const std::string& key, const std::string& value) override;
+
+    void reboot() override;
+    bool tryRunDetached(std::function<void()> fn) override;
 
     bool isSdCardMounted() override;
     std::vector<FileEntry_t> scanSdCard(const std::string& dirPath) override;
 
     bool usbCDetect() override;
     bool usbADetect() override;
+    bool usbKeyboardDetect() override;
     bool headPhoneDetect() override;
     std::vector<uint8_t> i2cScan(bool isInternal) override;
     void initPortAI2c() override;
@@ -88,6 +99,15 @@ public:
     void gpioInitOutput(uint8_t pin) override;
     void gpioSetLevel(uint8_t pin, bool level) override;
     void gpioReset(uint8_t pin) override;
+
+    HttpResponse_t httpGet(const std::string& url,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPost(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPut(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPostKeepAlive(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
 
 private:
     void set_gpio_output_capability();
