@@ -15,6 +15,8 @@
 #include "app_no_smooth/app_no_smooth.h"
 #include "app_settings/app_settings.h"
 #include "app_ha/app_ha.h"
+#include "app_idle_screen/app_idle_screen.h"
+#include "app_voice_input/app_voice_input.h"
 
 /* Header files locator (Don't remove) */
 
@@ -50,5 +52,8 @@ inline void on_install_apps()
     mooncake::GetMooncake().installApp(std::make_unique<AppNoSmooth>());
     mooncake::GetMooncake().installApp(std::make_unique<AppSettings>());
     mooncake::GetMooncake().installApp(std::make_unique<AppHA>());
+    //run in background 
+    mooncake::GetMooncake().createExtension( std::make_unique<AppIdleScreen>());
+    mooncake::GetMooncake().createExtension( std::make_unique<AppVoiceInput>());
     /* Install app locator (Don't remove) */
 }

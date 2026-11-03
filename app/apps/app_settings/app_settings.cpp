@@ -17,7 +17,7 @@ static const std::string _tag = "app-tools";
 // Xiaozhi's puhui common 30px cbin font — GB2312 ~3500 glyphs, XIP from flash.
 static const lv_font_t* zh_font_30()
 {
-    return &lv_font_montserrat_24;
+    return &lv_font_montserrat_30;
 }
 
 // Font defined in app_ha/view/font_zh_36.c (includes the tools calculator glyphs).
