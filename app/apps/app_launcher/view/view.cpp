@@ -8,7 +8,7 @@
 #include <mooncake_log.h>
 #include <assets/assets.h>
 #include <apps/utils/audio/audio.h>
-#include <src/core/lv_obj.h>
+//#include <src/core/lv_obj.h>
 #include <cstdint>
 
 using namespace view;
@@ -22,6 +22,7 @@ LauncherView::~LauncherView()
 #if APP_LAUNCHER_EXIT_ANIMATION
     lv_anim_delete(_base, _exitAnimationExec);
 #endif
+    _clock.reset();
     if (_base) {
         if(lv_obj_get_parent(_base)!= NULL)
             lv_obj_delete(_base);  // child objects will be deleted automatically
@@ -152,19 +153,33 @@ void LauncherView::init(std::vector<mooncake::AppProps_t> appProps)
     lv_obj_set_style_pad_all(sbar, 0, 0);
     lv_obj_remove_flag(sbar, (lv_obj_flag_t)(LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE));
 
-    lv_obj_t* status_time = lv_label_create(sbar);
-    lv_obj_set_style_text_font(status_time, &lv_font_montserrat_28, 0);
-    lv_obj_set_style_text_color(status_time, lv_color_hex(0x4FA3FF), 0);
-    lv_label_set_text(status_time, "--:--");
-    lv_obj_align(status_time, LV_ALIGN_LEFT_MID, 28, 0);    
+    // Clock (left)
+    _clock = std::make_unique<Clock>(sbar);
+    lv_obj_align(_clock->_container, LV_ALIGN_LEFT_MID, 0, 0);
 
-    // Date — to the right of the clock, same size as time (28px Chinese font).
-    lv_obj_t* status_date = lv_label_create(sbar);
-    lv_obj_set_style_text_font(status_date, &lv_font_montserrat_28, 0);
-    lv_obj_set_style_text_color(status_date, lv_color_hex(0x4FA3FF), 0);
-    lv_label_set_text(status_date, "");
-    lv_obj_align(status_date, LV_ALIGN_LEFT_MID, 138, 0);
 
+    // Weather (center): temperature (latin font, has °) + condition (zh font).
+    lv_obj_t* wbox = lv_obj_create(sbar);
+    lv_obj_set_size(wbox, LV_SIZE_CONTENT, 56);
+    lv_obj_set_style_bg_opa(wbox, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(wbox, 0, 0);
+    lv_obj_set_style_pad_all(wbox, 0, 0);
+    lv_obj_set_style_pad_column(wbox, 10, 0);
+    lv_obj_set_flex_flow(wbox, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(wbox, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_remove_flag(wbox, (lv_obj_flag_t)(LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE));
+    lv_obj_align(wbox, LV_ALIGN_CENTER, 0, 0);
+
+
+    lv_obj_t* status_wtemp = lv_label_create(wbox);
+    lv_obj_set_style_text_font(status_wtemp, &lv_font_montserrat_28, 0);
+    lv_obj_set_style_text_color(status_wtemp, lv_color_hex(0x4FA3FF), 0);
+    lv_label_set_text(status_wtemp, "wtemp");
+
+    lv_obj_t* status_wcond = lv_label_create(wbox);
+    //lv_obj_set_style_text_font(status_wcond, , 0);
+    lv_obj_set_style_text_color(status_wcond, lv_color_hex(0x4FA3FF), 0);
+    lv_label_set_text(status_wcond, "wcond");
 
 }
 

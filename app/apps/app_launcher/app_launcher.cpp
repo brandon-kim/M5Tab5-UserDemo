@@ -8,18 +8,20 @@
 #include <mooncake.h>
 #include <mooncake_log.h>
 
+static const std::string TAG = "launcher";
+
 using namespace mooncake;
 
 void AppLauncher::onLauncherCreate()
 {
-    mclog::tagInfo(getAppInfo().name, "on create");
+    mclog::tagInfo(TAG, "on create");
 
     open();
 }
 
 void AppLauncher::onLauncherOpen()
 {
-    mclog::tagInfo(getAppInfo().name, "on open");
+    mclog::tagInfo(TAG, "on open");
 
 #if APP_LAUNCHER_EXIT_ANIMATION
     _app_open_transition_started = false;
@@ -37,7 +39,7 @@ void AppLauncher::onLauncherRunning()
 
     const int appID = _view->consumeSelectedAppId();
     if (appID >= 0) {
-        mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
+        mclog::tagInfo(TAG, "handle open app, app id: {}", appID);
 #if APP_LAUNCHER_EXIT_ANIMATION
         _app_open_transition_started = true;
         _view->animateOut([this, appID]() {
@@ -51,12 +53,12 @@ void AppLauncher::onLauncherRunning()
 
 void AppLauncher::onLauncherClose()
 {
-    mclog::tagInfo(getAppInfo().name, "on close");
+    mclog::tagInfo(TAG, "on close");
 
     _view.reset();
 }
 
 void AppLauncher::onLauncherDestroy()
 {
-    mclog::tagInfo(getAppInfo().name, "on destroy");
+    mclog::tagInfo(TAG, "on destroy");
 }

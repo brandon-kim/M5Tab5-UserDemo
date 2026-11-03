@@ -9,6 +9,8 @@
 //#include <uitk/short_namespace.hpp>
 //#include <smooth_lvgl.hpp>
 #include <lvgl.h>
+#include <apps/utils/ui/clock.h>
+#include <memory>
 
 #ifndef APP_LAUNCHER_EXIT_ANIMATION
 #define APP_LAUNCHER_EXIT_ANIMATION 1
@@ -38,6 +40,7 @@ public:
 private:
     int _selected_app_id = -1;
     lv_obj_t* _base = nullptr;
+    std::unique_ptr<Clock> _clock;
 
     static void _card_event_handler(lv_event_t* e);
 #if APP_LAUNCHER_EXIT_ANIMATION

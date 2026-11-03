@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 // Ref: https://www.heroui.com/docs/components/toast
+#pragma once
 #include <cstdint>
 #include <string>
 #include <mooncake.h>

@@ -18,27 +18,8 @@ using namespace ha_view;
 //   zh_font_sm() — 20px, replaces the old 18px font_zh_18
 // On device these are cbin blobs used in-place from flash (no big RAM copy);
 // on the desktop sim we fall back to the linked 20px C-array font.
-#ifndef PLATFORM_BUILD_DESKTOP
-#include <cbin_font.h>
-extern const uint8_t font_puhui_common_30_4_bin_start[]
-    asm("_binary_font_puhui_common_30_4_bin_start");
-extern const uint8_t font_puhui_common_20_4_bin_start[]
-    asm("_binary_font_puhui_common_20_4_bin_start");
-static const lv_font_t* zh_font_lg()
-{
-    static lv_font_t* f = cbin_font_create((uint8_t*)font_puhui_common_30_4_bin_start);
-    return f;
-}
-static const lv_font_t* zh_font_sm()
-{
-    static lv_font_t* f = cbin_font_create((uint8_t*)font_puhui_common_20_4_bin_start);
-    return f;
-}
-#else
-extern "C" const lv_font_t font_puhui_20_4;
 static const lv_font_t* zh_font_lg() { return &lv_font_montserrat_30; }
 static const lv_font_t* zh_font_sm() { return &lv_font_montserrat_20; }
-#endif
 
 // ─── Colour palette ───────────────────────────────────────────────────────────
 static constexpr uint32_t C_BG          = 0x0A1A2E;  // light blue background
