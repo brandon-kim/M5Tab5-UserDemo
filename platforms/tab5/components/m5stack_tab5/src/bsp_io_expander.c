@@ -9,8 +9,8 @@
 
 #include "bsp/m5stack_tab5.h"
 
-esp_io_expander_handle_t io_expander = NULL;  // IO Expander
-esp_io_expander_handle_t io_expander1 = NULL;  // IO Expander
+static esp_io_expander_handle_t io_expander = NULL;  // IO Expander
+static esp_io_expander_handle_t io_expander1 = NULL;  // IO Expander
 
 esp_io_expander_handle_t bsp_io_expander_init(void)
 {

@@ -8,20 +8,20 @@
 #include <mooncake_log.h>
 #include <assets/assets.h>
 #include <apps/utils/audio/audio.h>
+#include <apps/utils/ui/app_theme.h>
 //#include <src/core/lv_obj.h>
 #include <cstdint>
 #include <nlohmann/json.hpp>
-#include "../../app_voice_input/app_voice_input.h"
-#include "../../app_ha/ha_weather.h"
-#include "../../app_settings/app_settings.h"
+#include <apps/app_voice_input/app_voice_input.h>
+#include <apps/app_ha/ha_weather.h>
+#include <apps/app_settings/app_settings.h>
+
 
 using namespace view;
 //using namespace smooth_ui_toolkit;
 //using namespace smooth_ui_toolkit::lvgl_cpp;
 
 static const std::string _tag = "launcher-view";
-
-static const lv_font_t* zh_font_lg() { return &lv_font_montserrat_20; }
 
 LauncherView::~LauncherView()
 {
@@ -495,7 +495,7 @@ lv_obj_t* mk_btn(lv_obj_t* parent, const char* text, uint32_t color, int w, int 
     lv_label_set_text(l, text);
     lv_obj_center(l);
     lv_obj_set_style_text_color(l, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_style_text_font(l, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(l, app_theme::font_small(), 0);
     return b;
 }
 }  // namespace
@@ -543,7 +543,7 @@ lv_obj_t* LauncherView::_openModal(int card_w, int card_h, const char* title)
     lv_label_set_text(t, title);
     lv_obj_align(t, LV_ALIGN_TOP_MID, 0, 22);
     lv_obj_set_style_text_color(t, lv_color_hex(M_ACCENT), 0);
-    lv_obj_set_style_text_font(t, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(t, app_theme::font_small(), 0);
     return card;
 }
 
@@ -560,7 +560,7 @@ void LauncherView::_openWeatherDialog()
     lv_obj_set_pos(_wx_body, 32, 74);
     lv_obj_set_width(_wx_body, 616);
     lv_obj_set_style_text_color(_wx_body, lv_color_hex(M_LBL), 0);
-    lv_obj_set_style_text_font(_wx_body, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_wx_body, app_theme::font_small(), 0);
     lv_obj_set_style_text_line_space(_wx_body, 12, 0);
     lv_label_set_text(_wx_body, "Loading...");
 
@@ -655,7 +655,7 @@ void LauncherView::_openPowerDialog()
     lv_label_set_text(q, "Shut down this device?");
     lv_obj_align(q, LV_ALIGN_TOP_MID, 0, 96);
     lv_obj_set_style_text_color(q, lv_color_hex(M_LBL), 0);
-    lv_obj_set_style_text_font(q, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(q, app_theme::font_small(), 0);
 
     const int BW = 150, BH = 64, GAP = 24;
     int total = BW * 3 + GAP * 2;
@@ -698,7 +698,7 @@ void LauncherView::_openQuickSettings()
         lv_label_set_text(l, name);
         lv_obj_set_pos(l, LBL_X, yy + 6);
         lv_obj_set_style_text_color(l, lv_color_hex(M_LBL), 0);
-        lv_obj_set_style_text_font(l, zh_font_lg(), 0);
+        lv_obj_set_style_text_font(l, app_theme::font_small(), 0);
 
         lv_obj_t* sl = lv_slider_create(card);
         lv_obj_set_pos(sl, SLD_X, yy + 6);
@@ -777,7 +777,7 @@ void LauncherView::_openNetworkDialog()
         lv_label_set_text(l, text);
         lv_obj_set_pos(l, LBL_X, yy + 12);
         lv_obj_set_style_text_color(l, lv_color_hex(M_LBL), 0);
-        lv_obj_set_style_text_font(l, zh_font_lg(), 0);
+        lv_obj_set_style_text_font(l, app_theme::font_small(), 0);
     };
     auto mk_ta = [&](int yy, int w, bool password) -> lv_obj_t* {
         lv_obj_t* ta = lv_textarea_create(card);
@@ -785,7 +785,7 @@ void LauncherView::_openNetworkDialog()
         lv_obj_set_size(ta, w, ROW_H - 10);
         lv_textarea_set_one_line(ta, true);
         lv_textarea_set_password_mode(ta, password);
-        lv_obj_set_style_text_font(ta, zh_font_lg(), 0);
+        lv_obj_set_style_text_font(ta, app_theme::font_small(), 0);
         lv_obj_add_event_cb(ta, _netTa_cb, LV_EVENT_ALL, this);
         return ta;
     };
@@ -807,7 +807,7 @@ void LauncherView::_openNetworkDialog()
     lv_obj_set_pos(_net_ssid_dd, FLD_X, y);
     lv_obj_set_size(_net_ssid_dd, FLD_W, ROW_H - 10);
     lv_dropdown_set_options(_net_ssid_dd, "(Tap Scan)");
-    lv_obj_set_style_text_font(_net_ssid_dd, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_net_ssid_dd, app_theme::font_small(), 0);
     lv_obj_add_event_cb(_net_ssid_dd, [](lv_event_t* e) {
         auto* s = static_cast<LauncherView*>(lv_event_get_user_data(e));
         char buf[64] = {0};
@@ -850,7 +850,7 @@ void LauncherView::_openNetworkDialog()
     lv_label_set_text(_net_status, "");
     lv_obj_set_pos(_net_status, FLD_X + 280, y + 16);
     lv_obj_set_style_text_color(_net_status, lv_color_hex(0xFFD166), 0);
-    lv_obj_set_style_text_font(_net_status, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_net_status, app_theme::font_small(), 0);
 
     // On-screen keyboard — child of the backdrop so it floats above the card.
     _net_kb = lv_keyboard_create(_modal);

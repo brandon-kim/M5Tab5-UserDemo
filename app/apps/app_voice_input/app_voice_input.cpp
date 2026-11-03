@@ -9,9 +9,12 @@
 // The VoiceInputService and xiaozhi headers are only available in the ESP-IDF
 // component tree, not on the desktop build.
 #else
+#define APP_NOT_IMPLLEMENTED  1
+#if !defined( APP_NOT_IMPLLEMENTED ) 
 #include "voice_input_service.h"
 #include "xiaozhi_ctl.h"
 #include "boards/common/board.h"
+#endif
 #endif
 
 namespace {
@@ -61,7 +64,7 @@ AppVoiceInput::~AppVoiceInput() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 void AppVoiceInput::onCreate() {
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
     _service = new voice_input::VoiceInputService();
 #endif
     s_instance = this;
@@ -73,7 +76,7 @@ void AppVoiceInput::onResume() {
 }
 
 void AppVoiceInput::onRunning() {
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
     // Process pending STT result on the LVGL thread
     if (resultPending) {
         ESP_LOGI("AppVoiceInput", "onRunning: resultPending=true, calling onSttResult (mic=%p ta=%p)",
@@ -89,15 +92,15 @@ void AppVoiceInput::onRunning() {
 }
 
 void AppVoiceInput::onPause() {
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED )     
     if (_service) _service->cancel();
-    _removeMicButton();
+        _removeMicButton();
 #endif
 }
 
 void AppVoiceInput::onDestroy() {
     s_instance = nullptr;
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
     onPause();
     delete _service;
     _service = nullptr;
@@ -109,7 +112,7 @@ void AppVoiceInput::onDestroy() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /* static */ void AppVoiceInput::requestVoiceInput(lv_obj_t* ta, int keyboard_h) {
-#ifdef PLATFORM_BUILD_DESKTOP
+#if defined( PLATFORM_BUILD_DESKTOP ) || defined( APP_NOT_IMPLLEMENTED ) 
     (void)ta; (void)keyboard_h;  // no-op on desktop
     return;
 #else
@@ -125,7 +128,7 @@ void AppVoiceInput::onDestroy() {
 }
 
 /* static */ void AppVoiceInput::requestMicInput(lv_obj_t* ta) {
-#ifdef PLATFORM_BUILD_DESKTOP
+#if defined( PLATFORM_BUILD_DESKTOP ) || defined( APP_NOT_IMPLLEMENTED ) 
     (void)ta;  // no-op on desktop
     return;
 #else
@@ -157,7 +160,7 @@ void AppVoiceInput::onDestroy() {
 // STT callback (runs on recording task — forwarded to UI thread)
 // ─────────────────────────────────────────────────────────────────────────────
 
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
 static void stt_callback_wrapper(const voice_input::Result& result) {
     ESP_LOGI("AppVoiceInput", "stt_callback_wrapper: success=%d text='%s' s_instance=%p",
              (int)result.success, result.text.c_str(), (void*)AppVoiceInput::s_instance);
@@ -237,7 +240,7 @@ void AppVoiceInput::_createMicButton(lv_obj_t* ta, int keyboard_h) {
     // Click handler
     lv_obj_add_event_cb(btn, [](lv_event_t* e) {
         auto* self = (AppVoiceInput*)lv_event_get_user_data(e);
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
         if (!self || !self->_service) return;
         // Allow click from any non-Recording/Processing state. The service
         // will reset from Done/Error back to Idle, then transition to
@@ -252,7 +255,7 @@ void AppVoiceInput::_createMicButton(lv_obj_t* ta, int keyboard_h) {
             cfg.opus_frame_duration_ms = self->_config.opus_frame_duration_ms;
             self->_service->start(cfg, stt_callback_wrapper);
             if (self->_status_label) lv_label_set_text(self->_status_label, "Recording...");
-        }
+        }      
 #else
         (void)self;
 #endif
@@ -332,7 +335,7 @@ void AppVoiceInput::_createBigMicButton(lv_obj_t* ta) {
     lv_obj_add_flag(_capture_layer, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(_capture_layer, [](lv_event_t* e) {
         auto* self = (AppVoiceInput*)lv_event_get_user_data(e);
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
         if (!self || !self->_service) return;
         if (self->_service->state() == voice_input::State::Recording) {
             ESP_LOGI("AppVoiceInput", "capture tap: stopping recording");
@@ -350,7 +353,7 @@ void AppVoiceInput::_createBigMicButton(lv_obj_t* ta) {
     lv_obj_move_foreground(_mic_btn);
     lv_obj_move_foreground(_status_label);
 
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
     // Start recording immediately.
     voice_input::Config cfg;
     cfg.max_record_ms = _config.max_record_ms;
@@ -362,7 +365,7 @@ void AppVoiceInput::_createBigMicButton(lv_obj_t* ta) {
 }
 
 void AppVoiceInput::_updateMicButton() {
-#ifndef PLATFORM_BUILD_DESKTOP
+#if !defined( PLATFORM_BUILD_DESKTOP ) && !defined( APP_NOT_IMPLLEMENTED ) 
     if (!_mic_btn || !_service) return;
 
     auto state = _service->state();

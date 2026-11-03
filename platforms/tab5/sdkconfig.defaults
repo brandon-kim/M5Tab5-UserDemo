@@ -1,10 +1,7 @@
 # This file was generated using idf.py save-defconfig or menuconfig [D] key. It can be edited manually.
-# Espressif IoT Development Framework (ESP-IDF) 5.5.4 Project Minimal Configuration
+# Espressif IoT Development Framework (ESP-IDF) 5.5.6 Project Minimal Configuration
 #
 CONFIG_IDF_TARGET="esp32p4"
-
-CONFIG_COMPILER_CXX_EXCEPTIONS=y
-CONFIG_CXX_EXCEPTIONS=y
 
 #
 # Bootloader config
@@ -34,7 +31,6 @@ CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 # Partition Table
 #
 CONFIG_PARTITION_TABLE_CUSTOM=y
-CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 CONFIG_PARTITION_TABLE_OFFSET=0x10000
 # end of Partition Table
 
@@ -42,6 +38,7 @@ CONFIG_PARTITION_TABLE_OFFSET=0x10000
 # Compiler options
 #
 CONFIG_COMPILER_OPTIMIZATION_PERF=y
+CONFIG_COMPILER_CXX_EXCEPTIONS=y
 # end of Compiler options
 
 #
@@ -49,29 +46,6 @@ CONFIG_COMPILER_OPTIMIZATION_PERF=y
 #
 
 #
-# Bluetooth
-#
-CONFIG_BT_ENABLED=y
-CONFIG_BT_NIMBLE_ENABLED=y
-
-#
-# NimBLE Options
-#
-
-#
-# BLE 5.x Features
-#
-CONFIG_BT_NIMBLE_50_FEATURE_SUPPORT=n
-# end of BLE 5.x Features
-
-#
-# Host-controller Transport
-#
-CONFIG_BT_NIMBLE_TRANSPORT_UART=n
-# end of Host-controller Transport
-# end of NimBLE Options
-# end of Bluetooth
-
 # HTTP Server
 #
 CONFIG_HTTPD_MAX_REQ_HDR_LEN=512
@@ -117,12 +91,12 @@ CONFIG_SPIRAM_XIP_FROM_PSRAM=y
 # Cache config
 #
 CONFIG_CACHE_L2_CACHE_256KB=y
-CONFIG_CACHE_L2_CACHE_LINE_128B=y
 # end of Cache config
 
 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE=4096
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_INT_WDT_TIMEOUT_MS=300
 # end of ESP System Settings
 
 #
@@ -178,7 +152,7 @@ CONFIG_SPI_FLASH_SUPPORT_GD_CHIP=n
 #
 # Rendering Configuration
 #
-CONFIG_LV_DRAW_BUF_ALIGN=128
+CONFIG_LV_DRAW_BUF_ALIGN=64
 # end of Rendering Configuration
 # end of LVGL configuration
 
@@ -189,15 +163,15 @@ CONFIG_LVGL_PORT_ENABLE_PPA=y
 # end of ESP LVGL PORT
 
 #
-# Board Support Package(m5stack_tab5)
+# Board Support Package (M5Stack Tab5)
 #
 
 #
 # Display
 #
-CONFIG_BSP_LCD_DPI_BUFFER_NUMS=3
+CONFIG_BSP_LCD_DRAW_BUF_DOUBLE=n
+CONFIG_BSP_LCD_DPI_BUFFER_NUMS=2
 # end of Display
-# end of Board Support Package(m5stack_tab5)
 
 #
 # Espressif Camera Sensors Configurations
@@ -238,7 +212,7 @@ CONFIG_ESP_HOSTED_SDIO_PIN_D3=8
 #
 # Espressif Video Configuration
 #
-CONFIG_ESP_VIDEO_ENABLE_HW_JPEG_VIDEO_DEVICE=y
+CONFIG_ESP_VIDEO_ENABLE_HW_JPEG_ENC_VIDEO_DEVICE=y
 # end of Espressif Video Configuration
 
 #
@@ -246,17 +220,6 @@ CONFIG_ESP_VIDEO_ENABLE_HW_JPEG_VIDEO_DEVICE=y
 #
 CONFIG_SLAVE_IDF_TARGET_ESP32C6=y
 # end of Wi-Fi Remote
-# end of Component config
+# end of Board Support Package (M5Stack Tab5)
 
-#
-# LVGL configuration
-#
-
-#
-# Memory Settings
-#
-CONFIG_LV_USE_CLIB_MALLOC=y
-CONFIG_LV_USE_CLIB_STRING=y
-CONFIG_LV_USE_CLIB_SPRINTF=y
-# end of Memory Settings
 CONFIG_IDF_EXPERIMENTAL_FEATURES=y

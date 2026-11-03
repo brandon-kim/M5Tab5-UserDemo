@@ -193,6 +193,7 @@ static bsp_tab5_board_version_t bsp_get_board_version(void)
 }
 
 //==================================================================================
+
 const char* bsp_display_get_panel_ic(void)
 {
 
@@ -586,18 +587,11 @@ lv_display_t *bsp_display_start(void)
         .double_buffer = 0,
 #endif
         .flags = {
-#if 1  //for PPA           
-            .buff_dma = false,
-#else
             .buff_dma = true,
-#endif
             .buff_spiram = false,
             .sw_rotate = true,
         }
     };
-#if 1// 
-    cfg.lvgl_port_cfg.task_stack = 12288;
-#endif
     return bsp_display_start_with_config(&cfg);
 }
 

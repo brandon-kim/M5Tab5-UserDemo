@@ -1,17 +1,12 @@
 #include "app_idle_screen.h"
-//#include "../app_home/app_home.h"
-#include "../app_voice_input/app_voice_input.h"
 #include <hal/hal.h>
 #include <cstdio>
 #include <ctime>
 #include <mooncake_log.h>
+//#include "../app_home/app_home.h"
+#include <apps/app_voice_input/app_voice_input.h>
+#include <apps/utils/ui/app_theme.h>
 
-
-// Full-coverage Chinese font (same blob already linked in for the HA/Claude
-// screens) — GB2312 common ~3500 glyphs, no tofu boxes. On device it's a
-// cbin blob used in-place from flash; on the desktop sim, the linked 20px
-// C-array font.
-static const lv_font_t* zh_font_lg() { return &lv_font_montserrat_20; }
 
 static constexpr int SCREEN_W = 1280;
 static constexpr int SCREEN_H = 720;
@@ -111,12 +106,12 @@ void AppIdleScreen::_show()
     lv_obj_align(_time_lbl, LV_ALIGN_TOP_MID, 0, 0);
 
     _date_lbl = lv_label_create(_group);
-    lv_obj_set_style_text_font(_date_lbl, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_date_lbl, app_theme::font_large(), 0);
     lv_obj_set_style_text_color(_date_lbl, lv_color_hex(C_DIM), 0);
     lv_obj_align(_date_lbl, LV_ALIGN_TOP_MID, 0, 70);
 
     _weather_lbl = lv_label_create(_group);
-    lv_obj_set_style_text_font(_weather_lbl, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_weather_lbl, app_theme::font_large(), 0);
     lv_obj_set_style_text_color(_weather_lbl, lv_color_hex(C_DIM), 0);
     lv_obj_align(_weather_lbl, LV_ALIGN_TOP_MID, 0, 116);
 

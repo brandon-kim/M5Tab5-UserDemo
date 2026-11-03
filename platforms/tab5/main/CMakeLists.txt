@@ -30,6 +30,18 @@ file(GLOB SOUND_ASSETS
 
 idf_component_register(SRCS ${APP_LAYER_SRCS} ${MY_HAL_SRCS}
                     INCLUDE_DIRS "." ${APP_LAYER_INCS}
-                    EMBED_FILES ${SOUND_ASSETS})
+                    EMBED_FILES ${SOUND_ASSETS}
+                    REQUIRES
+                        esp_netif
+                        nvs_flash
+                        esp_wifi
+                        esp_event
+                        esp_driver_ppa esp_mm esp_timer 
+                        imlib
+                        mooncake mooncake_log smooth_ui_toolkit                                 
+                    PRIV_REQUIRES
+                        esp_http_client
+                        esp_pm
+                    )
 
 

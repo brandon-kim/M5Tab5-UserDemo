@@ -8,18 +8,9 @@
 #include <cstdio>
 #include <hal/hal.h>
 #include <mooncake_log.h>
+#include <apps/utils/ui/app_theme.h>
 
 using namespace ha_view;
-
-// Full-coverage Chinese fonts (same as the Claude app) — GB2312 common ~3500
-// glyphs, so HA labels never render as tofu boxes. The old font_zh_18/_36 were
-// subset fonts (~135 chars) that boxed any char outside the subset.
-//   zh_font_lg() — 30px, replaces the old 36px font_zh_36
-//   zh_font_sm() — 20px, replaces the old 18px font_zh_18
-// On device these are cbin blobs used in-place from flash (no big RAM copy);
-// on the desktop sim we fall back to the linked 20px C-array font.
-static const lv_font_t* zh_font_lg() { return &lv_font_montserrat_30; }
-static const lv_font_t* zh_font_sm() { return &lv_font_montserrat_20; }
 
 // ─── Colour palette ───────────────────────────────────────────────────────────
 static constexpr uint32_t C_BG          = 0x0A1A2E;  // light blue background
@@ -183,7 +174,7 @@ static void _build_device_card(lv_obj_t* parent, int x, int y, int w, int h,
     // Device name (right of icon, vertically centered)
     lv_obj_t* lbl = lv_label_create(c);
     lv_label_set_text(lbl, card.label.c_str());
-    lv_obj_set_style_text_font(lbl, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(lbl, app_theme::font_small(), 0);
     lv_obj_set_style_text_color(lbl, lv_color_hex(card.is_offline ? 0x5A6A7C
                                   : (card.is_on ? C_TEXT : C_TEXT2)), 0);
     lv_obj_set_width(lbl, w - 14 - ic_size - 12 - 18);
@@ -205,7 +196,7 @@ static void _build_device_card(lv_obj_t* parent, int x, int y, int w, int h,
         // tap doesn't pretend to control a device HA can't reach.
         lv_obj_t* off = lv_label_create(c);
         lv_label_set_text(off, "Disconnected");
-        lv_obj_set_style_text_font(off, zh_font_sm(), 0);
+        lv_obj_set_style_text_font(off, app_theme::font_small(), 0);
         lv_obj_set_style_text_color(off, lv_color_hex(C_RED), 0);
         lv_obj_align(off, LV_ALIGN_BOTTOM_RIGHT, -12, -10);
     } else {
@@ -273,7 +264,7 @@ void HaView::_build_header()
     // Date — to the right of the time, same 36px height as time, black
     _lbl_date = lv_label_create(hdr);
     lv_label_set_text(_lbl_date, "");
-    lv_obj_set_style_text_font(_lbl_date, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_lbl_date, app_theme::font_large(), 0);
     lv_obj_set_style_text_color(_lbl_date, lv_color_hex(C_TEXT2), 0);
     lv_obj_align(_lbl_date, LV_ALIGN_LEFT_MID, PAD + 4 + 110, 0);
 
@@ -285,7 +276,7 @@ void HaView::_build_header()
 
     _lbl_weather = lv_label_create(hdr);
     lv_label_set_text(_lbl_weather, "");
-    lv_obj_set_style_text_font(_lbl_weather, zh_font_lg(), 0);
+    lv_obj_set_style_text_font(_lbl_weather, app_theme::font_large(), 0);
     lv_obj_set_style_text_color(_lbl_weather, lv_color_hex(C_TEXT2), 0);
     lv_obj_set_width(_lbl_weather, 360);
     lv_label_set_long_mode(_lbl_weather, LV_LABEL_LONG_CLIP);
