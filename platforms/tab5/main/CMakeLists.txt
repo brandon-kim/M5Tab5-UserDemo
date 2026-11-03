@@ -5,8 +5,10 @@ file(GLOB_RECURSE APP_LAYER_SRCS
     ../../../app/*.cpp
 )
 
+# "." .nlohmann_json is ignored during scan
 set(APP_LAYER_INCS
     ../../../app
+    ../../../dependencies/.nlohmann_json/single_include
 )
 
 file(GLOB_RECURSE MY_HAL_SRCS
@@ -29,3 +31,5 @@ file(GLOB SOUND_ASSETS
 idf_component_register(SRCS ${APP_LAYER_SRCS} ${MY_HAL_SRCS}
                     INCLUDE_DIRS "." ${APP_LAYER_INCS}
                     EMBED_FILES ${SOUND_ASSETS})
+
+

@@ -53,7 +53,13 @@ find_package(JPEG REQUIRED)
 include_directories(${JPEG_INCLUDE_DIRS})
 
 # nlohmann json (header only) — include parent so #include <nlohmann/json.hpp> resolves
-include_directories("${TAB5_DEPENDENCIES_DIR}")
+#include_directories("${TAB5_DEPENDENCIES_DIR}")
+# 1. nlohmann_json 인터페이스 타겟 정의
+add_library(nlohmann_json INTERFACE)
+# 2. fetch_repos.py가 생성한 폴더 안의 실제 헤더 경로 지정 (상대 경로 주의)
+target_include_directories(nlohmann_json INTERFACE 
+    "${TAB5_DEPENDENCIES_DIR}/.nlohmann_json/single_include"
+)
 
 # App layer
 file(GLOB_RECURSE APP_LAYER_SRCS
@@ -88,6 +94,7 @@ target_link_libraries(app_desktop_build PUBLIC
     ${JPEG_LIBRARIES}
     smooth_ui_toolkit
     pthread
+    nlohmann_json
 )
 
 # 设置构建路径

@@ -77,17 +77,21 @@ public:
     void setExtAntennaEnable(bool enable) override;
     bool getExtAntennaEnable() override;
     void startWifiAp() override;
+    bool isWifiConnected() override;
+    std::vector<WifiAp_t> wifiScan() override;
 
-#if USE_WIFI_AP == 0
-    std::string getWifiSSID() override; // get SSID
-    std::string getWifiIPv4() override; // get My IP Address (v4)
-#endif
+    std::string getConfig(const std::string& key, const std::string& defaultValue = "") override;
+    void setConfig(const std::string& key, const std::string& value) override;
+
+    void reboot() override;
+    bool tryRunDetached(std::function<void()> fn) override;
 
     bool isSdCardMounted() override;
     std::vector<FileEntry_t> scanSdCard(const std::string& dirPath) override;
 
     bool usbCDetect() override;
     bool usbADetect() override;
+    bool usbKeyboardDetect() override;
     bool headPhoneDetect() override;
     std::vector<uint8_t> i2cScan(bool isInternal) override;
     void initPortAI2c() override;
@@ -95,6 +99,15 @@ public:
     void gpioInitOutput(uint8_t pin) override;
     void gpioSetLevel(uint8_t pin, bool level) override;
     void gpioReset(uint8_t pin) override;
+
+    HttpResponse_t httpGet(const std::string& url,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPost(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPut(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
+    HttpResponse_t httpPostKeepAlive(const std::string& url, const std::string& body,
+        const std::vector<std::pair<std::string, std::string>>& headers = {}) override;
 
 private:
     void set_gpio_output_capability();

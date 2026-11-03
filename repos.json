@@ -21,7 +21,7 @@
     },
     {
         "url": "https://github.com/nlohmann/json.git",
-        "path": "dependencies/nlohmann_json",
-        "branch": "v3.11.3"
+        "path": "dependencies/.nlohmann_json",
+        "branch": "v3.12.0"
     }
 ]

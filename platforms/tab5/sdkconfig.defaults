@@ -3,6 +3,9 @@
 #
 CONFIG_IDF_TARGET="esp32p4"
 
+CONFIG_COMPILER_CXX_EXCEPTIONS=y
+CONFIG_CXX_EXCEPTIONS=y
+
 #
 # Bootloader config
 #
@@ -46,6 +49,29 @@ CONFIG_COMPILER_OPTIMIZATION_PERF=y
 #
 
 #
+# Bluetooth
+#
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+#
+# NimBLE Options
+#
+
+#
+# BLE 5.x Features
+#
+CONFIG_BT_NIMBLE_50_FEATURE_SUPPORT=n
+# end of BLE 5.x Features
+
+#
+# Host-controller Transport
+#
+CONFIG_BT_NIMBLE_TRANSPORT_UART=n
+# end of Host-controller Transport
+# end of NimBLE Options
+# end of Bluetooth
+
 # HTTP Server
 #
 CONFIG_HTTPD_MAX_REQ_HDR_LEN=512
@@ -222,4 +248,15 @@ CONFIG_SLAVE_IDF_TARGET_ESP32C6=y
 # end of Wi-Fi Remote
 # end of Component config
 
+#
+# LVGL configuration
+#
+
+#
+# Memory Settings
+#
+CONFIG_LV_USE_CLIB_MALLOC=y
+CONFIG_LV_USE_CLIB_STRING=y
+CONFIG_LV_USE_CLIB_SPRINTF=y
+# end of Memory Settings
 CONFIG_IDF_EXPERIMENTAL_FEATURES=y

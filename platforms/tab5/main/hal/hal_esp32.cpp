@@ -9,10 +9,57 @@
 #include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <esp_netif_sntp.h>
 #include <bsp/esp-bsp.h>
 #include <lv_demos.h>
+#include <cstdlib>
+#include <ctime>
+#include <functional>
+#include <new>
+#include <pthread.h>
 
 static const std::string _tag = "hal";
+static void set_local_timezone()
+{
+    setenv("TZ", "CST-8", 1);
+    tzset();
+}
+
+void sync_network_time()
+{
+    set_local_timezone();
+
+    static bool sntp_initialized = false;
+    if (!sntp_initialized) {
+        esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("ntp.aliyun.com");
+        esp_err_t ret = esp_netif_sntp_init(&config);
+        if (ret == ESP_OK || ret == ESP_ERR_INVALID_STATE) {
+            sntp_initialized = true;
+        } else {
+            mclog::tagWarn(_tag, "sntp init failed: {}", esp_err_to_name(ret));
+            return;
+        }
+    }
+
+    esp_err_t ret = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(10000));
+    if (ret == ESP_OK) {
+        time_t now = time(nullptr);
+        struct tm local_now;
+        localtime_r(&now, &local_now);
+        mclog::tagInfo(_tag, "network time synced: {:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}",
+                       local_now.tm_year + 1900, local_now.tm_mon + 1, local_now.tm_mday,
+                       local_now.tm_hour, local_now.tm_min, local_now.tm_sec);
+        // Persist network time into the hardware RTC (RX8130) so the clock stays
+        // correct across reboots and before WiFi reconnects on the next boot.
+        // Without this the system clock is right only this session; on the next
+        // cold boot update_system_time() would read the stale RTC again.
+        GetHAL()->setRtcTime(local_now);
+    } else {
+        mclog::tagWarn(_tag, "sntp sync timeout: {}", esp_err_to_name(ret));
+    }
+}
+
+
 #if 0
 extern esp_lcd_touch_handle_t _lcd_touch_handle;
 
@@ -46,6 +93,10 @@ void HalEsp32::init()
 {
     mclog::tagInfo(_tag, "init");
 
+	// NC in the checkmatic
+    //mclog::tagInfo(_tag, "camera init");
+    //bsp_cam_osc_init();
+
     mclog::tagInfo(_tag, "i2c init");
     bsp_i2c_init();
 
@@ -57,6 +108,10 @@ void HalEsp32::init()
 #else
 
 #endif
+    mclog::tagInfo(_tag, "wifi power on");
+    bsp_set_wifi_power_enable(true);
+    delay(500);  // give C6 time to boot before SDIO transport connects
+
     setChargeQcEnable(true);
     delay(50);
     setChargeEnable(true);
@@ -91,8 +146,6 @@ void HalEsp32::init()
     clearRtcIrq();
     update_system_time();
 
-    bsp_feature_enable(BSP_FEATURE_WIFI, true);
-
     mclog::tagInfo(_tag, "display init");
     lvDisp = bsp_display_start();
     lv_display_set_rotation(lvDisp, LV_DISPLAY_ROTATION_90);
@@ -100,7 +153,6 @@ void HalEsp32::init()
     
     mclog::tagInfo(_tag, "usb host init");
     bsp_usb_host_start(BSP_USB_HOST_POWER_MODE_USB_DEV, true);
-
     mclog::tagInfo(_tag, "hid init");
     hid_init();
 
@@ -234,6 +286,43 @@ void HalEsp32::setRtcTime(tm time)
     delay(50);
 
     update_system_time();
+}
+
+bool HalEsp32::tryRunDetached(std::function<void()> fn)
+{
+    // Heap-own the functor so it survives until the worker runs it.
+    auto* heap_fn = new (std::nothrow) std::function<void()>(std::move(fn));
+    if (!heap_fn) {
+        return false;
+    }
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    // 8 KB instead of the 16 KB pthread default: these workers do plain-HTTP
+    // fetches (no TLS), so 8 KB is ample and a contiguous 8 KB internal block is
+    // far easier to find than 16 KB when RAM is fragmented (e.g. right after
+    // leaving xiaozhi). Stack size set on the attr so we don't perturb the
+    // task-global esp_pthread cfg used by other threads (e.g. HaClient poll).
+    pthread_attr_setstacksize(&attr, 8192);
+
+    pthread_t tid;
+    int ret = pthread_create(&tid, &attr, [](void* arg) -> void* {
+        auto* f = static_cast<std::function<void()>*>(arg);
+        (*f)();
+        delete f;
+        return nullptr;
+    }, heap_fn);
+    pthread_attr_destroy(&attr);
+
+    if (ret != 0) {
+        // pthread_create failed (e.g. ENOMEM). Returning false lets the caller
+        // skip this work instead of aborting like std::thread would.
+        delete heap_fn;
+        mclog::tagWarn(_tag, "tryRunDetached: pthread_create failed ({})", ret);
+        return false;
+    }
+    return true;
 }
 
 void HalEsp32::update_system_time()
